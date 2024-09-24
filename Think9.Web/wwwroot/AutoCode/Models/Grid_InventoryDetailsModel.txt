@@ -1,0 +1,153 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:25
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【子表】  生成时间：2024-09-24 13:29:25
+	/// </summary>
+	 [Table("tb_InventoryDetails")]
+	public class InventoryDetailsModel : GridTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string v1 { get; set; }
+		/// <summary>
+		/// 编码
+		/// </summary>
+		[Computed]
+		public string v1_Exa { get; set; }
+		/// <summary>
+		/// 编码
+		/// </summary>
+		[Computed]
+		public string v1_Lock { get; set; }
+		/// <summary>
+		///编码
+		/// </summary>
+		[Computed]
+		public string v1_JS { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string v2 { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		[Computed]
+		public string v2_Exa { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		[Computed]
+		public string v2_Lock { get; set; }
+		/// <summary>
+		///名称
+		/// </summary>
+		[Computed]
+		public string v2_JS { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		public string v3 { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		[Computed]
+		public string v3_Exa { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		[Computed]
+		public string v3_Lock { get; set; }
+		/// <summary>
+		///规格型号
+		/// </summary>
+		[Computed]
+		public string v3_JS { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string v4 { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		[Computed]
+		public string v4_Exa { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		[Computed]
+		public string v4_Lock { get; set; }
+		/// <summary>
+		///单位
+		/// </summary>
+		[Computed]
+		public string v4_JS { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? v5 { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		[Computed]
+		public string v5_Exa { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		[Computed]
+		public string v5_Lock { get; set; }
+		/// <summary>
+		///单价
+		/// </summary>
+		[Computed]
+		public string v5_JS { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		public decimal? v6 { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		[Computed]
+		public string v6_Exa { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		[Computed]
+		public string v6_Lock { get; set; }
+		/// <summary>
+		///数量
+		/// </summary>
+		[Computed]
+		public string v6_JS { get; set; }
+		/// <summary>
+		/// 金额
+		/// </summary>
+		public decimal? v7 { get; set; }
+		/// <summary>
+		/// 金额
+		/// </summary>
+		[Computed]
+		public string v7_Exa { get; set; }
+		/// <summary>
+		/// 金额
+		/// </summary>
+		[Computed]
+		public string v7_Lock { get; set; }
+		/// <summary>
+		///金额
+		/// </summary>
+		[Computed]
+		public string v7_JS { get; set; }
+		#endregion Model
+		
+	}
+}

@@ -1,0 +1,406 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = @ViewBag.rpName + " - 第" + @ViewBag.n + "列";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display: none" id="colN" value="@ViewBag.n">
+    <input style="display: none" id="rpId" value="@ViewBag.rpId">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">@ViewBag.postion</li>
+            <li lay-id="2">参数赋值(@ViewBag.ParmNum)</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-form-item">
+                    <div class="layui-col-md5">
+                        <label class="layui-form-label" style="width:80px;">列类别</label>
+                        <div class="layui-input-block">
+                            <select id="ColType" name="ColType">
+                                <option value="string">字符</option>
+                                <option value="int">整数</option>
+                                <option value="decimal">小数</option>
+                                <option value="date">日期</option>
+                                <option value="img">图片</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-col-md5">
+                        <label class="layui-form-label" style="width:80px;">列宽(cm)</label>
+                        <div class="layui-input-block">
+                            <input type='text' name="ColWidth" id="ColWidth" autocomplete='off' class='layui-input' placeholder='请输入列宽' lay-verify="required|number" maxlength="4">
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <button type='button' class='layui-btn layui-btn-normal' id='editCol' lay-submit lay-filter='editCol' lay-tips='编辑列宽和类型'>编 辑</button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-md5">
+                        <label class="layui-form-label" style="width:80px;">选择</label>
+                        <div class="layui-input-block" style="margin-left:80px;">
+                            <input type="radio" name="selectSort" value="1" title="固定字符" checked="checked" id="Sort_1" lay-filter="selectSort">
+                            <input type="radio" name="selectSort" value="2" title="统计指标/条件参数" id="Sort_2" lay-filter="selectSort">
+                        </div>
+                    </div>
+                    <div class="layui-col-md5">
+                        <div class="layui-input-block">
+                            <input type='text' id="_selectText" autocomplete='off' class='layui-input' placeholder='请输入字符'>
+                            <input type='text' id="_selectValue" style="display: none">
+                            <span style="position: absolute;top: 0px; left: -5px;">
+                                <a href='javascript:;' class="layui-btn-xs" style="color: #FE7300;" id="lookIndex" lay-tips="点击查看"><i class="fa fa-question-circle-o"></i></a>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <button type='button' class='layui-btn layui-btn-normal' id='editIndex' lay-submit lay-filter='editIndex' lay-tips='将整列统一设置为字符或者统计指标'>编辑整列</button>
+                    </div>
+                </div>
+                <div id="divShowSelect" style="display: none;">
+                    <div class="layui-form-item">
+                        <div class="layui-input-inline">
+                            <select id="IndexSort" name="IndexSort" lay-filter="IndexSort" lay-search=''>
+                                <option value="">==请选择指标分类==</option>
+                                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.IndexSort))
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <input type='text' name="key" id="key" autocomplete='off' class='layui-input' placeholder='请输入查询关键词'>
+                        </div>
+                        <div class="layui-input-inline">
+                            <button type='button' class='layui-btn layui-btn-primary' id='searchIndex' lay-submit lay-filter='searchIndex'><i class='layui-icon layui-icon-search'></i></button>
+                            <button type='button' class='layui-btn layui-btn-primary' id='addIndex' lay-tips="新建统计指标"><i class="fa fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <table class="layui-hide" id="indexORParmList" lay-filter="tableFilter"></table>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <blockquote class="layui-elem-quote layui-text">
+                    『统计指标』中使用的『条件参数』须被赋值，赋值方式包括：1.在『统计指标』出现的位置,即『统计表』单元格中赋值；2.定义『动态行』为参数赋值；3.定义『查询参数』为参数赋值;优先级为1>2>3
+                </blockquote>
+                <div class="layui-form-item">
+                    <div class="layui-col-md3">
+                        <label class="layui-form-label required">选择参数</label>
+                        <div class="layui-input-block">
+                            <select id="ParmId" name="ParmId" style="width:100%" lay-filter="selectfilter">
+                                <option value="">==请选择参数==</option>
+                                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.ParmSort))
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-col-md3">
+                        <label class="layui-form-label required">参数值</label>
+                        <div class="layui-input-block">
+                            <input type='text' id="parmValue" autocomplete='off' class='layui-input' placeholder='请输入参数值'>
+                        </div>
+                    </div>
+                    <div class="layui-col-md2">
+                        <button type='button' class='layui-btn layui-btn-normal' id='addParm' lay-submit lay-filter='addParm'>添加参数</button>
+                    </div>
+                    <div class="layui-col-md3">
+                        <input type="checkbox" id="isDel" name="isDel" title="删除同名参数再添加">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <table class="layui-hide" id="parmList" lay-filter="tableFilter"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "element", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        element.on('tab(tabTag_Filter)', function (data) {
+
+        });
+
+        form.render();
+
+        form.val("formUser", {
+            "ColType": "@ViewBag.ColType"
+            , "ColWidth": "@ViewBag.ColWidth"
+        });
+
+        form.on('radio(selectSort)', function (data) {
+            var _sort = $('input:radio[name="selectSort"]:checked').val();
+            if (_sort == "2") {
+                $("#divShowSelect").attr("style", "display:block;");
+                $("#_selectText").attr("readonly", "readonly");
+                $("#_selectText").attr("placeholder", "请选择指标或参数，选择完成后需点击编辑按钮");
+            }
+            else {
+                $("#divShowSelect").attr("style", "display:none;");
+                $("#_selectText").removeAttr("readonly");
+                $("#_selectText").attr("placeholder", "请输入字符");
+                $("#_selectValue").val('');
+            }
+        });
+
+        let indexORParmListTable = table.render({
+            elem: "#indexORParmList",
+            url: "/SysStats/IndexStats/GetIndexORParmListBySearch?sort=" + $("#IndexSort").val() + "&key=" + $("#key").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            cols: [[
+                { title: "选择", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" },
+                { field: "Value", title: "编码" },
+                { field: "Text", title: "名称" },
+                { title: "", width: 60, templet: "#operation_Tp2" },
+            ]],
+            done: function (res, curr, count) {
+                /* $('th').hide();//表头隐藏的样式*/
+            }
+        });
+
+        let parmListTable = table.render({
+            elem: "#parmList",
+            url: "/SysStats/ReportRows/GetReportParmByColNum?colNum=" + $("#colN").val() + "&rpId=" + $("#rpId").val(),
+            toolbar: "#toolbarTp2",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refreshParm', icon: 'layui-icon-refresh' }],
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            cols: [[
+                { type: "checkbox" },
+                { field: "Description", title: "行列", sort: true },
+                { field: "ParmName", title: "参数名", sort: true },
+                { field: "ParmId", title: "参数ID", sort: true },
+                { templet: "<span>=</span>", width: 40, align: "center" },
+                { field: "ParmValue", title: "参数值", sort: true }
+            ]],
+            done: function (res, curr, count) {
+                /*$('th').hide();//表头隐藏的样式*/
+            }
+        });
+
+        //选择指标或参数
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "selectIndex":
+                    $("#_selectText").val(data.Text.replace("<i class='fa fa-external-link'></i>", ""));
+                    $("#_selectValue").val(data.Value);
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                    layer.msg('选择后，需点击『编辑整列』按钮');
+                    break;
+                case "indexDetails":
+                    exLayer.openMiddle(data.Text, "/SysStats/IndexStats/ShowIndexDetails?id=" + data.Value, '500px', '350px', layui.device().mobile);
+                    break;
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    $("#IndexSort").val("");
+                    $("#key").val("");
+                    indexORParmListTable.reload({
+                        url: "/SysStats/IndexStats/GetIndexORParmListBySearch?sort=" + $("#IndexSort").val() + "&key=" + $("#key").val(),
+                        page: { curr: 1 }
+                    });
+                    break;
+                case "refreshParm":
+                    parmListTable.reload({
+                        url: "/SysStats/ReportRows/GetReportParmByColNum?colNum=" + $("#colN").val() + "&rpId=" + $("#rpId").val(),
+                        page: { curr: 1 }
+                    });
+                    break;
+                case "batchDelParm":
+                    batchDelParm();
+                    break;
+            }
+        });
+
+        //查询指标
+        form.on("submit(searchIndex)", function (data) {
+            indexORParmListTable.reload({
+                url: "/SysStats/IndexStats/GetIndexORParmListBySearch?sort=" + $("#IndexSort").val() + "&key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+            return false;
+        });
+
+        //查看指标
+        $('#lookIndex').on('click', function () {
+            var sort = "";
+            if ($("#_selectValue").val() == null || $("#_selectValue").val() == '') {
+                sort = "字符 - " + $("#_selectText").val();
+            }
+            else {
+                if ($("#_selectValue").val().indexOf('@@') > -1) {
+                    sort = "条件参数 - " + $("#_selectText").val();
+                }
+                else {
+                    sort = "统计指标 - " + $("#_selectText").val();
+                }
+            }
+
+            exLayer.openMiddle(sort, "/SysStats/IndexStats/ShowIndexDetails?id=" + $("#_selectValue").val(), '500px', '300px', layui.device().mobile);
+        });
+
+        //编辑整列
+        form.on("submit(editIndex)", function (data) {
+            var _sort = $('input:radio[name="selectSort"]:checked').val();
+            exUtils.ajax("/SysStats/ReportRows/EditArrange", "post", { rpId: $("#rpId").val(), colNum: $("#colN").val(), value: $("#_selectValue").val(), text: $("#_selectText").val(), sort: _sort }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //编辑列宽和类型
+        form.on("submit(editCol)", function (data) {
+            exUtils.ajax("/SysStats/Report/EditColWidthAndType", "post", { rpId: $("#rpId").val(), num: $("#colN").val(), width: $("#ColWidth").val(), type: $("#ColType").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on("submit(addParm)", function (data) {
+            var parmId = $("#ParmId").val();
+            if (parmId == '') {
+                layer.msg('请选择参数');
+                return false;
+            }
+            var isDel = $("#isDel").prop("checked");
+            exUtils.ajax("/SysStats/ReportRows/AddArrangeParm", "post", { rpId: $("#rpId").val(), colNum: $("#colN").val(), parmId: parmId, parmValue: $("#parmValue").val(), isDel: isDel }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parmListTable.reload({
+                        url: "/SysStats/ReportRows/GetReportParmByColNum?colNum=" + $("#colN").val() + "&rpId=" + $("#rpId").val(),
+                        page: { curr: 1 }
+                    });
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        function batchDelParm() {
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                var idsStr = "";
+                var checkStatus = table.checkStatus("parmList");
+                var rows = checkStatus.data.length;
+                if (rows > 0) {
+                    for (var i = 0; i < checkStatus.data.length; i++) {
+                        idsStr += checkStatus.data[i].Id + ",";
+                    }
+                } else {
+                    layer.msg("未选择有效数据");
+                }
+                if (idsStr) {
+                    exUtils.ajax("/SysStats/ReportRows/BatchDelParm", "get", { idsStr: idsStr }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        parmListTable.reload({
+                            url: "/SysStats/ReportRows/GetReportParmByColNum?colNum=" + $("#colN").val() + "&rpId=" + $("#rpId").val(),
+                            page: { curr: 1 }
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+
+        form.on('select(selectfilter)', function (data) {
+            $("#parmValue").removeAttr("lay-verify");
+            exUtils.ajax("/SysStats/IndexParm/GetParmType", "get", { id: data.value }, true).done(function (response) {
+                if (response.extra == 'int') {
+                    $("#parmValue").attr("placeholder", "请输入参数值，必须是数字");
+                    $("#parmValue").attr("lay-verify", "required|number");
+                }
+                if (response.extra == 'decimal') {
+                    $("#parmValue").attr("placeholder", "请输入参数值，必须是数字");
+                    $("#parmValue").attr("lay-verify", "required|number");
+                }
+                if (response.extra == 'DateTime') {
+                    $("#parmValue").attr("placeholder", "请输入参数值，必须是日期");
+                    $("#parmValue").attr("lay-verify", "required|date");
+                }
+
+            }).fail(function (error) {
+                console.log(error);
+            });
+        })
+
+        $('#addIndex').on('click', function () {
+            exLayer.openMiddle("新建统计指标", "/SysStats/IndexStats/Add?frm=list2", '100%', '100%', layui.device().mobile);
+        });
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                indexORParmListTable.reload({
+                    url: "/SysStats/IndexStats/GetIndexORParmListBySearch?sort=" + $("#IndexSort").val() + "&key=" + $("#key").val(),
+                    page: { curr: 1 }
+                });
+                return false;
+            }
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>
+
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <span style="color: #FE7300;">选择后，需点击编辑整列按钮</span>
+    </div>
+</script>
+<script type="text/html" id="toolbarTp2">
+    <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDelParm" id="batchDelParm"><i class="fa fa-trash-o"></i></button>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="selectIndex" id="select">选择</a>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tp2">
+    <a href="javascript:;" class="layui-btn  layui-btn-primary layui-btn-xs" lay-event="indexDetails">
+        <i class="fa fa-search-plus"></i>
+    </a>
+</script>

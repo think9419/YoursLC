@@ -1,0 +1,139 @@
+﻿@model Think9.Models.UserEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户名</label>
+        <div class="layui-input-block layui-col-space3">
+            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                <input type="text" name="Account" id="Account" placeholder="用户名" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="15">
+            </div>
+            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                    <option value="">⇓自动生成编码</option>
+                    <option value="英文">英文</option>
+                    <option value="全拼">全拼</option>
+                    <option value="首拼">首拼</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="RealName" id="RealName" placeholder="姓名" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户部门</label>
+        <div class="layui-input-block">
+            <input type="text" id="DeptNo" lay-filter="tree" name="DeptNo" placeholder="==请选择部门==" autocomplete="off" class="layui-input" readonly="readonly" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户角色</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewBag.RoleList, "==请选择角色==", new Dictionary<string, object> { { "lay-verify", "required" } })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <select id="Gender" name="Gender">
+                <option value="1">男</option>
+                <option value="0">女</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号码</label>
+        <div class="layui-input-block">
+            <input type="text" name="MobilePhone" placeholder="手机号码" autocomplete="off" class="layui-input" maxlength="11" lay-verify='phone'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">微信</label>
+        <div class="layui-input-block">
+            <input type="text" name="WeChat" placeholder="微信" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="Email" placeholder="邮箱" autocomplete="off" class="layui-input" lay-verify='email'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">出生日期</label>
+        <div class="layui-input-block">
+            <input type="text" name="Birthday" id="birthday" placeholder="请选择出生日期" autocomplete="off" class="layui-input" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="text" name="Password" id="Password" autocomplete="off" class="layui-input" value="@ViewBag.Password" readonly>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新 建</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "upload", "layer", "treeSelect"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let upload = layui.upload;
+        let layer = layui.layer;
+        let treeSelect = layui.treeSelect;
+        let $ = layui.$;
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '用户名由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        treeSelect.render({
+            elem: "#DeptNo",
+            data: "/SysBasic/Organize/GetOrganizeTreeSelect",
+            type: "GET"
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysBasic/User/Add", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/User/GetPageListBySearch" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#RealName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#Account").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

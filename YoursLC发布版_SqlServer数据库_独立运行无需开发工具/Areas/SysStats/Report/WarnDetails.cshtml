@@ -1,0 +1,51 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="tbid" id="tbid" value="">
+
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">Code</li>
+        </ul><br />
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show" id="Controllers">
+                <pre class="layui-code" lay-title="Code" lay-height="" lay-skin="" lay-encode="">
+                    @ViewBag.Details
+           </pre>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "element", "exLayer", "exUtils", "table", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        layui.code({
+            about: false
+        });
+
+        form.render();
+
+        formValExa();
+
+        element.on('tab(tabTag_Filter)', function (data) {
+            var currentID = data.index;
+            $("#currentID").val(currentID);
+        });
+
+        function formValExa() {
+
+        }
+
+    });
+</script>

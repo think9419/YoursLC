@@ -1,0 +1,65 @@
+﻿@model Think9.Models.NotifyEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <input style="display:none" id="NotifyId" name="NotifyId">
+    <input style="display:none" id="_userid" value="@ViewBag.UserId">@*用户id*@
+    <input style="display:none" id="_attachmentId" value="@Model.attachmentId">@*附件id*@
+    <div class="layui-form-item">
+        <label class="layui-form-label required">通知标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="Subject" id="Subject" placeholder="请输入标题" autocomplete="off" class="layui-input" lay-verify="required" maxlength="50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">通知内容</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入通知内容" value="" name="Content" id="Content" class="layui-textarea" lay-verify="required"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+            <button type="button" class="layui-btn" id="att">附 件</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+        var classid = $("#classid").val();
+
+        form.render(); //
+
+        //赋值
+        form.val("formEdit", {
+            "NotifyId": "@Model.NotifyId",
+            "Subject": "@Model.Subject",
+            "Content": "@Model.Content"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysBasic/Notify/Edit", "post", { model: data.field, attid: $("#_attachmentId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/Notify/GetList" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#att').on('click', function () {
+            exLayer.open('附件上传', '/Com/FileManage/Attachment?fwid=_notify&listid=0' + '&prcid=-1' + '&userid=' + $('#_userid').val() + '&attid=' + $('#_attachmentId').val(), '100%', '100%', '0px', '0px', null, null);
+        });
+    });
+</script>

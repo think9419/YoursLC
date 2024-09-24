@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<style>
+    #ruleTree {
+        margin-bottom: 60px;
+    }
+</style>
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<input style="display:none" id="indexid" value="@ViewBag.indexid">
+<input style="display:none" id="datatype" value="@ViewBag.datatype">
+<div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md4" style="padding-top: 15px; padding-right: 20px;">
+            <div id="ruleTree"></div>
+        </div>
+
+        <div class="layui-col-md7" style="padding-top: 15px; padding-left: 20px;">
+            <div class="layui-card">
+                <div class="layui-form-item">
+                    <div class="layui-col-md12">
+                        <div class="layui-form-mid layui-word-aux" id="show">@ViewBag.show</div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-md12">
+                        <textarea placeholder="" value="" name="RuleName" id="RuleName" class="layui-textarea" readonly></textarea>
+                        <input type="hidden" name="RuleID" id="RuleID">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-md12">
+                        <div class="layui-inline">
+                            <input type="checkbox" name="CkBSelMuch" id="CkBSelMuch" lay-skin="primary" title="可多选" value="1" lay-filter="CkBSelMuch">
+                            <span style="color: #FE7300; ">弹出页面可多选，只对单列选择、多列选择、树形选择的弹出页面有效</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <button class="layui-btn layui-btn-normal" lay-event="OK" id="OK"><i class="fa fa-OK"></i>确定</button>
+                        <button class="layui-btn layui-btn-danger" lay-event="del" id="del"><i class="fa fa-trash-o"></i>清除</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["form", 'tree', 'exLayer', 'exUtils'], function () {
+        let form = layui.form;
+        let tree = layui.tree;
+        let index = 100;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        getVal();
+
+        function getVal() {
+            //读取名称
+            var rulename = getName();
+            $("#RuleName").val(rulename);
+
+            if (@ViewBag.ismuch == "1") {
+                $('#CkBSelMuch').attr("checked", true);
+            }
+            else {
+                $("#CkBSelMuch").removeAttr("checked");
+            }
+        }
+
+        tree.render({
+            elem: '#ruleTree',
+            data: eval('(' + getData() + ')'),
+            id: 'demoId1',
+            click: function (obj) {
+                var nodes = document.getElementsByClassName("layui-tree-txt");
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i].innerHTML === obj.data.title) {
+                        nodes[i].style.fontWeight = "bold";
+                    } else {
+                        nodes[i].style.fontWeight = "normal";
+                    }
+                }
+                editRule(obj.data.id);
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            },
+            showCheckbox: false,  //是否显示复选框
+            accordion: true,  //是否开启手风琴模式
+            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
+            isJump: false,  //点击文案跳转地址
+            edit: false  //操作节点图标
+        });
+
+        //清除
+        $("#del").click(function () {
+            exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexRule", "post", { tbid: $("#tbid").val(), indexid: $("#indexid").val() }, true).done(function (data) {
+                $("#RuleName").val("");
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $("#OK").click(function () {
+            var isBSelMuch = '2';
+            var isState = false;
+            if ($('#CkBSelMuch').prop("checked")) {
+                isState = true;
+                isBSelMuch = '1';
+            }
+
+            var name = 'isSelMuch';
+            var indexid = $("#indexid").val();
+
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                var rulename = getName();
+                if (isState) {
+                    rulename += "[可多选]";
+                }
+                $(window.parent.document).find('#RuleName').val(rulename);
+                $(window.parent.document).find('#isSelMuch').val(isBSelMuch);
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $("#CkBSelMuch").click(function () {
+
+        });
+
+        function getData() {
+            var data;
+            $.ajax({
+                url: "/SysTable/RuleList/RuleListTreeSelect",
+                type: "post",
+                async: false,
+                success: function (result) {
+                    data = result.extra;
+                }
+            });
+            return data;
+        };
+
+        function getName() {
+            var data;
+            $.ajax({
+                url: "/SysTable/RuleList/GetRuleName?tbid=" + $("#tbid").val() + "&indexid=" + $("#indexid").val(),
+                type: "post",
+                async: false,
+                success: function (result) {
+                    data = result.extra;
+                }
+            });
+            return data;
+        };
+
+        function editRule(ruleid) {
+            if (ruleid != "") {
+                exUtils.ajax("/SysTable/TbSetUp/UpTbIndexRule2", "post", { ruleid: ruleid, tbid: $("#tbid").val(), indexid: $("#indexid").val() }, true).done(function (data) {
+                    $("#RuleName").val(data.extra);
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        };
+    });
+</script>

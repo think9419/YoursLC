@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="dbXML">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>7b89ecea-4d59-4953-ab0e-ba4d9dbaa1ef</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+
+    <DataSet Name="dbMain">
+      <Fields>
+        <Field Name="listid">
+          <DataField>listid</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+			<Field Name="inZF01"><DataField>inZF01</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inZF02"><DataField>inZF02</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inRQ01"><DataField>inRQ01</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inRQ02"><DataField>inRQ02</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inXS01"><DataField>inXS01</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inXS02"><DataField>inXS02</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+      </Fields>
+      <Query>
+        <DataSourceName>dbXML</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+   <ReportSection>
+    <Body>
+     <ReportItems>
+		<Textbox Name="txtinZF01"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inZF01.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinZF01</rd:DefaultName> <Left>3.16250cm</Left> <Top>2.03920cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="txtinZF02"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inZF02.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinZF02</rd:DefaultName> <Left>3.16250cm</Left> <Top>3.18625cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="txtinRQ01"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inRQ01.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinRQ01</rd:DefaultName> <Left>3.16250cm</Left> <Top>4.33330cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="txtinRQ02"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inRQ02.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinRQ02</rd:DefaultName> <Left>3.16250cm</Left> <Top>5.48035cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="txtinXS01"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inXS01.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinXS01</rd:DefaultName> <Left>3.16250cm</Left> <Top>6.62740cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="txtinXS02"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inXS02.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinXS02</rd:DefaultName> <Left>3.16250cm</Left> <Top>7.77445cm</Top> <Height>0.75900cm</Height> <Width>17.20575cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab1"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>字符01长度应为3；字符02长度应为3；小数01要大于小数02；日期01要大于日期02</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab1</rd:DefaultName> <Left>0.25300cm</Left> <Top>0.89215cm</Top> <Height>0.75900cm</Height> <Width>20.13710cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab2"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>字符01</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab2</rd:DefaultName> <Left>0.25300cm</Left> <Top>2.03920cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab3"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>字符02</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab3</rd:DefaultName> <Left>0.25300cm</Left> <Top>3.18625cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab4"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>日期01</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab4</rd:DefaultName> <Left>0.25300cm</Left> <Top>4.33330cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab5"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>日期02</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab5</rd:DefaultName> <Left>0.25300cm</Left> <Top>5.48035cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab6"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>小数01</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab6</rd:DefaultName> <Left>0.25300cm</Left> <Top>6.62740cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab7"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>小数02</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab7</rd:DefaultName> <Left>0.25300cm</Left> <Top>7.77445cm</Top> <Height>0.75900cm</Height> <Width>2.80390cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+
+     </ReportItems>
+    <Height>9.26042cm</Height>
+    <Style>
+      <Border />
+    </Style>
+  </Body>
+  <Width>21cm</Width>
+  <Page>
+    <PageHeight>29.7cm</PageHeight>
+    <PageWidth>21cm</PageWidth>
+    <LeftMargin>0.5cm</LeftMargin>
+    <RightMargin>0.5cm</RightMargin>
+    <TopMargin>1.5cm</TopMargin>
+    <BottomMargin>1.5cm</BottomMargin>
+    <ColumnSpacing>0.13cm</ColumnSpacing>
+    <Style />
+  </Page>
+    </ReportSection>
+  </ReportSections>
+  <rd:ReportID>f2ca8aba-eb1e-4797-b7db-fd7891cc99f6</rd:ReportID>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+</Report>

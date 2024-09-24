@@ -1,0 +1,199 @@
+﻿@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:35:17 此文件放置于Views/BasedOnPrimaryAndSubTables2 /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+@*统计表(基于录入表(视图)创建) - 基于主子表2*@
+<input style="display:none" id="_rpId" value="rp_BasedOnPrimaryAndSubTables2">
+<fieldset class="table-fieldset" id="searchfield" >
+     <legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询 <span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form layui-form-pane" action="" id="_formid"  lay-filter="formUser">
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">仓库</label>
+					<div class="layui-input-block">
+						<select id="inWarehouse" name="inWarehouse" lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inWarehouse"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">合计</label>
+					<div class="layui-input-inline">
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="inTotalAmount" id="inTotalAmount" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='金额合计'>
+						</div>
+						<div class="layui-input-inline" >-</div>
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="inTotalAmount_Exa" id="inTotalAmount_Exa" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='金额合计'>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">日期</label>
+					<div class="layui-input-inline">
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input name="inStorageDate" id="inStorageDate" autocomplete='off' class='layui-input'  onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd'})" placeholder='入库日期'>
+						</div>
+						<div class="layui-input-inline" >-</div>
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input name="inStorageDate_Exa" id="inStorageDate_Exa" autocomplete='off' class='layui-input'  onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd'})" placeholder='入库日期'>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">名称</label>
+					<div class="layui-input-block">
+						<input type='text' name="v2" id="v2" autocomplete='off' class='layui-input' placeholder='名称'>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">数量</label>
+					<div class="layui-input-inline">
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="v6" id="v6" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='数量'>
+						</div>
+						<div class="layui-input-inline" >-</div>
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="v6_Exa" id="v6_Exa" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='数量'>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button> <button type='button' class='layui-btn layui-btn-primary' id='exportData' lay-submit lay-filter='exportData' lay-tips='查询并导出Excel'><i class='fa fa-file-excel-o'></i></button> <button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+				</div>
+			 </div>
+        </form>
+    </div>
+</fieldset>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "layer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/_RP/GetPageList?rpid=" + $("#_rpId").val(),
+            limits: [10, 50, 100, 200],
+            limit: 10,
+            method:"POST",
+            page: true,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '导出', layEvent: 'exportData', icon: 'layui-icon-export' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                 { type: "numbers", title: "NO.", fixed: 'left' }
+				,{ title: "入库日期", width: 112, templet: '<span>{{showDate(d.inStorageDate)}}<span>', sort: true }
+				,{ field: "inWarehouseEntryNumber", title: "单号", width: 112, sort: true }
+				,{ field: "inWarehouse", title: "仓库", width: 112, sort: true }
+				,{ field: "inTotalAmount", title: "合计", width: 112, sort: true }
+				,{ field: "v1", title: "编码", width: 112, sort: true }
+				,{ field: "v2", title: "名称", width: 112, sort: true }
+				,{ field: "v3", title: "规格", width: 112, sort: true }
+				,{ field: "v4", title: "单位", width: 112, sort: true }
+				,{ field: "v5", title: "单价", width: 112, sort: true }
+				,{ field: "v6", title: "数量", width: 112, sort: true }
+				,{ field: "v7", title: "金额", width: 112, sort: true }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    //layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        //查询
+		form.on("submit(search)", function (data) {
+			var _list = getControlValueList();
+            ThisTable.reload({
+                where: { rpid: $("#_rpId").val(), 'controlList': _list },
+                url: "/_RP/GetPageList",
+                page: { curr: 1 }
+            });
+            if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+            return false;
+        });
+
+        //导出数据
+        form.on("submit(exportData)", function (data) {
+            exportData();
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "searchShow":
+                     var display = $('#searchfield').css('display');
+                     if (display == 'none') {
+                        $("#searchfield").show();
+                        document.body.scrollTop = document.documentElement.scrollTop = 0;
+                     }
+                     else {
+                        $("#searchfield").hide();
+                     }
+                 break;
+                case "exportData":
+                    exportData();
+                    break;
+            }
+        });
+
+        //将查询条件存储在list中
+        function getControlValueList() {
+            var _list = [];
+			_list.push({ ControlID: 'inWarehouse', ControlValue: $('#inWarehouse').val(), ControlType: '2' });//仓库
+			_list.push({ ControlID: 'inTotalAmount', ControlValue: $('#inTotalAmount').val(), ControlType: '1' });//金额合计
+			_list.push({ ControlID: 'inTotalAmount_Exa', ControlValue: $('#inTotalAmount_Exa').val(), ControlType: '1' });//金额合计
+			_list.push({ ControlID: 'inStorageDate', ControlValue: $('#inStorageDate').val(), ControlType: '1' });//入库日期
+			_list.push({ ControlID: 'inStorageDate_Exa', ControlValue: $('#inStorageDate_Exa').val(), ControlType: '1' });//入库日期
+			_list.push({ ControlID: 'v2', ControlValue: $('#v2').val(), ControlType: '1' });//名称
+			_list.push({ ControlID: 'v6', ControlValue: $('#v6').val(), ControlType: '1' });//数量
+			_list.push({ ControlID: 'v6_Exa', ControlValue: $('#v6_Exa').val(), ControlType: '1' });//数量
+            return _list;
+        }
+
+        //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+        //关闭搜索
+        $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+
+        //导出excel
+        function exportData() {
+            var _list = getControlValueList();
+            exUtils.ajax("/_RP/ExportData", "post", { rpid: $("#_rpId").val(), "controlList": _list }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['250', '100px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+    });
+</script>

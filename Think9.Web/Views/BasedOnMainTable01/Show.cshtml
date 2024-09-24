@@ -1,0 +1,183 @@
+﻿@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:35:17 此文件放置于Views/BasedOnMainTable01 /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+@*统计表(基于录入表(视图)创建) - 基于主表 - 从其他页面跳转打开*@
+<input style="display:none" id="_rpId" value="rp_BasedOnMainTable01">
+<fieldset class="table-fieldset" id="searchfield" >
+    <legend style="color:darkgrey">基于主表&nbsp;<span><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form layui-form-pane" action=""  id="_formid" lay-filter="formUser">
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">类别</label>
+					<div class="layui-input-block">
+						<select id="inCategory" name="inCategory" lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inCategory"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">名称</label>
+					<div class="layui-input-block">
+						<input type='text' name="inName" id="inName" autocomplete='off' class='layui-input' placeholder='名称'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">单位</label>
+					<div class="layui-input-block">
+						<select id="inUnit" name="inUnit" lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inUnit"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">单价</label>
+					<div class="layui-input-inline">
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="inUnitPrice" id="inUnitPrice" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='单价'>
+						</div>
+						<div class="layui-input-inline" >-</div>
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input type='text' name="inUnitPrice_Exa" id="inUnitPrice_Exa" autocomplete='off' class='layui-input'  lay-verify='number'  placeholder='单价'>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button> <button type='button' class='layui-btn layui-btn-primary' id='exportData' lay-submit lay-filter='exportData' lay-tips='查询并导出Excel'><i class='fa fa-file-excel-o'></i></button> <button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+				</div>
+			 </div>
+        </form>
+    </div>
+</fieldset>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "layer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        form.render();
+
+        //查询条件赋值
+		form.val("formUser", {
+			"inCategory": "@Model.inCategory"
+			,"inCategory_Exa": "@Model.inCategory_Exa"
+			,"inName": "@Model.inName"
+			,"inUnit": "@Model.inUnit"
+			,"inUnit_Exa": "@Model.inUnit_Exa"
+			,"inUnitPrice": "@Model.inUnitPrice"
+			,"inUnitPrice_Exa": "@Model.inUnitPrice_Exa"
+		});
+
+        var _controlValueList = getControlValueList();
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/_RP/GetPageList",
+            where: { rpid: $("#_rpId").val(), 'controlList': _controlValueList },
+            limits: [10, 50, 100, 200],
+            limit: 10,
+            method:"POST",
+            page: true,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '导出', layEvent: 'exportData', icon: 'layui-icon-export' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                 { type: "numbers", title: "NO.", fixed: 'left' }
+				,{ field: "listid", title: "主键", width: 84, sort: true  }
+				,{ field: "inCategory", title: "类别", width: 112, sort: true }
+				,{ field: "inCoding", title: "编码", width: 84, sort: true }
+				,{ field: "inName", title: "名称", width: 112, sort: true }
+				,{ field: "inSpecificationAndModel", title: "规格型号", width: 168, sort: true }
+				,{ field: "inUnit", title: "单位", width: 84, sort: true }
+				,{ field: "inUnitPrice", title: "单价", width: 84, sort: true }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    //layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        //查询
+		form.on("submit(search)", function (data) {
+			var _list = getControlValueList();
+            //$("#searchfield").hide();
+            ThisTable.reload({
+                where: { rpid: $("#_rpId").val(), 'controlList': _list },
+                url: "/_RP/GetPageList",
+                page: { curr: 1 }
+            });
+            return false;
+        });
+
+        //导出数据
+        form.on("submit(exportData)", function (data) {
+            exportData();
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "searchShow":
+                     var display = $('#searchfield').css('display');
+                     if (display == 'none') {
+                        $("#searchfield").show();
+                        document.body.scrollTop = document.documentElement.scrollTop = 0;
+                     }
+                     else {
+                        $("#searchfield").hide();
+                     }
+                 break;
+                case "exportData":
+                    exportData();
+                    break;
+            }
+        });
+
+        //将查询条件存储在list中
+        function getControlValueList() {
+            var _list = [];
+			_list.push({ ControlID: 'inCategory', ControlValue: $('#inCategory').val(), ControlType: '2' });//类别
+			_list.push({ ControlID: 'inName', ControlValue: $('#inName').val(), ControlType: '1' });//名称
+			_list.push({ ControlID: 'inUnit', ControlValue: $('#inUnit').val(), ControlType: '2' });//单位
+			_list.push({ ControlID: 'inUnitPrice', ControlValue: $('#inUnitPrice').val(), ControlType: '1' });//单价
+			_list.push({ ControlID: 'inUnitPrice_Exa', ControlValue: $('#inUnitPrice_Exa').val(), ControlType: '1' });//单价
+            return _list;
+        }
+
+        $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+
+        //导出excel
+        function exportData() {
+            var _list = getControlValueList();
+            exUtils.ajax("/_RP/ExportData", "post", { rpid: $("#_rpId").val(), "controlList": _list }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['250', '100px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+    });
+</script>

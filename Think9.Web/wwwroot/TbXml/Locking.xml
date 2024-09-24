@@ -1,0 +1,15 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="除流程步骤可以设置控件不可编辑，设置录入表指标属性也可以管理控件的可编辑状态" horAlignment="None" verAlignment="None" Selectable="True">除流程步骤可以设置控件不可编辑，设置录入表指标属性也可以管理控件的可编辑状态</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编辑时锁定" horAlignment="None" verAlignment="None" Selectable="True">编辑时锁定</lab>
+			 <textField x="125" y="80" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inLockDuringEditing" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inLockDuringEditing</textField>
+			<lab x="10" y="125" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="锁定" horAlignment="None" verAlignment="None" Selectable="True">锁定</lab>
+			 <textField x="125" y="125" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inLocking" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inLocking</textField>
+			<lab x="10" y="170" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="不锁定" horAlignment="None" verAlignment="None" Selectable="True">不锁定</lab>
+			 <textField x="125" y="170" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inNotLocked" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inNotLocked</textField>
+			<table2 x="10" y="215" width="790" height="120" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable04" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable04</table2>
+		</staticContent>
+	</content>
+</daReport>

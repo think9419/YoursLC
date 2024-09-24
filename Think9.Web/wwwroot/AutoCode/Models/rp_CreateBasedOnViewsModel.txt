@@ -1,0 +1,76 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:35:17
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体参数类【统计表】  生成时间：2024-09-24 13:35:17
+	/// </summary>
+	public class CreateBasedOnViewsModel
+	{
+		/// <summary>
+		/// UpdateTime
+		/// </summary>
+		public string UpdateTime { get; set; }
+		/// <summary>
+		/// Mlen
+		/// </summary>
+		public long? Mlen { get; set; }
+		/// <summary>
+		/// Mlen_Exa
+		/// </summary>
+		public long? Mlen_Exa { get; set; }
+		/// <summary>
+		/// isUse
+		/// </summary>
+		public string isUse { get; set; }
+		/// <summary>
+		/// isEdit
+		/// </summary>
+		public string isEdit { get; set; }
+		/// <summary>
+		/// IndexSort
+		/// </summary>
+		public string IndexSort { get; set; }
+		/// <summary>
+		/// IndexName
+		/// </summary>
+		public string IndexName { get; set; }
+		/// <summary>
+		/// IndexInType
+		/// </summary>
+		public string IndexInType { get; set; }
+		/// <summary>
+		/// IndexId
+		/// </summary>
+		public string IndexId { get; set; }
+		/// <summary>
+		/// IndexFlag
+		/// </summary>
+		public string IndexFlag { get; set; }
+		/// <summary>
+		/// IndexExplain
+		/// </summary>
+		public string IndexExplain { get; set; }
+		/// <summary>
+		/// IndexDefineType
+		/// </summary>
+		public string IndexDefineType { get; set; }
+		/// <summary>
+		/// IndexDataType
+		/// </summary>
+		public string IndexDataType { get; set; }
+		/// <summary>
+		/// Digit
+		/// </summary>
+		public long? Digit { get; set; }
+		/// <summary>
+		/// Digit_Exa
+		/// </summary>
+		public long? Digit_Exa { get; set; }
+	}
+}

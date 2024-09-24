@@ -1,0 +1,55 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "可实现数据自动填写（系统自动生成编号），无需手动输入，常用于商品编号、入库编号等",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 2,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 3,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    }
+]

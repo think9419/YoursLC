@@ -1,0 +1,219 @@
+﻿@using Think9.Models;
+@model Think9.Models.IndexBasicEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<style>
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible; /* 与移动端冲突 */
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: -3px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="guid" value="@ViewBag.Guid">
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标分类</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("IndexSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择指标分类==", new Dictionary<string, object> { })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">编码方式</label>
+        <div class="layui-input-block">
+            <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                <option value="首拼">首拼</option>
+                <option value="全拼">全拼</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标字符</label>
+        <div class="layui-input-block">
+            <textarea placeholder="字符之间以空格分割，输入完成后点击刷新按钮" name="IndexName" id="IndexName" class="layui-textarea"></textarea>
+            <span style="position: absolute;bottom: 5px; right: 5px;">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="refresh" id="_refresh"><i class='layui-icon layui-icon-refresh' lay-tips="点击刷新"></i></button>
+            </span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">批量新建</button>
+        </div>
+    </div>
+    <div class="layui-table-box">
+        <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/IndexBasic/GetIndexListByGuid?guid=" + $("#guid").val() + "&idsStr=" + $("#IndexName").val() + "&type=" + $("#AutoType").val(),
+            method: "post",
+            defaultToolbar: [],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "Info2", title: "编码", width: 150, templet: "#Info2" },
+                { field: "Info3", title: "类型", width: 190, templet: "#Info3" },
+                { field: "Info1", title: "名称", templet: "#Info1", width: 290 }
+            ]],
+            done: function (res, curr, count) {
+                if (layui.device().mobile) {
+                }
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+                case "check":
+                    check();
+                    break;
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            var _list = [];
+            foreachGridTable(_list);
+
+            exUtils.ajax("/SysTable/IndexBasic/BatchAdd", "post", { "list": _list, sort: $("#IndexSort").val(), guid: $("#guid").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#_refresh').on('click', function () {
+            refresh();
+        });
+
+        function check() {
+            var _list = [];
+            foreachGridTable(_list);
+
+            exUtils.ajax("/SysTable/IndexBasic/BatchCheck", "post", { "list": _list, sort: $("#IndexSort").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                where: { guid: $("#guid").val(), idsStr: $("#IndexName").val(), type: $("#AutoType").val() }
+            });
+            return false;
+        }
+
+        function foreachGridTable(_list) {
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _id = tdArr.eq(1).find('input').val();
+                var _name = tdArr.eq(3).find('input').val();
+                var _type = tdArr.eq(2).find('select').val();
+
+                if (_id != undefined) {
+                    var _row = {};
+                    _row.IndexId = _id;
+                    _row.IndexName = _name;
+                    _row.IndexDataType = _type;
+                    _list.push(_row);
+                }
+            }
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-btn-container">
+        <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="refresh"><i class='layui-icon layui-icon-refresh'></i>刷新</button>
+        <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" lay-event="check"><i class="fa fa-check"></i>检测</button>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="Info2">
+    <input type='text' name='Info2' value='{{d.Info2}}' autocomplete='off' class='layui-input' maxlength='30' style='height:30px;' placeholder='指标编码' lay-verify="required|id">
+</script>
+<script type="text/html" id="Info1">
+    <input type='text' name='Info1' value='{{d.Info1}}' autocomplete='off' class='layui-input' maxlength='30' style='height:30px;' placeholder='指标名称' lay-verify="required">
+</script>
+<!-- 控件类型 -->
+<script type='text/html' id='Info3'>
+     <div class='layui-input-inline' style='width:150px;'>
+         <select id="info3" name="info3" lay-filter="info3">
+            @foreach (IndexDtaeTypeEntity item in ((List
+    <IndexDtaeTypeEntity>)ViewBag.DtaeTypeList))
+            {
+                             <option value="@item.TypeId">@item.TypeName</option>
+            }
+         </select>
+     </div>
+</script>
+<script type="text/html" id="Info4">
+    <div class='layui-input-inline' style='width:150px;'>
+        <select id="info3" name="info3" lay-filter='Info3'>
+            {{d.info4}}
+            <option value="首拼">首拼</option>
+            <option value="全拼">全拼</option>
+        </select>
+    </div>
+</script>

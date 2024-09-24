@@ -1,0 +1,63 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "除流程步骤可以设置控件不可编辑，设置录入表指标属性也可以管理控件的可编辑状态",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inLockDuringEditing",
+        "label": "编辑时锁定",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编辑时锁定",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 2,
+        "tag": "input",
+        "name": "inLocking",
+        "label": "锁定",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入锁定",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 3,
+        "tag": "input",
+        "name": "inNotLocked",
+        "label": "不锁定",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入不锁定",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 4,
+        "tag": "gridtable",
+        "name": "tb_Subtable04",
+        "label": "子表04",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    }
+]

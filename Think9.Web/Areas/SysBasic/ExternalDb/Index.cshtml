@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+<blockquote class="layui-elem-quote layui-text">
+    『外部数据库』可作为单列选择、多列选择的数据源，可创建从『外部数据库』取数的『数据读取』，『统计指标』可从『外部数据库』取数...
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", 'miniPage'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+        let miniPage = layui.miniPage;
+
+        form.render(); //
+        var openWH = miniPage.getOpenWidthHeight();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/ExternalDb/GetList",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "DbType", title: "类别", width: 120, sort: true },
+                { field: "DbName", title: "名称", width: 220, sort: true },
+                { field: "DbCon", title: "连接字符", sort: true },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.DbID);
+                    break;
+                case "del":
+                    del(data.DbID);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.open("新建数据库连接", "/SysBasic/ExternalDb/Add", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+
+        function edit(id) {
+            exLayer.open("编辑数据库连接", "/SysBasic/ExternalDb/Edit?id=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysBasic/ExternalDb/Delete", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    refresh();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysBasic/ExternalDb/GetList"
+            });
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建数据库连接</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+     <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>

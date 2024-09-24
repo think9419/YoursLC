@@ -1,0 +1,119 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportIndexColParmEntity;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+    <input style="display:none" id="ReportId" value="@ViewBag.rpId">
+    <input style="display:none" id="colId" value="@ViewBag.colId">
+    <input style="display:none" id="_tbid" value="@ViewBag.tbid">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">选择参数</label>
+            <div class="layui-input-block">
+                <select name='ParmId' id="ParmId" lay-verify="required">
+                    <option value="">== 请选择 ==</option>
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.ParmSort))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">赋值方式</label>
+            <div class="layui-input-block">
+                <input type="radio" name="Type" value="0" title="当前行数据" id="Sort_0" lay-filter="selectType" checked="checked">
+                <input type="radio" name="Type" value="1" title="固定值" id="Sort_1" lay-filter="selectType">
+            </div>
+        </div>
+        <div class="layui-form-item" id="div_1">
+            <label class="layui-form-label required">赋值</label>
+            <div class="layui-input-block">
+                <select name='ParmValue' id="ParmValue">
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.FieldList))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="div_2" style="display: none;">
+            <label class="layui-form-label required">赋值</label>
+            <div class="layui-input-block">
+                <input type="text" name="ParmValue2" id="ParmValue2" placeholder="必填 请输入参数值" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add" id="add">添加</button>&nbsp;
+                <input type="checkbox" id="continue" title="连续添加">
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "table"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let table = layui.table;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+
+        //点击保存按钮
+        form.on("submit(add)", function (data) {
+            var _sort = $('input:radio[name="Type"]:checked').val();
+            var _parmValue = '';
+            if (_sort == "0") {
+                _parmValue = $("#ParmValue").val();
+            }
+            else {
+                _parmValue = $("#ParmValue2").val();
+            }
+            exUtils.ajax("/SysStats/ReportBasic/AddReportIndexColParm", "post", { rpId: $("#ReportId").val(), colId: $("#colId").val(), parmValue: _parmValue, parmId: $("#ParmId").val(), type: _sort }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableColParm', { url: "/SysStats/ReportBasic/GetReportIndexColParmList?rpId=" + $("#ReportId").val() + "&colId=" + $("#colId").val() });
+                    if ($("#continue").is(':checked')) {
+                    }
+                    else {
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on('radio(selectType)', function (data) {
+            var _sort = $('input:radio[name="Type"]:checked').val();
+            if (_sort == "0") {
+                $("#div_2").attr("style", "display:none;");
+                $("#div_1").attr("style", "display:block;");
+            }
+            else {
+                $("#div_1").attr("style", "display:none;");
+                $("#div_2").attr("style", "display:block;");
+            }
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

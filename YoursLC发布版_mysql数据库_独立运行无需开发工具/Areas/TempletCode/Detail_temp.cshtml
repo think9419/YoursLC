@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>monaco-editor basic use</title>
+    <script src="../../../monaco-editor/package/min/vs/loader.js"></script>
+    <script src="../../../monaco-editor/package/jquery/dist/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div id="container" style="height: 600px;"></div>
+        <script>
+            var monacoEditor;
+            require.config({ paths: { 'vs': '../../../monaco-editor/package/min/vs' } });
+            require(['vs/editor/editor.main'], function () {
+                monacoEditor = monaco.editor.create(document.getElementById('container'), {
+                    value: "@ViewBag.Code",
+                    language: "cshtml",
+                    folding: true, // 是否折叠
+                    foldingHighlight: true, // 折叠等高线
+                    foldingStrategy: "indentation", // 折叠方式  auto | indentation
+                    showFoldingControls: "always", // 是否一直显示折叠 always | mouseover
+                    disableLayerHinting: true, // 等宽优化
+                    emptySelectionClipboard: false, // 空选择剪切板
+                    selectionClipboard: false, // 选择剪切板
+                    automaticLayout: true, // 自动布局
+                    codeLens: false, // 代码镜头
+                    scrollBeyondLastLine: false, // 滚动完最后一行后再滚动一屏幕
+                    colorDecorators: true, // 颜色装饰器
+                    accessibilitySupport: "off", // 辅助功能支持  "auto" | "off" | "on"
+                    lineNumbers: "on", // 行号 取值： "on" | "off" | "relative" | "interval" | function
+                    lineNumbersMinChars: 5, // 行号最小字符   number
+                    enableSplitViewResizing: false,
+                    readOnly: false, //是否只读  取值 true | false
+                });
+            });
+            //自适应宽度
+            window.onresize = function () {
+                if (monacoEditor) {
+                    monacoEditor.layout();
+                }
+            };
+        </script>
+    </div>
+</body>
+</html>

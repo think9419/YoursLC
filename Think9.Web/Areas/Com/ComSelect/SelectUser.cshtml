@@ -1,0 +1,246 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="fromId" value="@ViewBag.fromid">
+    <input style="display:none" id="strId" value="@ViewBag.strId">
+
+    <div class="layui-form-item" style="text-align: center; margin-top: 10px;">
+        <button class="layui-btn layui-btn-normal" lay-event="OK" id="OK">确定选择</button>
+    </div>
+    <div class="layui-form-item" id="div_search" style="display:none">
+        <div class="layui-inline">
+            @Html.DropDownList("depList", (IEnumerable<SelectListItem>)ViewBag.depList, "==所有==", new Dictionary<string, object> { })
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button> <button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md5">
+            <table class="layui-hide" id="lefttable" lay-filter="tableFilter"></table>
+        </div>
+        <div class="layui-col-md2">
+            <div style="text-align: center; padding-top: 100px; " id="divBut">
+                <button type="button" class="layui-btn" id="add">
+                    添加&nbsp;<i class=" fa fa-angle-double-right"></i>
+                </button><br /><br />
+                <button type="button" class="layui-btn layui-btn-danger" id="del"><i class="fa fa-angle-double-left"></i>&nbsp;移除</button>
+            </div>
+        </div>
+        <div class="layui-col-md5">
+            <table class="layui-hide" id="righttable" lay-filter="tableFilter"></table>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        let LeftTable = table.render({
+            elem: "#lefttable",
+            url: "/Com/ComSelect/GetUserListBySearch?key=" + $("#key").val() + "&dep=" + $("#depList").val(),
+            defaultToolbar: [],
+            height: layui.device().mobile ? 220 : 312,
+            toolbar: "#toolbarTpl",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }],
+            method: "post",
+            cols: [[
+                { type: "checkbox" },
+                { field: "Account", title: "账户", sort: true },
+                { field: "RealName", title: "姓名", sort: true }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let RightTable = table.render({
+            elem: "#righttable",
+            url: "/Com/ComSelect/GetUserListByStr?strID=" + $("#strId").val(),
+            defaultToolbar: [],
+            height: layui.device().mobile ? 220 : 312,
+            toolbar: "#toolbarTp2",
+            method: "post",
+            cols: [[
+                { type: "checkbox" },
+                { field: "Value", title: "账户", sort: true },
+                { field: "Text", title: "姓名", sort: true }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '<span style="color: #FE7300;">待选项选中后，再点击添加按钮</span>'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "searchShow":
+                    var display = $('#div_search').css('display');
+                    if (display == 'none') {
+                        $("#div_search").show();
+                    }
+                    else {
+                        $("#div_search").hide();
+                    }
+                    break;
+            }
+        });
+
+        //查询
+        $("#search").click(function () {
+            LeftTable.reload({
+                where: { key: $("#key").val(), dep: $("#depList").val() }
+            });
+            $("#div_search").hide();
+            return false;
+        });
+
+        //添加
+        $("#add").click(function () {
+            var checkStatus = table.checkStatus('lefttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                if ($("#strId").val().indexOf(';' + o.Account + ';') == -1) {
+                    ids.push(o.Account);
+                }
+            });
+            if (ids.length < 1) {
+                layer.msg('未选择有效数据或重复选择');
+                $("input[type='checkbox'][name='layTableCheckbox']").prop('checked', false);
+                form.render("checkbox");
+                return false;
+            }
+
+            var _sel = $("#strId").val() + ";" + ids.join(";") + ";";
+            $("#strId").val(_sel);
+
+            RightTable.reload({
+                where: { strID: $("#strId").val() }
+            });
+
+            getSelect();
+
+            $("input[type='checkbox'][name='layTableCheckbox']").prop('checked', false);
+            form.render("checkbox");
+        });
+
+        //移除
+        $("#del").click(function () {
+            var _strid = $("#strId").val();
+            var checkStatus = table.checkStatus('righttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                ids.push(o.Value);
+                var _sel = ";" + o.Value + ";";
+                _strid = _strid.replace(_sel, ";");
+            });
+
+            $("#strId").val(_strid);
+
+            RightTable.reload({
+                where: { strID: $("#strId").val() }
+            });
+
+            getSelect();
+
+            return false;
+        });
+
+        //确定
+        $("#OK").click(function () {
+            var checkStatus = table.checkStatus('righttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                if ($("#strId").val().indexOf(';' + o.Account + ';') == -1) {
+                    ids.push(o.Account);
+                }
+            });
+            if (ids.length < 1) {
+            }
+            else {
+            }
+
+            getSelect();
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        });
+
+        //确定选择
+        function getSelect() {
+            var _strid = ";";
+            var _strname = "";
+            var datas = new Array();
+            datas = layui.table.cache["righttable"];
+            for (i = 0; i < datas.length; i++) {
+                var _strid = _strid + datas[i].Value + ";";
+                var _strname = _strname + datas[i].Text + " ";
+            }
+
+            if ($("#fromId").val() == 'flowprcs') {
+                $(window.parent.document).find('#PrcsUser').val(_strid);
+                $(window.parent.document).find('#PrcsUser_Exa').val(_strname);
+            }
+
+            if ($("#fromId").val() == 'prcnext1') {
+                $(window.parent.document).find('#selectUserV').val(_strid);
+                $(window.parent.document).find('#selectUserT').val(_strname);
+            }
+
+            if ($("#fromId").val() == 'tbedit') {
+                $(window.parent.document).find('#EditUser').val(_strid);
+                $(window.parent.document).find('#EditUser_Exa').val(_strname);
+            }
+
+            if ($("#fromId").val() == 'tblimits1') {
+                $(window.parent.document).find('#EditUser').val(_strid);
+                $(window.parent.document).find('#EditUser_Exa').val(_strname);
+            }
+
+            if ($("#fromId").val() == 'tblimits2') {
+                $(window.parent.document).find('#ManageUser').val(_strid);
+                $(window.parent.document).find('#ManageUser_Exa').val(_strname);
+            }
+
+            if ($("#fromId").val() == 'tblimits3') {
+                $(window.parent.document).find('#ManageUser2').val(_strid);
+                $(window.parent.document).find('#ManageUser2_Exa').val(_strname);
+            }
+        }
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                LeftTable.reload({
+                    where: { key: $("#key").val(), dep: $("#depList").val() }
+                });
+                $("#div_search").hide();
+                return false;
+            }
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#divBut").attr("style", "text-align: center; ");
+                $("#add").html('从待选项中添加');
+                $("#del").html('从已选项中移除');
+            }
+        });
+    })
+</script>
+<script type="text/html" id="toolbarTpl">
+    <span>待选项</span>
+</script>
+<script type="text/html" id="toolbarTp2">
+    <span>已选项</span>
+</script>

@@ -1,0 +1,166 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Add"; Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<style>
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible; /* 与移动端冲突 */
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: -3px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="btnid" value="@ViewBag.btnid">
+    <input style="display:none" id="pageType" value="@ViewBag.pageType">
+    <div class="layui-form-item" style="text-align: center;margin-top: 8px;">
+        <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+    </div>
+    <div style='text-align: Left;'><span class="layui-word-tip">由人员、单位及角色的合集确定，即『禁用』其中之一，便不能使用该按钮</span></div>
+    <div class="layui-row  layui-col-space10">
+        <div class="layui-col-md4 layui-table-box">
+            <table class="layui-hide" id="UserTable" lay-filter="tableFilter3"></table>
+            <br />
+        </div>
+        <div class="layui-col-md4 layui-table-box">
+            <table class="layui-hide" id="OrganizeTable" lay-filter="tableFilter1"></table>
+            <br />
+        </div>
+        <div class="layui-col-md4 layui-table-box">
+            <table class="layui-hide" id="RoleTable" lay-filter="tableFilter2"></table>
+            <br />
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+        form.render();
+
+        let UserTable = table.render({
+            elem: "#UserTable",
+            url: "/SysTable/TbBasic/GetTbButDisableListForUser?tbid=" + $('#tbid').val() + "&btnid=" + $('#btnid').val() + "&pageType=" + $('#pageType').val(),
+            defaultToolbar: [],
+            method: "get",
+            cols: [[
+                { templet: '<span>3</span>', hide: true },
+                { field: "Value", hide: true },
+                { field: "Text", title: "用户" },
+                { field: "Exa", title: "启用|禁用", width: 120, templet: '#optionExa3' }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let OrganizeTable = table.render({
+            elem: "#OrganizeTable",
+            url: "/SysTable/TbBasic/GetTbButDisableListForOrganize?tbid=" + $('#tbid').val() + "&btnid=" + $('#btnid').val() + "&pageType=" + $('#pageType').val(),
+            defaultToolbar: [],
+            method: "get",
+            cols: [[
+                { templet: '<span>1</span>', hide: true },
+                { field: "Value", hide: true },
+                { field: "Text", title: "单位部门" },
+                { field: "Exa", title: "启用|禁用", width: 120, templet: '#optionExa1' }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let RoleTable = table.render({
+            elem: "#RoleTable",
+            url: "/SysTable/TbBasic/GetTbButDisableListForRole?tbid=" + $('#tbid').val() + "&btnid=" + $('#btnid').val() + "&pageType=" + $('#pageType').val(),
+            defaultToolbar: [],
+            method: "get",
+            cols: [[
+                { templet: '<span>2</span>', hide: true },
+                { field: "Value", hide: true },
+                { field: "Text", title: "角色" },
+                { field: "Exa", title: "启用|禁用", width: 120, templet: '#optionExa2' }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        form.on("submit(edit)", function (data) {
+            var _list = getList();
+            exUtils.ajax("/SysTable/TbBasic/EditTbButDisable", "post", { tbid: $('#tbid').val(), btnid: $('#btnid').val(), pageType: $('#pageType').val(), list: _list }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function getList() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");
+            for (var i = 0; i < trList.length; i++) {
+                var tdArr = trList.eq(i).find("td");
+                var _ObjType = tdArr.eq(0).text();
+                var _ObjId = tdArr.eq(1).text();
+                var _selectId = tdArr.eq(3).find('select').val();
+                if (_selectId == '0') {
+                    var _row = {};
+                    _row.ObjType = _ObjType;
+                    _row.SelectId = _selectId;
+                    _row.ObjId = _ObjId;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="optionExa1">
+    <div class='layui-input-inline' style='width:80px;'>
+        <select id="optionExa1" name="optionExa1">
+            {{d.Exa}}
+        </select>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="optionExa2">
+    <div class='layui-input-inline' style='width:80px;'>
+        <select id="optionExa2" name="optionExa2">
+            {{d.Exa}}
+        </select>
+    </div>
+</script>
+<script type="text/html" id="optionExa3">
+    <div class='layui-input-inline' style='width:80px;'>
+        <select id="optionExa3" name="optionExa3">
+            {{d.Exa}}
+        </select>
+    </div>
+</script>

@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "@ViewBag.rpid" + " - CodeList";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="rpid" id="rpid" value="@ViewBag.rpid">
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/TempletCode/GetCodeList2?rpid=" + $("#rpid").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "Type", title: "类别", width: 60 },
+                { field: "FilePath", title: "路径", sort: true },
+                { field: "CreationTime", title: "创建时间", sort: true, width: 160 },
+                { field: "LastWriteTime", title: "最后修改", sort: true, width: 160, templet: "#T_LastWriteTime" },
+                { field: "Description", title: "备注", sort: true },
+                { title: "记录", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tp9" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "creat":
+                    creat();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    detail(data.SourceFilePath);
+                    break;
+                case "detail2":
+                    detail(data.TargetFilePath);
+                    break;
+            }
+        });
+
+        function creat() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].SourceFilePath + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+
+            exLayer.confirm("确定要生成吗？", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysBasic/TempletCode/Creat", "post", { idsStr: idsStr, rpid: $("#rpid").val() }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        parent.layer.closeAll();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysBasic/TempletCode/GetCodeList2?rpid=" + $("#rpid").val()
+            });
+        }
+
+        function detail(path) {
+            exLayer.open("查看", "/SysBasic/TempletCode/CodeDetail?path=" + path, '100%', '100%', '0px', '0px', null, null);
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+
+</script>
+<!-- 行工具栏模板 fa-ellipsis-h -->
+<script type="text/html" id="operation_Tp9">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" href="/SysBasic/TempletCode/CodeRecord?filePath={{d.FilePath}}" target="_blank" id="detail"><i class="fa fa-ellipsis-h"></i></a>
+</script>
+<!-- 行工具栏模板(锁定) -->
+<script type='text/html' id='T_LastWriteTime'>
+    {{#  if(d.CreationTime == d.LastWriteTime){ }}
+    {{d.LastWriteTime}}
+    {{#  }else{ }}
+    <span  style='color: blue;'>{{d.LastWriteTime}}</span>
+    {{#  } }}
+</script>

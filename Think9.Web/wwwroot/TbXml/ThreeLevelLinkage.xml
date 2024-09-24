@@ -1,0 +1,16 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="省" horAlignment="None" verAlignment="None" Selectable="True">省</lab>
+			<drop x="130" y="30" width="280" height="30"  txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inProvince" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">inProvince</drop>
+			<lab x="420" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="市县" horAlignment="None" verAlignment="None" Selectable="True">市县</lab>
+			<drop x="540" y="30" width="280" height="30"  txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCityAndCounty" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">inCityAndCounty</drop>
+			<lab x="10" y="75" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="乡镇" horAlignment="None" verAlignment="None" Selectable="True">乡镇</lab>
+			<drop x="130" y="75" width="280" height="30"  txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inTownship" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">inTownship</drop>
+			<lab x="420" y="75" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="备注" horAlignment="None" verAlignment="None" Selectable="True">备注</lab>
+			 <textField x="540" y="75" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inRemarks" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inRemarks</textField>
+			<table2 x="10" y="120" width="960" height="150" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable07" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable07</table2>
+		</staticContent>
+	</content>
+</daReport>

@@ -1,0 +1,71 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+    <div class="layui-collapse" lay-filter="test" lay-accordion>
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title">作为数据源被其他录入表访问读取</h2>
+            <div class="layui-colla-content">
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+    <div class="layui-collapse" lay-filter="test" lay-accordion>
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title">访问其他录入表</h2>
+            <div class="layui-colla-content">
+                <table class="layui-hide" id="tableId2" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TableList/GetDCIList?tbid=" + $("#tbid").val(),
+            method: "post",
+            cols: [[
+                { field: "info1", title: "已定义", width: 220, sort: true },
+                { field: "info2", title: "已关联", sort: true }
+            ]]
+        });
+
+        let ThisTable2 = table.render({
+            elem: "#tableId2",
+            url: "/SysTable/TableList/GetDCIList2?tbid=" + $("#tbid").val(),
+            method: "post",
+            cols: [[
+                { field: "info1", title: "指标", width: 220, sort: true },
+                { field: "info2", title: "数据源", sort: true }
+            ]]
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detial":
+                    getDetial(data.Detial);
+                    break;
+
+            }
+        });
+
+        function getDetial(id) {
+
+        }
+    })
+</script>

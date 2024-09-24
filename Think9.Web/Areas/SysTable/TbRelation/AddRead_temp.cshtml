@@ -1,0 +1,402 @@
+﻿@using Think9.Models;
+@model Think9.Models.RelationRDEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="Guid" value="@ViewBag.Guid">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="id" value="@ViewBag.id">
+    <input style="display:none" id="ParentId" value="@ViewBag.ParentId">
+    <input style="display:none" id="tbname" value="@ViewBag.tbname">
+    <input style="display:none" id="_sort" value="1">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">名 称</label>
+            <div class="layui-input-block">
+                <input type="text" name="RelationName" placeholder="必填 请输入名称" autocomplete="off" class="layui-input" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">读取类别</label>
+            <div id="IsRelationSort">
+                <div class="layui-input-inline">
+                    <input type="radio" name="RelationSort" value="1" title="读取单值" checked="checked" id="Sort_1" lay-filter="selectSort">
+                    <i class="layui-icon layui-icon-about" lay-tips="如选择产品后自动为页面控件赋值，如产品名称、计量单位等" data-offset="4" style="margin-left: -20px;"></i>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="radio" name="RelationSort" value="2" title="读取列表值" id="Sort_2" lay-filter="selectSort">
+                    <i class="layui-icon layui-icon-about" lay-tips="为下拉选择赋值，如实现数据联动等" data-offset="4" style="margin-left: -20px;"></i>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="radio" name="RelationSort" value="9" title="子表写入" id="Sort_9" lay-filter="selectSort">
+                    <i class="layui-icon layui-icon-about" lay-tips="自动读取其他录入表数据为子表赋值（更新子表数据）" data-offset="4" style="margin-left: -20px;"></i>
+                </div>
+                <div class="layui-input-inline">
+                    <div id="divIsDel" style="display: none;">
+                        <input type="hidden" name="UseType" value="1">
+                        <input type="checkbox" id="UseType" name="UseType" value="2" title="累加" checked="checked" disabled="disabled">
+                        <i class="layui-icon layui-icon-about" lay-tips="勾选后，子表写入时，将不执行删除操作" data-offset="4" style="margin-left: -10px;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">读取录入表</label>
+            <div class="layui-input-block">
+                <select id="FromTbId" name="FromTbId" lay-filter="FromTbId" lay-verify='required'>
+                    <option value="">==需首先选择 -  确定从哪个录入表或已创建的视图读值==</option>
+                    <optgroup label="从已定义的录入表(主表)读值 未创建数据表的录入表不能读值">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                    <optgroup label="从已创建的视图读值">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.ViewList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey">读取字段--需先选择读取录入表；点击『添加读取字段』按钮可添加多个读取字段</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label">数据源字段</label>
+                <div class="layui-input-block">
+                    <select id="SelectIndexId" name="SelectIndexId">
+                        <option value="">==请选择 需先选择读取录入表==</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">目标字段</label>
+                <div class="layui-input-block">
+                    <select id="FillIndexId" name="FillIndexId">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FillIndexId))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item" style="text-align: right;">
+                点击『添加读取字段』按钮可添加多个读取字段>>
+                <button type="button" class="layui-btn " id="addListFiled"><i class="fa fa-plus"></i>添加读取字段</button>
+            </div>
+            <div class="layui-form-item">
+                <span id="_showListFiled" style="display: none; color: #FE7300;">
+                    <i class="fa fa-angle-double-down
+"></i>添加读取列表值时，需添加两条数据，两条数据的目标字段应相同(该目标字段对应的控件是下拉选择)，第一条数据源字段对应下拉选择的value，第二条数据源字段对应下拉选择的text
+                </span>
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+        </fieldset>
+        <br />
+
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md10">
+                    <label class="layui-form-label">排序字段</label>
+                    <div class="layui-input-block">
+                        <select id="OrderIndexId" name="OrderIndexId">
+                            <option value="">==请选择 需先选择读取录入表==</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-col-md2" align="left">
+                    <div class="layui-input-block">
+                        <input type="hidden" name="OrderType" value="1">
+                        <input type="checkbox" id="OrderType" name="OrderType" value="2" title="倒序">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey">筛选条件</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label">连 接</label>
+                <div class="layui-input-inline">
+                    <select name="linkstr" id="linkstr">
+                        <option value=""></option>
+                        <option value=" AND "> 并且 ( AND )</option>
+                        <option value=" OR "> 或者 ( OR )</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">判 断</label>
+                <div class="layui-input-inline">
+                    <select name="judge" id="judge">
+                        <option value="=">等于</option>
+                        <option value=">">大于</option>
+                        <option value=">=">大于等于</option>
+                        <option value="<">小于</option>
+                        <option value="<=">小于等于</option>
+                        <option value="<>">不等于</option>
+                        <option value="like">包含</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">字 段</label>
+                <div class="layui-input-block">
+                    <select id="ConditionFiled" name="ConditionFiled">
+                        <option value="">==请选择 需先选择取值数据表==</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">值</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="valuekey" id="valuekey" placeholder="输入或选择" class="layui-input">
+                    <span style="position: absolute;top: 0px; left: 0px;">
+                        <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="输入或选择，控件值表达式为tb_name.indexid.Value（区分大小写），其中tb_name为数据表名称，indexid指标编码，Value值不可少，代表录入表tb_name中的指标indexid值" data-offset="4"></i>
+                    </span>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" class="layui-btn layui-btn-primary" id="selectvalue"><i class="fa fa-check"></i>选择</button>
+                </div>
+                <div class="layui-inline">
+                    <button type="button" class="layui-btn " id="addvalue"><i class="fa fa-plus"></i>添加筛选条件</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <textarea class="layui-textarea" id="WhereStr1" name="WhereStr1" placeholder='点击『添加筛选条件』按钮可添加筛选条件 如：被读取表的字段X=tb_A.inB.Value，其中tb_A.inB.Value是录入表tb_A中的指标inB，为保证数据读取会被触发，条件中应包含触发数据读取的控件（即等式中的tb_A.inB.Value），并且该控件属于下拉选择、弹出选择或者该录入指标设置为可扫码，才能保证数据读取会被触发'></textarea>
+                    <span style="position: absolute;top: 0px; left: 0px;">
+                        <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipsWhereStr"></i>
+                    </span>
+                </div>
+            </div>
+        </fieldset>
+        <div class="layui-form-item" style="padding-top:10px;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add">添加数据读取</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "layer"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        SetRadio($("#ParentId").val());
+
+        form.render(); //
+
+        form.on('radio(selectSort)', function (data) {
+            var val = $('input:radio[name="RelationSort"]:checked').val();
+            $("#_sort").val(val);
+
+            $("#_showListFiled").attr("style", "display:none;");
+            $("#divIsDel").attr("style", "display:none;");
+            if (val == "2") {
+                $("#_showListFiled").attr("style", "display:block;color: #FE7300;");
+            }
+            if (val == "9") {
+                $("#divIsDel").attr("style", "display:block;");
+            }
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbRelation/GetFiledRead?guid=" + $("#Guid").val() + "&tbid=" + $("#tbid").val() + "&fromtbid=" + $("#FromTbId").val() + "&id=" + $("#id").val(),
+            page: false,
+            method: "POST",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "Info1", title: "所选录入表-数据源字段" },
+                { title: "<span><i class='fa fa-angle-double-right'></i></span>", templet: '<span><i class="fa fa-angle-double-right"></i></span>', width: 40 },
+                { field: "Info2", title: "@ViewBag.tbname" + "-目标字段" },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.id);
+                    break;
+            }
+        });
+
+        GetFieldList($("#FromTbId").val());
+
+        form.on('select(FromTbId)', function (data) {
+            GetFieldList(data.value);
+        })
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysTable/TbRelation/AddRead", "post", { model: data.field, guid: $("#Guid").val(), tbid: $("#tbid").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbRelation/GetListByType?type=11&tbid=" + $(window.parent.document).find("#tbid").val() });
+
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#selectvalue').on('click', function () {
+            exLayer.openMiddle('选择', '/SysTable/TbRelation/SelectValue?tbid=' + $("#tbid").val(), '500px', '450px', layui.device().mobile);
+        });
+
+        $('#addListFiled').on('click', function () {
+            var _value = $("#SelectIndexId").val();
+            var _value2 = $("#FillIndexId").val();
+            if (_value == '' || _value2 == '') {
+                exLayer.yellowSighMsg("字段无效");
+                return false;
+            }
+            else {
+                exUtils.ajax("/SysTable/TbRelation/AddFiledRead", "post", { guid: $("#Guid").val(), id: $("#id").val(), value: $("#SelectIndexId").val(), value2: $("#FillIndexId").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    ThisTable.reload({
+                        url: "/SysTable/TbRelation/GetFiledRead?guid=" + $("#Guid").val() + "&tbid=" + $("#tbid").val() + "&fromtbid=" + $("#FromTbId").val() + "&id=" + $("#id").val()
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        });
+
+        $('#addvalue').on('click', function () {
+            var _old = $("#WhereStr1").val();
+            var _new = _old + ' ' + $("#linkstr").val() + ' ' + $("#ConditionFiled").val() + ' ' + $("#judge").val() + ' ' + $("#valuekey").val();
+            $("#WhereStr1").val(_new);
+            $("#valuekey").val('');
+            $('#tipsWhereStr').attr("lay-tips", GetTips($('#WhereStr1').val()));
+        });
+
+        function GetFieldList(id) {
+            GetSelectValueFieldByTb(id);
+            GetSelectOrderFieldByTb(id);
+            GetConditionFieldListByTb(id);
+        }
+
+        function GetSelectValueFieldByTb(id) {
+            var controlid = "#SelectIndexId";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbRelation/GetSelectValueFieldByTb", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();
+            });
+        }
+
+        function GetSelectOrderFieldByTb(id) {
+            var controlid = "#OrderIndexId";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbRelation/GetSelectOrderFieldByTbId", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();
+            });
+        }
+
+        function GetConditionFieldListByTb(id) {
+            var controlid = "#ConditionFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbRelation/GetConditionFieldList", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        function del(id) {
+            exUtils.ajax("/SysTable/TbRelation/DeleteReadFiled", "get", { id: id, guid: $("#Guid").val() }, true).done(function (response) {
+                ThisTable.reload({
+                    url: "/SysTable/TbRelation/GetFiledRead?guid=" + $("#Guid").val() + "&tbid=" + $("#tbid").val() + "&fromtbid=" + $("#FromTbId").val() + "&id=" + $("#id").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function SetRadio(ParentId) {
+            $("#Sort_1").removeAttr("disabled");
+            $("#Sort_2").removeAttr("disabled");
+            $("#Sort_9").removeAttr("disabled");
+            if (ParentId == "") {
+                $("#Sort_9").attr("disabled", "disabled");
+            }
+            else {
+                /*$("#Sort_2").attr("disabled", "disabled");*/
+            }
+
+        };
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        $(document).on("mouseenter", "#tipsWhereStr", function () {
+            var remind = GetTips($('#WhereStr1').val());
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "#tipsWhereStr", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del"><i class="fa fa-close"></i></a>
+</script>

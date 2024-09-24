@@ -1,0 +1,24 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:39
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:39
+	/// </summary>
+	 [Table("tb_SubTableDataInitialization")]
+	public class SubTableDataInitializationModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		#endregion Model
+		
+	}
+}

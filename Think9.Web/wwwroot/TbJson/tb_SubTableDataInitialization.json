@@ -1,0 +1,56 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "是指新建录入表数据时(如点击『新增数据』按钮)，子表将按照设定的数据初始化完成数据加载，分为两类，读取空数据和从其他录入表读取数据",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inCoding",
+        "label": "编码",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编码",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 1,
+        "tag": "note",
+        "name": "note_1",
+        "textarea": "初始化空数据",
+        "width": 100
+    },
+    {
+        "index": 2,
+        "tag": "gridtable",
+        "name": "tb_Subtable51",
+        "label": "子表51",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    },
+    {
+        "index": 2,
+        "tag": "note",
+        "name": "note_2",
+        "textarea": "从其他录入表读数",
+        "width": 100
+    },
+    {
+        "index": 3,
+        "tag": "gridtable",
+        "name": "tb_Subtable52",
+        "label": "子表52",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    }
+]

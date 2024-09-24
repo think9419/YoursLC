@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" style="padding-top: 10px;">
+    <input style="display:none" id="listid" value="@ViewBag.ListId">
+    <input style="display:none" id="flid" value="@ViewBag.FwId">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">固定流程-转交下一步</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-form-item">
+                    <table class="layui-hide" id="tableId01" lay-filter="tableFilter"></table>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">办理人</label>
+                    <div class="layui-input-block">
+                        <input type='text' id="selectUserV" style="display:none">
+                        <input type='text' name="selectUserT" id="selectUserT" autocomplete='off' class='layui-input' placeholder="点击选择办理人">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">转交意见</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" id="ispublic1" lay-skin="primary" title="转交意见公开" checked="checked" disabled="disabled">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <textarea class="layui-textarea" id="remarks01" placeholder="转交意见..."></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">短消息</label>
+                    <div class="layui-inline">
+                        <span> <input type="checkbox" name="ckmsg11" id="ckmsg11" lay-skin="primary" title="提醒下一步骤办理人：内部短消息" checked="checked"></span>
+                    </div>
+                    <div class="layui-inline">
+                        <span><input type="checkbox" name="ckmsg12" id="ckmsg12" lay-skin="primary" title="提醒本流程的发起人：内部短消息 " checked="checked"></span>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <textarea class="layui-textarea" id="msg01" placeholder="短消息...">@ViewBag.Msg</textarea>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" id="btnOK1">转交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", "element", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        element.on('tab(tabTag_Filter)', function (data) {
+        });
+
+        form.render();
+
+        let Table01 = table.render({
+            elem: "#tableId01",
+            url: "/SysFlow/PrcsNext/GetStepList?listid=" + $('#listid').val() + "&flid=" + $('#flid').val(),
+            method: "POST",
+            cols: [[
+                { type: "radio", fixed: 'left' }
+                , { type: "numbers", title: "NO.", fixed: 'left' }
+                , { field: "Value", hide: true }
+                , { field: "Text", title: "选择下一步" }
+                , { title: "办理人", width: 80, align: "center", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '<span style="color: #FE7300;">未定义下一步骤，不能转交 请联系系统管理员</span>'
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    detail(data.Value, data.Text);
+                    break;
+            }
+        });
+
+        //选择用户
+        $('#selectUserT').on('click', function () {
+            exLayer.open("选择办理人", "/Com/ComSelect/SelectUser?fId=prcnext1&sId=" + $("#selectUserV").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $('#btnOK1').on('click', function () {
+            var checkStatus = table.checkStatus('tableId01');
+            if (checkStatus.data.length < 1) {
+                layer.msg('请选择下一步');
+                return false;
+            }
+            if (checkStatus.data[0].Value != '0' && $('#selectUserV').val() == '') {
+                layer.msg('请选择办理人');
+                return false;
+            }
+
+            var _list = [];
+            getControl01(_list);
+
+            layer.confirm('确定要转交吗？', function (index) {
+                exUtils.ajax("/SysFlow/PrcsNext/FlowPrcsNext01", "post", { listid: $("#listid").val(), list: _list, from: 'manage' }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        $(window.parent.parent.document).find('#search').click();
+                        parent.parent.layer.closeAll();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+
+        });
+
+        //从控件读值
+        function getControl01(_list) {
+            //流程id
+            _list.push({ ClassID: 'classid', Text: $('#flid').val(), Value: 'fwid' });
+            //转交意见公开
+            _list.push({ ClassID: 'classid', Text: $("#ispublic1").prop("checked"), Value: 'isPublic' });
+            //选择的用户
+            _list.push({ ClassID: 'classid', Text: $('#selectUserV').val(), Value: 'selectUserId' });
+            //短消息
+            _list.push({ ClassID: 'classid', Text: $('#msg01').val(), Value: 'msg' });
+            //转交意见
+            _list.push({ ClassID: 'classid', Text: $('#remarks01').val(), Value: 'remarks' });
+            //提醒下一步骤办理人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg11").prop("checked"), Value: 'ckmsg11' });
+            //提醒本流程的发起人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg12").prop("checked"), Value: 'ckmsg12' });
+
+            var checkStatus01 = table.checkStatus('tableId01');
+            //选择的流程步骤
+            _list.push({ ClassID: 'classid', Text: checkStatus01.data[0].Value, Value: 'selectPrcsId' });
+            //是否指定了办理人
+            _list.push({ ClassID: 'classid', Text: 'false', Value: 'ckSelectUser' });
+
+        }
+
+        function detail(id, name) {
+            exLayer.openMiddle(name + " - 办理人", "/SysFlow/FlowPrcs/PrcsTransactor/" + id, '500px', '450px', layui.device().mobile);
+        }
+
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class='layui-btn layui-btn-primary layui-btn-xs' href='javascript:;' lay-event='detail' id='detail'><i class="fa fa-search"></i> </a>
+</script>

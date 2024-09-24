@@ -1,0 +1,14 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="是指新建录入表数据时(如点击『新增数据』按钮)，子表将按照设定的数据初始化完成数据加载，分为两类，读取空数据和从其他录入表读取数据" horAlignment="None" verAlignment="None" Selectable="True">是指新建录入表数据时(如点击『新增数据』按钮)，子表将按照设定的数据初始化完成数据加载，分为两类，读取空数据和从其他录入表读取数据</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编码" horAlignment="None" verAlignment="None" Selectable="True">编码</lab>
+			 <textField x="125" y="80" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCoding" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inCoding</textField>
+			<lab x="10" y="125" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="初始化空数据" horAlignment="None" verAlignment="None" Selectable="True">初始化空数据</lab>
+			<table2 x="10" y="170" width="790" height="120" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable51" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable51</table2>
+			<lab x="10" y="305" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="从其他录入表读数" horAlignment="None" verAlignment="None" Selectable="True">从其他录入表读数</lab>
+			<table2 x="10" y="350" width="790" height="120" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable52" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable52</table2>
+		</staticContent>
+	</content>
+</daReport>

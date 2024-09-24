@@ -1,0 +1,99 @@
+﻿@model Think9.Models.RuleAutoEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    @Html.HiddenFor(x => x.RuleId)
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-input-block layui-col-space3" style="margin-left:5px;">
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                    <select name="AutoType" id="AutoType" lay-filter="selectfilter" lay-search=''>
+                        <option selected="selected" value="11">固定字符</option>
+                        <option value="21">日期（年）</option>
+                        <option value="22">日期（年月）</option>
+                        <option value="23">日期（年月日）</option>
+                        <option value="31">序号</option>
+                        <option value="41">用户名</option>
+                        <option value="42">用户所在单位(部门)编码</option>
+                    </select>
+                </div>
+                <div class="layui-col-xs3 layui-col-sm3 layui-col-md3" id="divSome1">
+                    <input type="text" name="AutoSome1" id="AutoSome1" placeholder="请输入字符" autocomplete="off" class="layui-input" maxlength="10" lay-verify="required">
+                </div>
+                <div class="layui-col-xs3 layui-col-sm3 layui-col-md3" id="divSome2">
+                    <input type="text" name="AutoSome2" id="AutoSome2" autocomplete="off" class="layui-input" style="display:none">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: center;">
+            <div class="layui-inline">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add">添加</button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysTable/RuleAuto/AddItem", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/RuleAuto/GetList/" + $(window.parent.document).find("#_id").val() });
+                    /* parent.layer.close(parent.layer.getFrameIndex(window.name));*/
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on('select(selectfilter)', function (data) {
+            $("#AutoSome1").removeAttr("placeholder");
+            $("#AutoSome1").removeAttr("maxlength");
+            $("#AutoSome1").removeAttr("lay-verify");
+
+            $("#AutoSome2").removeAttr("placeholder");
+            $("#AutoSome2").removeAttr("maxlength");
+            $("#AutoSome2").removeAttr("lay-verify");
+
+            $("#AutoSome1").hide();
+            $("#AutoSome2").hide();
+
+            if (data.value == "11") {
+                $("#AutoSome1").val('');
+
+                $("#AutoSome1").show();
+                $("#AutoSome1").attr("placeholder", "请输入字符");
+                $("#AutoSome1").attr("maxlength", "10");
+                $("#AutoSome1").attr("lay-verify", "required");
+            }
+            if (data.value == "31") {
+                $("#AutoSome1").val('');
+                $("#AutoSome2").val('');
+
+                $("#AutoSome1").show();
+                $("#AutoSome2").show();
+
+                $("#AutoSome1").attr("placeholder", "位数 3-12之间");
+                $("#AutoSome1").attr("maxlength", "2");
+                $("#AutoSome1").attr("lay-verify", "required|number");
+
+                $("#AutoSome2").attr("placeholder", "起始值 1-99之间");
+                $("#AutoSome2").attr("maxlength", "2");
+                $("#AutoSome2").attr("lay-verify", "required|number");
+            }
+        })
+    });
+</script>

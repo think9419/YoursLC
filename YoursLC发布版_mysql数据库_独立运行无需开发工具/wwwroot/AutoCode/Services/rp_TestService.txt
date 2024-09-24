@@ -1,0 +1,269 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:35:17
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+
+using System;
+using System.Data;
+using System.IO;
+using System.Collections.Generic;
+using Think9.Models;
+using Think9.Services.Base;
+using Newtonsoft.Json;
+using Think9.Services.Com;
+using Think9.Services.Basic;
+
+namespace Think9.Services.CodeBuild
+{
+    /// <summary>
+    /// Service
+    /// </summary>
+    public partial class TestService
+    {
+        private string sql;
+        private string str;
+        private string itemStr;
+        private ComService comService = new ComService();
+        private ExtraDbService extraDb = new ExtraDbService();//外部数据源
+		private ExtraDbEntity extraDbModel;//外部数据源
+
+        #region sql 自定义的统计指标解析为sql语句
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		private string _SpecificationAndModel = "SELECT inSpecificationAndModel AS ex_value FROM  tb_ProductManagement WHERE   tb_ProductManagement.inCoding = @prmProductCodes";
+		/// <summary>
+		/// 货品名称
+		/// </summary>
+		private string _DescriptionOfGoods = "SELECT inName AS ex_value FROM  tb_ProductManagement WHERE   tb_ProductManagement.inCoding = @prmProductCodes";
+		/// <summary>
+		/// 入库数量
+		/// </summary>
+		private string _InventoryQuantity = "SELECT SUM(v6) AS ex_value FROM tb_InventoryDetails INNER JOIN tb_GoodsStorage ON tb_InventoryDetails.listid = tb_GoodsStorage.listid WHERE   tb_InventoryDetails.v1 = @prmProductCodes  AND  tb_GoodsStorage.inWarehouse = @prmWarehouse  AND  tb_GoodsStorage.inStorageDate >= @prmStartDate  AND  tb_GoodsStorage.inStorageDate <= @prmDeadline";
+		/// <summary>
+		/// 计量单位
+		/// </summary>
+		private string _MeasurementUnit = "SELECT inUnit AS ex_value FROM  tb_ProductManagement WHERE   tb_ProductManagement.inCoding = @prmProductCodes";
+
+        #endregion sql 自定义的统计指标解析为sql语句
+
+        /// <summary>
+        /// 获取rdlc报表的相关数据
+        /// </summary>
+        /// <param name="rpid">统计表编码</param>
+        /// <param name="rpname">统计表名称</param>
+        /// <param name="prm">条件参数对象</param>
+        /// <returns></returns>
+        public RdlcDeviceEntity GetRdlcDevice(string rpid, string rpname, TestPrm_Model prm)
+        {
+            string err = "";
+            string directory = Directory.GetCurrentDirectory();
+
+            RdlcDeviceEntity device = new RdlcDeviceEntity();
+            device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\rp_Test.rdlc");//rdlc模板文件
+            device.PathUserImg = Think9.Services.Base.BaseConfig.GetUserImgPath();//用户图片所在文件夹
+            device.ImgNoExist = Think9.Services.Base.BaseConfig.GetImgNoExistPath();//图片不存在时的替代
+            device.MainDt = GetMainDataTable(rpid, rpname, prm);
+            device.GridDt = GetGridDataTable(ref err, rpid, rpname, prm);//列表数据
+
+            if (!string.IsNullOrEmpty(err))
+            {
+                device.Err = err;
+            }
+
+            return device;
+        }
+
+        /// <summary>
+        /// 获取下拉选择、多选、单选数据源
+        /// </summary>
+        /// <param name="user">当前用户</param>
+        /// <returns></returns>
+        public IEnumerable<valueTextEntity> GetSelectList(CurrentUserEntity user)
+        {
+            TestPrm_Model param = GetModel(user);
+            DataTable dt = DataTableHelp.NewValueTextDt();
+
+
+
+            return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+        }
+
+        /// <summary>
+        /// 为参数对象赋值
+        /// </summary>
+        /// <param name="user">当前用户</param>
+        /// <param name="list">条件参数列表</param>
+        /// <returns></returns>
+        public TestPrm_Model GetModel(CurrentUserEntity user, List<ControlEntity> list = null)
+        {
+            TestPrm_Model model = new TestPrm_Model();
+            model.currentUserName = user == null ? "!NullEx" : user.RealName;
+            model.currentUserId = user == null ? "!NullEx" : user.Account;
+            model.currentDeptNo = user == null ? "!NullEx" : user.DeptNo;
+            model.currentDeptName = user == null ? "!NullEx" : user.DeptName;
+            model.currentRoleNo = user == null ? "!NullEx" : user.RoleNo;
+            model.currentRoleName = user == null ? "!NullEx" : user.RoleName;
+            model.timeToday = DateTime.Today;
+            model.timeNow = DateTime.Now;
+
+            if(list != null)
+            {
+				foreach (ControlEntity item in list)
+				{
+				  switch (item.ControlID)
+				  {
+				      case "prmStartDate":
+				        model.prmStartDate = string.IsNullOrEmpty(item.ControlValue) ? null : ExtConvert.ToDateOrNull(item.ControlValue);
+				        break;
+				      case "prmDeadline":
+				        model.prmDeadline = string.IsNullOrEmpty(item.ControlValue) ? null : ExtConvert.ToDateOrNull(item.ControlValue);
+				        break;
+				  }
+				}
+
+            }
+
+            return model;
+        }
+
+        /// <summary>
+        /// 获取对象并向查询条件赋初始值
+        /// </summary>
+        /// <param name="request">request不为空时（通常为从其他页面打开）</param>
+        /// <returns></returns>
+        public TestPrm_Model GetModel(Microsoft.AspNetCore.Http.HttpRequest request)
+        {
+            TestPrm_Model model = new TestPrm_Model();
+            if (request != null)
+            {
+				if (!string.IsNullOrEmpty(request.Query["prmStartDate"]) && ValidatorHelper.IsDateTime(request.Query["prmStartDate"].ToString()))
+				{
+					model.prmStartDate = ExtConvert.ToDateOrNull(request.Query["prmStartDate"].ToString());//开始日期
+				}
+				if (!string.IsNullOrEmpty(request.Query["prmDeadline"]) && ValidatorHelper.IsDateTime(request.Query["prmDeadline"].ToString()))
+				{
+					model.prmDeadline = ExtConvert.ToDateOrNull(request.Query["prmDeadline"].ToString());//截止日期
+				}
+            }
+            return model;
+        }
+
+        /// <summary>
+        /// 获取数据
+        /// </summary>
+        /// <param name="rpid">统计表编码</param>
+        /// <param name="rpname">统计表名称</param>
+        /// <param name="prm">条件参数对象</param>
+        /// <returns></returns>
+        private DataTable GetMainDataTable(string rpid, string rpname, TestPrm_Model prm)
+        {
+            DataTable dt = DataTableHelp.NewReportMainTb();
+            DataRow row = dt.NewRow();
+            row["ReportID"] = rpid;
+            row["ReportName"] = rpname;
+            row["ReportParm"] = "";
+            row["Title"] = rpname;
+            dt.Rows.Add(row);
+
+            return dt;
+        }
+
+        /// <summary>
+        /// 获取数据列表
+        /// </summary>
+        /// <param name="err">错误信息</param>
+        /// <param name="rpid">统计表编码</param>
+        /// <param name="rpname">统计表名称</param>
+        /// <param name="prm">条件参数对象</param>
+        /// <returns></returns>
+        private DataTable GetGridDataTable(ref string err, string rpid, string rpname, TestPrm_Model prm)
+        {
+            List<Rows10Entity> list = new List<Rows10Entity>();
+            Rows10Entity model;
+            string[] arrItem;
+            try
+            {
+				#region 数据动态行 - 第1行
+				DebugApp.Trace = "数据动态行第1行";
+				//从数据规范读取参数值，可以包含条件参数，只要保证条件参数能从查询条件取得赋值；也可自定义过滤条件参数
+				sql = "SELECT inCoding AS id,state AS name FROM tb_ProductManagement WHERE  tb_ProductManagement.listid <= 200 ORDER BY state";
+				foreach (DataRow dr in comService.GetDataTable(sql, prm).Rows)
+				{
+					DebugApp.Trace = "数据动态行第1行";
+					model = new Rows10Entity("rp_Test");
+					str = dr["id"].ToString().Trim();
+					prm.prmProductCodes = str;//动态行参数赋值
+					
+					DebugApp.Trace = "数据动态行第1行第1列";
+					model.V1 = prm.prmProductCodes == null ? "" : prm.prmProductCodes.ToString();//参数赋值3
+					model.I1 = "@prmProductCodes";//参数编码
+					model.Cell_1_TopBorder = "None";//上边框
+					
+					DebugApp.Trace = "数据动态行第1行第2列";
+					model.V2 = ExtConvert.EmptyToNull(comService.GetSingleField(_DescriptionOfGoods, prm));
+					model.I2 = "DescriptionOfGoods";//指标编码
+					model.Cell_2_TopBorder = "None";//上边框
+					
+					DebugApp.Trace = "数据动态行第1行第3列";
+					model.V3 = ExtConvert.EmptyToNull(comService.GetSingleField(_SpecificationAndModel, prm));
+					model.I3 = "SpecificationAndModel";//指标编码
+					model.Cell_3_TopBorder = "None";//上边框
+					
+					DebugApp.Trace = "数据动态行第1行第4列";
+					model.V4 = ExtConvert.EmptyToNull(comService.GetSingleField(_MeasurementUnit, prm));
+					model.I4 = "MeasurementUnit";//指标编码
+					model.Cell_4_TopBorder = "None";//上边框
+					
+					DebugApp.Trace = "数据动态行第1行第5列";
+					prm.prmWarehouse = "01";//单元格内参数赋值
+					model.V5 = ExtConvert.EmptyToNull(comService.GetSingleField(_InventoryQuantity, prm));
+					model.I5 = "InventoryQuantity";//指标编码
+					model.Cell_5_TopBorder = "None";//上边框
+					
+					DebugApp.Trace = "数据动态行第1行第6列";
+					prm.prmWarehouse = "02";//单元格内参数赋值
+					model.V6 = ExtConvert.EmptyToNull(comService.GetSingleField(_InventoryQuantity, prm));
+					model.I6 = "InventoryQuantity";//指标编码
+					model.Cell_6_TopBorder = "None";//上边框
+					
+					list.Add(model);
+				}
+				#endregion 数据动态行 - 第1行
+
+
+                if (list.Count < 1)//list为空会报错，至少添加一条数据
+                {
+                   model = new Rows10Entity("rp_Test");
+                   list.Add(model);
+                }
+                return DataTableHelp.ListToDataTable<Rows10Entity>(list);//转换DataTable
+            }
+            catch (Exception ex)
+            {
+                err = DebugApp.Trace + " - " + ex.Message;
+                return null;
+            }
+        }
+
+         /*
+        public TestPrm_Model GetModel(CurrentUserEntity user, string prmStartDate, string prmDeadline)
+        {
+            TestPrm_Model model = new TestPrm_Model();
+
+            model.currentUserName = user == null ? "" : user.RealName;
+            model.currentUserId = user == null ? "" : user.Account;
+            model.currentDeptNo = user == null ? "" : user.DeptNo;
+            model.currentDeptName = user == null ? "" : user.DeptName;
+            model.currentRoleNo = user == null ? "" : user.RoleNo;
+            model.currentRoleName = user == null ? "" : user.RoleName;
+            model.timeToday = DateTime.Today;
+            model.timeNow = DateTime.Now;
+			model.prmStartDate = string.IsNullOrEmpty(prmStartDate) ? null : ExtConvert.ToDateOrNull(prmStartDate);
+			model.prmDeadline = string.IsNullOrEmpty(prmDeadline) ? null : ExtConvert.ToDateOrNull(prmDeadline);
+
+            return model;
+        }
+        */
+    }
+}

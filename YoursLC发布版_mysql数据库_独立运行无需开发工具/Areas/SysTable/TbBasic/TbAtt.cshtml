@@ -1,0 +1,64 @@
+﻿@model Think9.Models.FlowEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <input style="display: none" name="FlowId" id="FlowId" value="@Model.FlowId">
+    <div class="layui-form-item">
+        <label class="layui-form-label">附件分类</label>
+        <div class="layui-input-block">
+            <textarea name="FlowAttachment" id="FlowAttachment" class="layui-textarea"></textarea>
+            <tip>分类之间请用空格间隔 如分类1 分类2</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">允许类型</label>
+        <div class="layui-input-block">
+            <textarea name="FlowAttachment2" id="FlowAttachment2" class="layui-textarea"></textarea>
+            <tip>类型(文件后缀名)之间请用|间隔 如xls|xlsx|zip|pdf|doc|docx|png|jpeg|jpg|gif 不输入则不做限定</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">禁止类型</label>
+        <div class="layui-input-block">
+            <textarea name="FlowAttachment3" id="FlowAttachment3" class="layui-textarea"></textarea>
+            <tip>类型(文件后缀名)之间请用|间隔 如xls|xlsx|zip|pdf|doc|docx|png|jpeg|jpg|gif 不输入则不做限定</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+        form.render();
+
+        form.val("formEdit", {
+            "FlowAttachment": "@Model.FlowAttachment"
+            , "FlowAttachment2": "@Model.FlowAttachment2"
+            , "FlowAttachment3": "@Model.FlowAttachment3"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbBasic/EditTbAtt", "post", { model: data.field, fwid: $("#FlowId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    })
+</script>

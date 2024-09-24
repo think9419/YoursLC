@@ -1,0 +1,332 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="AppId" id="AppId" value="@ViewBag.AppId">
+<blockquote class="layui-elem-quote layui-text">
+    生成并下载代码后，首先按照要求将代码放置在规定的文件目录下，然后『启动调式模式』可使用调式代码功能；<br>『启动调式模式』链接路径由『_RP?rpid=表编码』自动修改为『表编码(去前缀)』，Views文件夹中cshtml文件中的『/_RP/』自动修改为『/表编码(去前缀)/』<br>
+    如需启动『发布模式』，选择左侧菜单『模式切换』点击启动『发布模式』按钮
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    @Html.DropDownList("SortID", (IEnumerable<SelectListItem>)ViewBag.SortList, "==所有分类==", new Dictionary<string, object> { })
+                </div>
+                <div class="layui-inline">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search'><i class='layui-icon layui-icon-search'></i></button> <button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+        form.render();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/Report/GetReportList",
+            toolbar: "#toolbarTpl",
+            page: false,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ReportId", title: "编码", sort: true },
+                { field: "ReportName", title: "名称", sort: true },
+                { field: "Model", title: "模式", width: 90, templet: '#switchModel', unresize: true, sort: true },
+                { title: "设置", width: 360, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "Warning":
+                    Warning();
+                    break;
+                case "download":
+                    DownLoad();
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+                case "model":
+                    model();
+                    break;
+                case "refresh":
+                    $("#searchfield").hide();
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportList?key=" + $("#key").val() + "&sortid=" + $("#SortID").val()
+                    });
+                    break;
+            }
+        });
+
+        //监听切换按钮
+        form.on('switch(stateModel)', function (data) {
+            var tbid = this.value;
+            var isRelease = "release";
+            if (data.elem.checked) {
+                isRelease = "";
+            }
+            exUtils.ajax("/SysStats/Report/ChangeModel?idsStr=" + tbid + "&isRelease=" + isRelease, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportList"
+                    });
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "btnEdit":
+                    if (data.ReporType == '0') {
+                        exLayer.open(data.ReportName + " - 基本属性", "/SysStats/Report/EditReport?rpId=" + data.ReportId, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    }
+                    else {
+                        exLayer.open("基本属性", "/SysStats/ReportBasic/EditReportBasic?rpId=" + data.ReportId, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    }
+                    break;
+                case "btnRowsCols":
+                    if (data.ReporType == '0') {
+                        exLayer.open(data.ReportName + " - 编辑行列", "/SysStats/ReportRows/RowList?rpId=" + data.ReportId, '100%', '100%', '0px', '0px', null, null);
+                    } else {
+                        layer.msg('点击属性按钮进行设置');
+                    }
+                    break;
+                case "btnDYNParm":
+                    if (data.ReporType == '0') {
+                        exLayer.open(data.ReportName + " - 动态行管理", "/SysStats/Report/DYNParmList?rpId=" + data.ReportId, '100%', '100%', '0px', '0px', null, null);
+                    } else {
+                        layer.msg('点击属性按钮进行设置');
+                    }
+                    break;
+                case "btnQueryParm":
+                    if (data.ReporType == '0') {
+                        exLayer.open(data.ReportName + " - 查询参数管理", "/SysStats/Report/QueryParmList?rpId=" + data.ReportId, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    } else {
+                        layer.msg('点击属性按钮进行设置');
+                    }
+                    break;
+                case "btnParm":
+                    if (data.ReporType == '0') {
+                        exLayer.open(data.ReportName + " - 赋值参数", "/SysStats/Report/ParmAssignList?rpId=" + data.ReportId, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    } else {
+                        layer.msg('点击属性按钮进行设置');
+                    }
+                    break;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        form.on("submit(search)", function (data) {
+            $("#searchfield").hide();
+            ThisTable.reload({
+                url: "/SysStats/Report/GetReportList?key=" + $("#key").val() + "&sortid=" + $("#SortID").val()
+            });
+            return false;
+        });
+
+        function Creat() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+            }
+            if (idsStr) {
+                exUtils.ajax("/SysStats/RpCodeBuild/CodeBuild", "post", { idsStr: idsStr }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+
+        function DownLoad() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+                //个人用户
+                if ($("#AppId").val().indexOf('B1') > -1) {
+                    exUtils.ajax("/SysTable/TbCodeBuild/GetMsg", "post", { idsStr: idsStr }, true).done(function (response) {
+                        layer.confirm(response.message, {
+                            btn: ['继续', '取消']
+                        }, function () {
+                            DownLoadCode(idsStr);
+                        }, function () {
+                            layer.msg('操作已取消');
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+                else {
+                    DownLoadCode(idsStr);
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+        }
+
+        function DownLoadCode(idsStr) {
+            var _msg = '下载后，参看说明将文件按要求放置，并启动调试模式，启动『调试模式』可使用代码调式功能 <br>生成后再运行时需考虑清理浏览器缓存';
+            exLayer.confirm(_msg, function () {
+                exUtils.ajax("/SysStats/RpCodeBuild/DownloadCode", "post", { idsStr: idsStr }, true).done(function (response) {
+                    layer.open({
+                        title: response.message
+                        , type: 1
+                        , area: ['350', '150px']
+                        , content: response.extra
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function Warning() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+                exLayer.open("批量检测", "/SysStats/Report/Warn?idsStr=" + idsStr, '100%', '100%', '0px', '0px', null, null);
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+        }
+
+        function model() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+            }
+            if (idsStr) {
+                exUtils.ajax("/SysStats/Report/ChangeModel", "post", { idsStr: idsStr, isRelease: '' }, true).done(function (response) {
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportList"
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+
+        function look(tbid, tbname) {
+            exLayer.open(tbname + " - 代码查看", "/SysStats/RpCodeBuild/LookCode?rpid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="download" id="download"><i class="fa fa-download"></i>生成代码并下载</button>
+        <button class="layui-btn layui-btn-warm layui-btn-sm" lay-event="Warning" id="Warning"><i class="fa fa-warning"></i>批量检测</button>
+        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="model" id="model" style="display: none"><i class="fa fa-code"></i>启动调式模式</button>
+    </div>
+    <div class="layui-inline">
+        <span class="layui-word-aux"></span>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <div class="layui-btn-group">
+        <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btnEdit" lay-tips="统计表基本属性">属性</a>
+        <a style="width:80px" href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btnRowsCols" lay-tips="统计表行列管理"><span>行列({{ d.RowsNum }}*{{ d.ColsNum }})</span> </a>
+        <a style="width:70px" href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btnDYNParm" lay-tips="统计表动态行管理">动态行({{ d.DYNParmNum }})</a>
+        <a style="width:80px" href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btnQueryParm" lay-tips="查询参数">查询参数({{ d.QueryParmNum }})</a>
+        <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btnParm" lay-tips="统计表参数赋值">参数赋值</a>
+    </div>
+</script>
+<script type="text/html" id="switchModel">
+    @* <span title="模式"><input type="checkbox" name="Model" value="{{d.ReportId}}" lay-skin="switch" lay-text="调试|" lay-filter="stateModel" {{ d.Model == 2 ? 'checked' : '' }}></span> *@
+    {{#  if(d.Model == '0'){ }}
+    <sapn style='color: red;'>???</sapn>
+    {{#  } }}
+    {{#  if(d.Model == '1'){ }}
+    <sapn>发布模式</sapn>
+    {{#  } }}
+    {{#  if(d.Model == '2'){ }}
+    <sapn style='color: #FFAB00;'>调试模式</sapn>
+    {{#  } }}
+</script>

@@ -1,0 +1,55 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:11:03
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:11:03
+	/// </summary>
+	 [Table("tb_HXMB")]
+	public class HXMBModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 上报日期
+		/// </summary>
+		public DateTime? inReportDate { get; set; }
+		/// <summary>
+		/// 上报日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inReportDate_Exa { get; set; }
+		/// <summary>
+		/// 上报人
+		/// </summary>
+		public string inReportPerson { get; set; }
+		/// <summary>
+		/// 小数
+		/// </summary>
+		public decimal? inDecimal { get; set; }
+		/// <summary>
+		/// 小数 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inDecimal_Exa { get; set; }
+		/// <summary>
+		/// 修改时间
+		/// </summary>
+		public DateTime? inChangeTime { get; set; }
+		/// <summary>
+		/// 修改时间 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inChangeTime_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

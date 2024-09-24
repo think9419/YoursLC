@@ -1,0 +1,41 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:28:39
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:28:39
+	/// </summary>
+	 [Table("tb_FreeProcess")]
+	public class FreeProcessModel : MainTB2Entity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		/// <summary>
+		/// 日期
+		/// </summary>
+		public DateTime? inDate { get; set; }
+		/// <summary>
+		/// 日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inDate_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

@@ -1,0 +1,251 @@
+﻿@using Think9.Models;
+@model Think9.Models.RuleSingleEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" name="RuleId" id="RuleId" value="@ViewBag.id">
+    <input style="display:none" id="ValueScope" value="@Model.ValueScope">
+    <input style="display:none" id="DbID">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">名 称</label>
+        <div class="layui-input-block">
+            <input type="text" name="Name" placeholder="必填 请输入名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength='50'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">数据源</label>
+        <div class="layui-input-block">
+            <input type="text" name="DbID_Exa" autocomplete="off" class="layui-input" lay-verify="required" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">取值数据表</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbId_Exa" id="TbId_Exa" readonly="readonly" class="layui-input" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item required">
+        <label class="layui-form-label required">Value字段</label>
+        <div class="layui-input-block">
+            <select id="ValueFiled" name="ValueFiled" lay-verify="required">
+                @foreach (valueTextEntity item in ((List
+                <valueTextEntity>
+                )ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("valuetext")))
+                {
+
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <tip>作为下拉框、单选按钮等组件的value值，弹出选择时，选择的是该值</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">Text字段</label>
+        <div class="layui-input-block">
+            <select id="TxtFiled" name="TxtFiled" lay-verify="required">
+                @foreach (valueTextEntity item in ((List
+                <valueTextEntity>
+                )ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("valuetext")))
+                {
+
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <tip>作为下拉框、单选按钮等组件的Text值，可与Value字段相同</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-row">
+            <div class="layui-col-md10">
+                <label class="layui-form-label required">排序字段</label>
+                <div class="layui-input-block">
+                    <select id="OrderFiled" name="OrderFiled" lay-verify="required">
+                        @foreach (valueTextEntity item in ((List
+                        <valueTextEntity>
+                        )ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("order")))
+                        {
+
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="layui-col-md2" align="left">
+                <div class="layui-input-block">
+                    <input type="hidden" name="OrderType" value="1">
+                    <input type="checkbox" id="OrderType" name="OrderType" value="2" title="倒序">
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">筛选条件</legend>
+        <div class="layui-form-item">
+            <label class="layui-form-label">连 接</label>
+            <div class="layui-input-inline">
+                <select name="linkstr" id="linkstr">
+                    <option value=""></option>
+                    <option value=" AND "> 并且 ( AND )</option>
+                    <option value=" OR "> 或者 ( OR )</option>
+                </select>
+            </div>
+            <label class="layui-form-label">判 断</label>
+            <div class="layui-input-inline">
+                <select name="judge" id="judge">
+                    <option value="=">等于</option>
+                    <option value=">">大于</option>
+                    <option value=">=">大于等于</option>
+                    <option value="<">小于</option>
+                    <option value="<=">小于等于</option>
+                    <option value="<>">不等于</option>
+                    <option value="like">包含</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">字 段</label>
+            <div class="layui-input-block">
+                <select id="ConditionFiled" name="ConditionFiled">
+                    @foreach (valueTextEntity item in ((List
+                    <valueTextEntity>
+                    )ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("condition")))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">值</label>
+            <div class="layui-input-inline">
+                <input type="text" name="valuekey" id="valuekey" placeholder="输入或选择" class="layui-input">
+            </div>
+            <div class="layui-input-inline">
+                <button type="button" class="layui-btn layui-btn-primary" id="selectvalue"><i class="fa fa-check"></i>选择</button>
+            </div>
+            <div class="layui-input-inline">
+                <button type="button" class="layui-btn " id="addvalue"><i class="fa fa-plus"></i>添加筛选条件</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="margin-left:5px;">
+                <textarea class="layui-textarea" id="LimitStr" name="LimitStr" placeholder='可自定义SQL语句，如字段1=条件1，其中条件可包含系统参数，如字段1=@@currentUserId，其中@@currentUserId表示用户登录名，数据库为PostgreSql或Oracle时字段前后需加入双引号'>@Html.Raw(@Model.LimitStr)</textarea>
+                <span style="position: absolute;top: 0px; left: 0px;">
+                    <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipsWhereStr"></i>
+                </span>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑数据库为PostgreSql或Oracle时字段前后需加入双引号，如"字段"=条件
+                    </span>
+                </tip>
+            </div>
+        </div>
+    </fieldset>
+    <div class="layui-form-item" style="padding-top:10px;">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+        form.render(); //
+        getVal();
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //赋值
+        form.val("formUser", {
+            "Name": "@Model.Name",
+            "DbID": "@Model.DbID",
+            "DbID_Exa": "@Model.DbID_Exa",
+            "TbId_Exa": "@Model.TbId_Exa",
+            "TbId": "@Model.TbId",
+            "ValueFiled": "@Model.ValueFiled",
+            "TxtFiled": "@Model.TxtFiled",
+            "OrderFiled": "@Model.OrderFiled",
+            "LimitStr": "@Html.Raw(@Model.LimitStr)"
+        });
+        function getVal() {
+            $('#tipsWhereStr').attr("lay-tips", GetTips('@Model.LimitStr'));
+            if (@Model.OrderType == "2") {
+                $('#OrderType').attr("checked", true);
+            }
+            else {
+                $("#OrderType").removeAttr("checked");
+            }
+        }
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/RuleSingle/Edit", "post", { model: data.field, id: $("#RuleId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    $(window.parent.document).find('#search').click();
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#selectvalue').on('click', function () {
+            exLayer.openMiddle('选择', '/Com/ComSelect/SelectParm', '500px', '450px', layui.device().mobile);
+        });
+
+        $('#addvalue').on('click', function () {
+            var _old = $("#LimitStr").val();
+            var _new = _old + ' ' + $("#linkstr").val() + ' ' + $("#ConditionFiled").val() + ' ' + $("#judge").val() + ' ' + $("#valuekey").val();
+            $("#LimitStr").val(_new);
+            $("#valuekey").val('');
+            $('#tipsWhereStr').attr("lay-tips", GetTips($('#LimitStr').val()));
+        });
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>

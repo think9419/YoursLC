@@ -1,0 +1,354 @@
+﻿@*学生表 适配移动端*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:11:03 列表-此文件放置于Views/StudentList /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "MobileList";
+    Layout = "~/Areas/Shared/_LayuiMobileList.cshtml"; }
+
+<style type="text/css">
+    .layui-table-cell {
+        height: auto;
+        line-height: 35px;
+    }
+    .layui-table{
+        border: 2px solid #fff; /* 不加手机右侧总有两道线 */
+    }
+</style>
+
+<input style="display:none" id="_isDebug" value="debug">@*debug为调试；release为发布*@
+<input style="display:none" id="_fwid" value="bi_StudentList">
+<input style="display:none" id="_searchTag" value="">@*查询字符与选项卡关联*@
+@*弹出选择时页面间传递数据*@
+<input style="display:none" id="pu_value">@*弹出选择时使用-选择的值*@
+<input style="display:none" id="pu_tbid">@*弹出选择时使用-表id*@
+<input style="display:none" id="pu_indexid">@*弹出选择时使用-指标编码*@
+<input style="display:none" id="pu_rowid">@*弹出选择时使用-子表弹出，对应tableid 哪一行*@
+<input style="display:none" id="pu_column">@*弹出选择时使用-子表弹出，第几列*@
+
+<fieldset class="table-fieldset" id="searchfield" style="display:none;border: 1px solid #fff;">
+    <legend style="color:darkgrey">快速查询 -<span id="sp_searchmode"></span><span><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form layui-form-pane" action=""  id="_formid">
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<label class="layui-form-label">编码</label>
+					<div class="layui-input-block">
+						<input type='text' name="inCoding" id="inCoding" autocomplete='off' class='layui-input'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<label class="layui-form-label">名称</label>
+					<div class="layui-input-block">
+						<input type='text' name="inName" id="inName" autocomplete='off' class='layui-input'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<label class="layui-form-label">备注</label>
+					<div class="layui-input-block">
+						<input type='text' name="inRemarks" id="inRemarks" autocomplete='off' class='layui-input'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button> <button type='button' class='layui-btn layui-btn-primary' id='exportData' lay-submit lay-filter='exportData' lay-tips='查询并导出Excel'><i class='fa fa-file-excel-o'></i></button><button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+				</div>
+			 </div>
+        </form>
+    </div>
+</fieldset>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.config({
+        base: '/Self_JS/' /*自定义的js文件--wwwroot/Self_JS文件夹中*/
+    });
+    layui.use(["table", "element", "form", "exLayer", "exUtils", "miniPage", "StudentList"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let miniPage = layui.miniPage;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+        let myJS = layui.StudentList;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+        form.render();//更新全部表单数据
+
+		element.on('tab(tabTag_Filter)', function (data) {
+		});
+
+        //渲染表格，url数据接口参数；cols设置显示字段...
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/_TB/GetPageList",
+            where: { fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val() },
+            limits: [20, 50, 100],
+            limit: 20,
+            method:"POST",
+            page: {
+                layout: ['limit', 'count', 'prev', 'page', 'next'] //自定义分页布局
+                , groups: 1 //只显示 1 个连续页码
+                , first: false
+                , last: false
+                , next: "下一页>>"
+                , prev: "<<上一页"
+            },
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { templet: "#mobile_list"}
+            ]],
+            done: function (res, curr, count) {
+                $('th').hide();//不显示表头
+                $("[lay-id='tableId']>.layui-table-page").css({ "text-align": "center" });//分页居中
+                myJS.disableListBtn("@ViewBag.DisableBut");//控制List页面按钮状态
+                if (count == -1) {
+                    //layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+         //查询
+        form.on("submit(search)", function (data) {
+            $("#searchfield").hide();
+            ThisTable.reload({
+                where: {fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val(), model: data.field, json: JSON.stringify(data.field, null, 4)},
+                url: "/_TB/GetPageList",
+                page: { curr: 1 }
+            });
+            return false;
+        });
+        //导出
+        form.on("submit(exportData)", function (data) {
+            exUtils.ajax("/_TB/ExportData", "post", { json: JSON.stringify(data.field, null, 4), fwid: $("#_fwid").val() }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['250', '100px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        //toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add"://新增按钮事件
+                    add();
+                    break;
+                 case "importExcel"://数据导入按钮事件
+                    exLayer.openMobile("数据导入", "/SysTable/ImportData/ImportDataFromExcel?tbid=tb_StudentList", '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "searchShow"://查询按钮事件
+                    myJS.searchShow();
+                    break;
+                case "refresh"://刷新按钮事件
+                    layer.msg('显示所有数据', { icon: 1, shade: this.shade, scrollbar: false, time: 2000, shadeClose: true });
+                    $("#searchfield").hide();
+                    ThisTable.reload({
+                        url: "/_TB/GetPageList?isAll=all",
+                        where: {fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val()},
+                        page: { curr: 1 }
+                    });
+                    break;
+                case "mergeExport"://合并导出按钮事件
+                    mergeExport();
+                    break;
+                case "batchDel"://批量删除按钮事件
+                    batchDel();
+                    break;
+            }
+        });
+        //tool监听事件(处理table数据行按钮)
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail"://列表行 - 查看详细按钮事件
+                    exLayer.openMobile("学生表 - 查看详细", "/_TB/Detail?listid=" + data.ListId_Exa + "&mobile=y" + "&fwid=" + $("#_fwid").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "record"://列表行 - 查看记录按钮事件
+                    record(data.ListId);
+                    break;
+                case "edit"://列表行 - 编辑数据按钮事件
+                    edit(data.ListId);
+                    break;
+                case "prcslist"://列表行 - 流程记录查看按钮事件
+                    exLayer.openMobile('记录查看', '/SysFlow/FlowRunList/RecordList?listid=' + data.ListId + "&fwid=" + $("#_fwid").val() + "&mobile=y", '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "del"://列表行 - 删除数据按钮事件
+                    del(data.ListId);
+                    break;
+
+
+            }
+        });
+        //新增数据 发布模式调用_TB/BeforeAdd，调试模式调用StudentList/BeforeAdd
+        function add() {
+            exUtils.ajax("/_TB/BeforeAdd", "post", { type: 'add', listid: '0', fwid: $("#_fwid").val() }, true).done(function (response) {
+                exLayer.openMobile("学生表 - 新增数据", "/_TB/Form?listid=" + response.extra + "&pid=" + response.extra2 + "&type=add&mobile=y" + "&fwid=" + $("#_fwid").val(), '100%', '100%', '0px', '0px', null, null);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+        //编辑数据 发布模式调用_TB/BeforeEdit，调试模式调用StudentList/BeforeEdit
+        function edit(id) {
+            exUtils.ajax("/_TB/BeforeEdit", "post", { type: 'edit', listid: id, fwid: $("#_fwid").val()}, true).done(function (response) {
+                exLayer.openMobile("学生表 - 编辑数据", "/_TB/Form?listid=" + id + "&pid=" + response.extra2 + "&type=edit&mobile=y" + "&fwid=" + $("#_fwid").val(), '100%', '100%', '0px', '0px', null, null);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+        //记录查看
+        function record(id) {
+            exLayer.openMobile('记录查看', '/SysFlow/FlowRunList/RecordList?listid=' + id + "&fwid=" + $("#_fwid").val()+ "&mobile=y", '100%', '100%', '0px', '0px', null, null);
+        }
+        //删除数据 发布模式调用_TB/Delete，调试模式调用StudentList/Delete
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/_TB/Delete", "get", { listid: id, fwid: $("#_fwid").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $("#search").click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+        //弹出页面关闭后为控件赋值 无弹出页面可删除
+        $("#pu_value").click(function () {
+            //弹出页面关闭时以下组件已被赋值
+        	var _tbid = $('#pu_tbid').val();//表id，主表为_main，子表纵列为_gridColumn
+			var _indexid = $('#pu_indexid').val();//指标编码，触发弹出选择的控件id
+			var _rowid = $('#pu_rowid').val();//子表数据主键
+			var _value = $('#pu_value').val();//弹出页面选择的值
+			var _column = $('#pu_column').val();//第几列--子表弹出时有用
+            //弹出页面关闭后，将选择的Value赋值给触发弹出页面的input，wwwroot\Self_JS\StudentList.js中定义
+            myJS.getValueFromPopUp(_tbid, _indexid, _rowid, _column, _value);
+        });
+        //处理查询参数
+        function jsonToUrlParam(json) {
+            return Object.keys(json).map(key => key + '=' + json[key]).join('&');
+        }
+        //批量删除数据 发布模式调用_TB/BatchDel，调试模式调用StudentList/BatchDel
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ListId + ",";
+                }
+                exLayer.confirm("确定要删除吗？", function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax("/_TB/BatchDel", "post", { idsStr: idsStr, fwid: $("#_fwid").val() }, true).done(function (response) {
+                            exUtils.tableSuccessMsg(response.message);
+                            $("#search").click();
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg("未选择有效数据");
+            }
+        }
+        //合并导出pdf 发布模式调用_TB/MergeExport，调试模式调用StudentList/MergeExport
+       function mergeExport() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ListId + ",";
+                }
+                if (idsStr) {
+                    exUtils.ajax("/_TB/MergeExport", "post", { idsStr: idsStr, fwid: $("#_fwid").val() }, true).done(function (response) {
+                        layer.open({
+                            title: response.message
+                            , type: 1
+                            , area: ['250', '100px']
+                            , content: response.extra
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            }
+            else {
+                layer.msg("未选择有效数据");
+            }
+        }
+
+
+
+
+
+      $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none;border: 1px solid #fff;");
+        });
+
+      $(document).ready(function () {
+            $("#sp_searchmode").text("@ViewBag.SearchMode");//查看编辑模式 可在录入表管理-权限管理中设置
+        });
+    });
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+  <div class="layui-row">
+	<button class="layui-btn layui-btn-radius layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel_Mobile"><i class="fa fa-trash-o"></i></button>&nbsp;&nbsp;
+	<button class="layui-btn layui-btn-radius layui-btn-normal layui-btn-sm" lay-event="mergeExport" id="mergeExport_Mobile"><i class="fa fa-file-pdf-o"></i></button>&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-radius layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i></button>&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm" lay-event="searchShow" id="searchShow"><i class="fa fa-search"></i></button>
+   </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type='text/html' id='mobile_list'>
+   @*  完全显示内容的样式style='margin-left:-30px;overflow:visible;text-overflow:inherit;white-space:normal;' *@
+	<div class='layui-tab-content'>
+		<div class='layui-table-cell' style='margin-left:-25px;margin-right:-25px;'>编码： {{d.inCoding ==  null ? '' : d.inCoding}}</div>
+		<div class='layui-table-cell' style='margin-left:-25px;margin-right:-25px;'>名称： {{d.inName ==  null ? '' : d.inName}}</div>
+		<div class='layui-table-cell' style='margin-left:-25px;margin-right:-25px;'>备注： {{d.inRemarks ==  null ? '' : d.inRemarks}}</div>
+		<div class='layui-row' style='text-align: left;'>
+			<input type='checkbox' name='layTableCheckbox' id='layTableCheckbox' lay-skin='primary'>
+			&nbsp;&nbsp;&nbsp;
+			{{#  if(d.isLock == '0'){ }}
+				<i class='fa fa-unlock'></i>
+			{{#  } }}
+			{{#  if(d.isLock == '1'){ }}
+				<i class='fa fa-lock'></i>
+			{{#  } }}
+			{{#  if(d.isLock == '9'){ }}
+				<i class='fa fa-unlock-alt'></i>
+			{{#  } }}
+			&nbsp;&nbsp;&nbsp;
+			{{#  if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[detail]") > -1){ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-disabled layui-btn-sm" id="detail">详 细</a>
+			{{#  }else{ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-primary  layui-btn-sm" lay-event="detail" id="detail">详 细</a>
+			{{#  } }}
+			{{# if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[record]") > -1){ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-disabled layui-btn-sm" id="record">记 录</a>
+			{{#  }else{ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm" lay-event="record" id="record">记 录</a>
+			{{#  } }}
+			{{# if(d.DisableButStr == 'all' ||  d.DisableButStr.indexOf("[edit]") > -1){ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-disabled layui-btn-sm" id="edit">编 辑</a>
+			{{# }else{ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm" id="edit" lay-event="edit">编 辑</a>
+			{{# } }}
+			{{# if(d.DisableButStr == 'all' ||  d.DisableButStr.indexOf("[del]") > -1){ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-disabled layui-btn-sm" id="del">删 除</a>
+			{{# }else{ }}
+				<a href='javascript:;' class="layui-btn layui-btn-radius layui-btn-primary layui-btn-sm" style='color:red' id="del" lay-event="del">删 除</a>
+			{{# } }}
+		</div>
+	</div>
+</script>
+<!-- 图片显示 -->
+<script>
+    function PopUpImg(id) {
+        showImg(id);//在global.js中定义
+    }
+</script>

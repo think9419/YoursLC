@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "记录查看";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form layui-form-pane" action="" id="_formid">
+    <fieldset class="table-fieldset" id="searchfield" style="display: none">
+        <legend style="color:darkgrey">快速查询</legend>
+        <div class="layui-form">
+            <div class="layui-form layui-row layui-col-space10">
+                <div class="layui-col-xs12 layui-col-sm4 layui-col-md4">
+                    <label class="layui-form-label">日期</label>
+                    <div class="layui-input-inline">
+                        <div class="layui-input-inline" style="width: 150px; ">
+                            <input name="inDate" id="inDate" autocomplete='off' class='layui-input' onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd HH:mm:ss'})">
+                        </div>
+                        <div class="layui-input-inline">-</div>
+                        <div class="layui-input-inline" style="width: 150px; ">
+                            <input name="inDate_Exa" id="inDate_Exa" autocomplete='off' class='layui-input' onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd HH:mm:ss'})">
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-col-xs12 layui-col-sm2 layui-col-md2">
+                    <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button>
+                    <button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <input style="display: none" name="filePath" id="filePath" value="@ViewBag.FilePath">
+</form>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/TempletCode/GetCodeRecordList?filePath=" + $("#filePath").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "OperateTime", title: "时间", sort: true },
+                { field: "Info", title: "说明", sort: true }
+            ]],
+            done: function (res, curr, count) {
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysBasic/TempletCode/GetCodeRecordList?filePath=" + $("#filePath").val()
+                    });
+                    break;
+            }
+        });
+
+        $("#close").click(function () {
+            window.close();
+        });
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    文件路径： @ViewBag.FilePath <button type='button' class='layui-btn layui-btn-primary layui-btn-sm' id='close'>关 闭</button>
+</script>

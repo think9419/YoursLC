@@ -1,0 +1,1073 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:29:48
+ * Description: Think9企业级开发工具 http://yourslc.top Controller类
+*********************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Think9.Controllers.Basic;
+using Think9.Models;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+using Think9.Services.CodeBuild;
+using Think9.Util.Helper;
+
+namespace Think9.Controllers.CodeBuild
+{
+    public partial class A2DataWriteBackController : BaseController
+    {
+        private A2DataWriteBackService tbA2DataWriteBack = new A2DataWriteBackService();
+
+        private ComService comService = new ComService();
+        private readonly string _maintbid = "tb_A2DataWriteBack";//主表编码
+        private readonly string _flowid = "fw_A2DataWriteBack";//流程编码 bi_基础信息 fw_一般录入表
+        private readonly string _tbname = "A2数据回写";//录入表名称
+        private readonly string _split = Think9.Services.Base.BaseConfig.ComSplit;//多选项的字符分割
+        private string str;
+        //当前用户 可统一修改
+        private CurrentUserEntity GetUser()
+        {
+            return GetCurrentUser();
+        }
+        //当前用户ID
+        private string GetUserId()
+        {
+            var user = GetUser();
+            return user == null ? "!NullEx" : user.Account;
+        }
+
+        #region 自定义按钮的事件处理，点击自定义的按钮将触发
+        /// <summary>
+        /// List页面自定义按钮处理
+        /// </summary>
+        /// <param name="idsStr">listid逗号间隔</param>
+        /// <param name="frm">从哪个页面打开的</param>
+        /// <param name="btnId">按钮id</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ListButClick(string idsStr, string frm, string btnId)
+        {
+            string err = "";
+            try
+            {
+                List<string> resultList = tbA2DataWriteBack.ListButEvent(ref err, idsStr, frm, btnId, GetUser());
+                Record.AddResultList("system", "", _flowid, resultList, "List页面自定义按钮处理");
+                if (!string.IsNullOrEmpty(err))
+                {
+                    return Json(ErrorTip("List页面自定义按钮处理：" + err));
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr("", _flowid, "A2DataWriteBackController:ListButClick", ex);
+                return Json(ErrorTip(ex));
+            }
+            return Json(SuccessTip("操作成功"));
+        }
+
+        [HttpPost]
+        public ActionResult FormButClick(string listid, IEnumerable<ControlEntity> controlslist, string grid, IEnumerable<GridListEntity> gridlist, string frm, string btnId)
+        {
+            return Json(SuccessTip("建设中..."));
+        }
+        #endregion 自定义按钮的事件处理，点击自定义的按钮将触发
+
+        #region list列表页面
+        /// <summary>
+        /// 调试模式下点击左侧菜单触发，菜单链接路径为主表编码去除tb_前缀
+        /// </summary>
+        /// <param name="id">菜单id，加密非原始值</param>
+        /// <returns></returns>
+        [HttpGet]
+        public override ActionResult Index(int? id)
+        {
+            string mobile = string.IsNullOrEmpty(HttpContext.Request.Query["mobile"]) ? "n" : HttpContext.Request.Query["mobile"].ToString().ToLower();//y跳转到MobileList
+            string err = CheckCom.CheckedTableBeforeBegin(_flowid);//检查数据库是否建表、是否缺少文件
+            if (string.IsNullOrEmpty(err))
+            {
+                //查询条件(下拉选择)准备动态数据
+                ViewBag.SelectList = tbA2DataWriteBack.GetSelectList("list", BasicHelp.GetParamObject(GetUser()));
+                ViewBag.SearchMode = BasicHelp.GetSearchModeName(_flowid, GetUserId());//获取查看编辑模式-录入表管理/权限设置可设置
+                //禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置
+                ViewBag.DisableBut = tbA2DataWriteBack.GetDisableButStr("list", GetUser());
+
+                return base.TableList(id, _maintbid, mobile);
+            }
+            else
+            {
+                return Json(err);
+            }
+        }
+
+        /// <summary>
+        /// 添加前判断及处理，列表页面点击新增数据按钮触发
+        /// </summary>
+        /// <param name="type">类型add</param>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist中的listid</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult BeforeAdd(string type, string listid)
+        {
+            string err = "";
+            long newid = 0;//自动编号及子表数据初始化等情况需插入空数据并返回自增长id
+            try
+            {
+                CurrentPrcsEntity mPrcs = FlowCom.GetFistStept(_flowid);//获取步骤第一步，基础信息表返回空
+                err = mPrcs == null ? "" : mPrcs.ERR;
+                if (string.IsNullOrEmpty(err))
+                {
+                    err = tbA2DataWriteBack.CheckedBeforeAdd(mPrcs, GetUser());//添加前检测，权限等
+                }
+                if (string.IsNullOrEmpty(err))
+                {
+                    newid = tbA2DataWriteBack.BeforeAdd(ref err, mPrcs, GetUser());//添加前处理
+                }
+                if (string.IsNullOrEmpty(err))
+                {
+                    string pid = mPrcs == null ? "-1" : mPrcs.PrcsId;//当前流程步骤id
+                    return Json(SuccessTip("", newid.ToString(), pid));//将当前listid及当前流程步骤id返回
+                }
+                else
+                {
+                    return Json(ErrorTip(err));
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr(newid.ToString(), _flowid, "A2DataWriteBackController:BeforeAdd", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+
+        /// <summary>
+        /// 编辑前判断及处理，列表页面点击编辑按钮触发
+        /// </summary>
+        /// <param name="type">类型edit</param>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist中的listid</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult BeforeEdit(string type, string listid)
+        {
+            string err = "";
+            CurrentPrcsEntity mPrcs = FlowCom.GetCurrentStept(_flowid, listid); //当前流程步骤
+            err = mPrcs == null ? "" : mPrcs.ERR;
+            if (string.IsNullOrEmpty(err))
+            {
+                err = tbA2DataWriteBack.CheckedBeforeEdit(listid, mPrcs, GetUser());//编辑前检测
+            }
+            if (string.IsNullOrEmpty(err))
+            {
+                err = tbA2DataWriteBack.BeforeEdit(listid, mPrcs, GetUser());//编辑前数据处理
+            }
+            if (string.IsNullOrEmpty(err))
+            {
+                string pid = mPrcs == null ? "-1" : mPrcs.PrcsId;//当前流程步骤id
+                return Json(SuccessTip("", listid, pid));
+            }
+            else
+            {
+                return Json(ErrorTip(err));
+            }
+        }
+
+        /// <summary>
+        /// 数据查看，列表页面点击详细按钮触发
+        /// </summary>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist中的listid</param>
+        /// <param name="mobile">移动端为y跳转到MobileForm，否则Form页面</param>
+        /// <returns></returns>
+        [HttpGet]
+        public  ActionResult Detail(string listid, string mobile)
+        {
+            ViewBag.UserId = GetUserId();
+            mobile = string.IsNullOrEmpty(mobile) ? "n" : mobile;
+            if (mobile == "y")
+            {
+                ViewBag.ListId = ListIdService.GetOriginalListId(listid).ToString();//转化成原始id
+                return View("MobileDetail");//移动端
+            }
+            TbBasicEntity model = PageCom.GetDetailButon(listid, _flowid);//按钮设置，可在录入表管理/页面按钮中设置
+            ViewBag.ButPdf = model.ButPDFDetails;//Pdf是否显示?y显示
+            ViewBag.ButDoc = model.ButDOCDetails;//DOC是否显示?y显示
+            ViewBag.ButExcel = model.ButExcelDetails;//Excel是否显示?y显示
+            ViewBag.ButAtt = model.ButAtt;//附件按钮是否显示?y显示
+            ViewBag.ButAttTxt = model.ButAttTxt;//附件按钮标题
+            ViewBag.ListId = listid;
+            return View();
+        }
+
+        /// <summary>
+        /// 查看详细，详细页面点击按钮触发，将rdlc模板填充数据后转化为pdf等
+        /// </summary>
+        /// <param name="type">类别pdf、doc、excel</param>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist中的listid</param>
+        /// <param name="isOriginal">listid是否原始id?y或n</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult GetDetail(string type, string listid, string isOriginal)
+        {
+            string err = "";
+            isOriginal = string.IsNullOrEmpty(isOriginal) ? "n" : isOriginal;//id是否初始值？
+            listid = ListIdService.GetOriginalListId(listid, isOriginal).ToString();
+            FileContentResult file = null;
+            RdlcDeviceEntity device = A2DataWriteBackService.GetRdlcDevice(listid, GetHostUrl(HttpContext.Request), GetUser());
+            if (!string.IsNullOrEmpty(device.Err))
+            {
+                return Json(ErrorTip(device.Err));
+            }
+
+            if (type == "html" || type == "_html")
+            {
+                byte[] _byte = RDLCReport.ExportHtml(ref err, device);
+                file = File(_byte, "text/html");
+            }
+            if (type == "pdf")
+            {
+                //录入表管理/前端设置/pdf文档尺寸可设置pdf文档大小，以适应不同文档和打印尺寸
+                byte[] _byte = RDLCReport.ExportPdf(ref err, device);
+                file = File(_byte, "application/pdf");
+            }
+            if (type == "doc")
+            {
+                byte[] _byte = RDLCReport.ExportDocx(ref err, device);
+                file = File(_byte, "application/msword", _tbname + DateTime.Today.ToShortDateString() + ".docx");
+            }
+            if (type == "excel")
+            {
+                byte[] _byte = RDLCReport.ExportXlsx(ref err, device);
+                file = File(_byte, "application/msexcel", _tbname + DateTime.Today.ToShortDateString() + ".xlsx");
+            }
+
+            if (string.IsNullOrEmpty(err))
+            {
+                return file;
+            }
+            else
+            {
+                return Json(ErrorTip(err));
+            }
+        }
+
+        /// <summary>
+        /// 导出EXCEL,列表页面点击导出按钮触发
+        /// </summary>
+        /// <param name="json">附加查询条件，json字符可转化为model</param>
+        /// <param name="searchTag">选项卡附加的筛选条件</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ExportData(string json, string searchTag)
+		{
+			string err = "";
+            string newFileName = System.Guid.NewGuid().ToString("N") + ".xlsx";
+            string sourcePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\TempFile\\" + newFileName);
+            A2DataWriteBackModel model = tbA2DataWriteBack.JsonToModel(json);
+			DataTable gridDt = tbA2DataWriteBack.GetListForExport(searchTag, model, GetUser(), GetHostUrl(HttpContext.Request));
+			RdlcDeviceEntity device = A2DataWriteBackService.GetRdlcDevice(gridDt, GetHostUrl(HttpContext.Request));
+
+			byte[] _byte = RDLCReport.ExportExcelList(ref err, device);
+            if (!string.IsNullOrEmpty(err))
+			{
+				return Json(ErrorTip(err));
+			}
+            Think9.Util.Helper.FileHelper.CreateFile(sourcePath, _byte);
+			string url = "<br><br><div class=\"layui-form-item\" style=\"text-align: center;width: 200px;\"><a href='../TempFile/" + newFileName + "' target ='_blank' class='layui-btn'>点击下载</a></div>";
+            return Json(SuccessTip("", url));
+		}
+
+        /// <summary>
+        /// 批量导出pdf，列表页面点击批量导出按钮触发
+        /// </summary>
+        /// <param name="idsStr">listid逗号间隔</param>
+        /// <returns>数据量太大可能会报错</returns>
+        [HttpPost]
+        public JsonResult MergeExport(string idsStr)
+        {
+            string err = "";
+            string directory = Directory.GetCurrentDirectory();
+            string sourcePath = Path.Combine(directory, "wwwroot\\TempFile\\" + System.Guid.NewGuid().ToString("N") + "\\");
+            Think9.Util.Helper.FileHelper.CreateSuffic(sourcePath);
+            string pdfFileName = System.Guid.NewGuid().ToString("N") + ".pdf";
+
+            string[] arr = BaseUtil.GetStrArray(idsStr, ",");
+            for (int i = 0; i < arr.GetLength(0); i++)
+            {
+                string listid = arr[i].ToString().Trim();
+                RdlcDeviceEntity device = A2DataWriteBackService.GetRdlcDevice(listid, GetHostUrl(HttpContext.Request), GetUser());
+                byte[] _byte = RDLCReport.ExportPdf(ref err, device);
+                Think9.Util.Helper.FileHelper.CreateFile(sourcePath + "\\" + listid + ".pdf", _byte);
+            }
+            PdfService.MergePDF(sourcePath, Path.Combine(directory, "wwwroot\\TempFile\\"), pdfFileName);
+            string url = "<br><br><div class=\"layui-form-item\" style=\"text-align: center;width: 200px;\"><a href='../TempFile/" + pdfFileName + "' target ='_blank' class='layui-btn'>点击下载</a></div>";
+            return Json(SuccessTip("", url));
+        }
+
+        /// <summary>
+        /// 查看详细，移动端列表页面点击详细按钮触发
+        /// </summary>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist中的listid</param>
+        /// <param name="isOriginal">listid是否原始id?y或n</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult GetMobileDetail(string listid, string isOriginal)
+        {
+            isOriginal = string.IsNullOrEmpty(isOriginal) ? "n" : isOriginal;//id是否初始值？
+            listid = ListIdService.GetOriginalListId(listid, isOriginal).ToString();
+            IEnumerable<dynamic> list = tbA2DataWriteBack.GetDetailForMobile(listid, GetUser());
+            var result = new { code = 0, msg = "", count = 99999, data = list };
+            return Json(result);
+        }
+
+        /// <summary>
+        /// 数据删除（可处理软删除），列表页面点击删除按钮触发
+        /// </summary>
+        /// <param name="listid">基础信息表自增长，一般录入表对应flowrunlist的listid</param>
+        /// <returns></returns>
+        [HttpGet]
+        public JsonResult Delete(string listid)
+        {
+            CurrentPrcsEntity mPrcs = FlowCom.GetCurrentStept(_flowid, listid);//当前流程步骤
+            string err = mPrcs == null ? "" : mPrcs.ERR;
+            if (string.IsNullOrEmpty(err))
+            {
+                err = tbA2DataWriteBack.CheckedBeforeDel(listid, mPrcs, GetUser());//校验 包括权限、锁定等
+            }
+            try
+            {
+                if (string.IsNullOrEmpty(err))
+                {
+                    err = tbA2DataWriteBack.DelByListId(GetUser(), listid);
+                }
+                if (string.IsNullOrEmpty(err))
+                {
+                    return Json(SuccessTip("删除成功"));
+                }
+                else
+                {
+                    return Json(ErrorTip(err));
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr(listid, _flowid, "A2DataWriteBackController:Delete", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+
+        /// <summary>
+        /// 批量删除，列表页面点击批量删除按钮触发
+        /// </summary>
+        /// <param name="idsStr">listid逗号间隔</param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult BatchDel(string idsStr)
+        {
+            string err = "";
+            string showErr = "";
+            int numSuccess = 0;
+            int numFail = 0;
+            string listid = "";
+            string[] arr = BaseUtil.GetStrArray(idsStr, ",");
+            try
+            {
+                for (int i = 0; i < arr.GetLength(0); i++)
+                {
+                    listid = arr[i].ToString().Trim();
+                    CurrentPrcsEntity mPrcs = FlowCom.GetCurrentStept(_flowid, listid);//当前流程步骤
+                    err = mPrcs == null ? "" : mPrcs.ERR;
+                    if (string.IsNullOrEmpty(err))
+                    {
+                        err = tbA2DataWriteBack.CheckedBeforeDel(listid, mPrcs, GetUser());//检测
+                        if (string.IsNullOrEmpty(err))
+                        {
+                            err = tbA2DataWriteBack.DelByListId(GetUser(), listid);
+                            if (string.IsNullOrEmpty(err))
+                            {
+                                numSuccess++;
+                            }
+                            else
+                            {
+                                showErr += err;
+                                numFail++;
+                            }
+                        }
+                        else
+                        {
+                            numFail++;
+                        }
+                    }
+                    else
+                    {
+                        numFail++;
+                    }
+                }
+                if (string.IsNullOrEmpty(showErr))
+                {
+                    str = numFail == 0 ? "删除成功" + numSuccess.ToString() + "数据" : "删除成功" + numSuccess + "数据;" + "因数据无效、锁定、权限校验等原因，删除失败" + numFail.ToString() + "数据;";
+                    return Json(SuccessTip(str));
+                }
+                else
+                {
+                    return Json(ErrorTip(showErr));
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr(listid, _flowid, "A2DataWriteBackController:BatchDel", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+
+        /// <summary>
+        /// 数据查询，列表页面点击查询按钮或顶部选项卡触发
+        /// </summary>
+        /// <param name="model">封装查询条件</param>
+        /// <param name="pageInfo">页面信息，包括行数、排序等</param>
+        /// <param name="searchTag">选项卡附加的筛选条件</param>
+        /// <param name="isAll">为all显示所有</param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetPageList(A2DataWriteBackModel model, PageInfoEntity pageInfo, string searchTag, string isAll)
+        {
+            if (GetUser() == null)
+            {
+                return Json(new { msg = "<span style='color: #FE7300;'>超时 请重新登录</span>", count = -1 });
+            }
+            long total = 0;
+            try
+            {
+                List<dynamic> list = tbA2DataWriteBack.GetListForPage(ref total, model, pageInfo, GetUser(), searchTag, isAll);
+                if (list == null)
+                {
+                    return Json(new { msg = "<span>数据列表为空，可能存在错误</span>", count = -1 });
+                }
+                else
+                {
+                    return Json(new { code = 0, msg = "", count = total, data = list });
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr("", _flowid, "A2DataWriteBackController:GetPageList", ex);
+                return Json(new { msg = ex.Message, count = -1 });
+            }
+        }
+
+        /// <summary>
+        /// 数据导入，点击数据导入按钮触发
+        /// </summary>
+        /// <param name="fwid">流程编码</param>
+        /// <param name="filename">文件名</param>
+        /// <param name="list">源字段与目标字段的对应列表</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ImportData(string fwid, string filename, List<InfoListEntity> list)
+        {
+            string err = "";
+            string listidsStr = "";
+            string msg = "";
+            string timeBegin = DateTime.Now.ToString();
+            if (GetUser() == null)
+            {
+                return Json(ErrorTip("当前用户对象为空"));
+            }
+            try
+            {
+                ExcelData excelData = new ExcelData();
+                err = excelData.ImportDataFromExcel(ref listidsStr, ref msg, fwid, filename, list, GetUser());
+                if (!string.IsNullOrEmpty(err))
+                {
+                    return Json(ErrorTip(err));
+                }
+                else
+                {
+                    //执行自定义AfterAdd事件
+                    var resultList = tbA2DataWriteBack.BatchAfterAdd(ref err, listidsStr, GetUser());
+                    if (!string.IsNullOrEmpty(err))
+                    {
+                        return Json(ErrorTip(err));
+                    }
+                    msg = timeBegin + " - " + DateTime.Now.ToString() + " " + msg;
+                    return Json(SuccessTip(msg));
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr("", _flowid, "A2DataWriteBackController:ImportData", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+        #endregion list列表页面
+
+        #region Form编辑页面
+        /// <summary>
+        /// 录入页面显示
+        /// </summary>
+        /// <param name="frm">从哪里跳转来?：List页面或其他页面跳转(默认list)</param>
+        /// <param name="type">add或edit</param>
+        /// <param name="listid">基础信息表自增长，一般录入表与flowrunlist中的listid对应关联</param>
+        /// <param name="pid">当前流程步骤id</param>
+        /// <param name="mobile">移动端为y跳转到MobileForm，否则Form页面</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Form(string frm, string type, string listid, string pid, string mobile)
+        {
+            mobile = string.IsNullOrEmpty(mobile) ? "n" : mobile;//y跳转到MobileForm
+            ViewBag.UserId = GetUserId();//当前用户id
+            ViewBag.Split = _split;//字符分割，checkbox多选时使用
+            ViewBag.FId = _flowid;//流程编码
+            ViewBag.Frm = string.IsNullOrEmpty(frm) ? "list" : frm;//List页面或从其他页面跳转
+            //禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置
+            ViewBag.DisableBut = tbA2DataWriteBack.GetDisableButStr("form", GetUser());
+            //为下拉选择等...选项赋值
+            ViewBag.SelectList = tbA2DataWriteBack.GetSelectList(type, BasicHelp.GetParamObject(GetUser()));
+            long newid = listid == null ? 0 : long.Parse(listid);
+            ViewBag.PrcId = pid;//流程步骤id
+            ViewBag.PrcNo = FlowCom.GetFlowNoByID(_flowid, pid);//流程步骤编码
+            ViewBag.UpFields = A2DataWriteBackService.GetUpdateFields(ViewBag.PrcNo, GetUser());//可修改字段
+            ViewBag.HiddenFields = PageCom.GetHiddenIndexStr(GetUser(), _maintbid, "y");//保密字段
+            ViewBag.Type = type;//add或edit
+            ViewBag.ListId = newid;
+            //包括为录入指标赋初始值--系统指标或默认值
+            A2DataWriteBackModel model = tbA2DataWriteBack.GetModel(type, newid, GetUser());
+            if (model != null)
+            {
+                if (mobile == "y")
+                {
+                    return View("~/Views/" + _maintbid.Replace("tb_", "") + "/MobileForm.cshtml", model);
+                }
+                else
+                {
+                    return View(model);
+                }
+            }
+            else
+            {
+                return Json("数据不存在");
+            }
+        }
+
+        /// <summary>
+        /// 数据保存，Form页面点击保存按钮触发
+        /// </summary>
+        /// <param name="model">主表数据</param>
+        /// <param name="gridlist">子表数据，移动端保存时为空</param>
+        /// <param name="listid">listid=0表示增加</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <param name="type">add或edit</param>
+        /// <param name="att">附件id</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult SaveData(A2DataWriteBackModel model, IEnumerable<GridListEntity> gridlist, long listid, string prcno, string type, string att)
+        {
+            string err = "";
+
+            try
+            {
+                if (listid != 0)//编辑
+                {
+                    err = tbA2DataWriteBack.EditData(GetUser(), model, gridlist, listid, prcno);//编辑主子表数据，调用子表的AfterGridEdit事件
+                }
+                else
+                {
+                    listid = tbA2DataWriteBack.AddData(ref err, GetUser(), model, prcno);//添加主表数据
+                }
+				if (string.IsNullOrEmpty(err) && type == "add")
+				{
+					AttachmentService.DealWithAttachments(listid, _flowid, att);//处理listid=0时添加了附件
+				}
+				if (string.IsNullOrEmpty(err))//自定义事件处理
+				{
+					err = tbA2DataWriteBack.AfterEditEvent(type, listid.ToString(), GetUser(), model, prcno);
+				}
+				if (string.IsNullOrEmpty(err))
+				{
+					return Json(SuccessTip("操作成功！", listid.ToString()));
+				}
+				else
+				{
+					return Json(ErrorTip("操作失败！<br>" + err));
+				}
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr(listid.ToString(), _flowid, "A2DataWriteBackController:SaveData", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+		/// <summary>
+		/// 转交下一步--保存数据并流程转交，点击转交按钮触发
+		/// </summary>
+		/// <param name="model">主表数据model</param>
+		/// <param name="gridlist">子表数据列表，移动端保存时为空</param>
+		/// <param name="listid">listid=0表示增加</param>
+		/// <param name="prcno">流程步骤编码</param>
+		/// <param name="type">add或edit</param>
+		/// <param name="att">附件id</param>
+		/// <returns></returns>
+		[HttpPost]
+		public ActionResult NextStep(A2DataWriteBackModel model, IEnumerable<GridListEntity> gridlist, long listid, string prcno, string type, string att)
+		{
+			string err = "";
+
+			try
+			{
+				if (listid != 0)//编辑
+				{
+					err = tbA2DataWriteBack.EditData(GetUser(), model, gridlist, listid, prcno);//编辑主子表数据，调用子表的AfterGridEdit事件
+				}
+				else
+				{
+					listid = tbA2DataWriteBack.AddData(ref err, GetUser(), model, prcno);//添加主表数据
+				}
+				if (string.IsNullOrEmpty(err) && type == "add")
+				{
+					AttachmentService.DealWithAttachments(listid, _flowid, att);//处理listid=0时添加了附件
+				}
+				if (string.IsNullOrEmpty(err))//自定义事件处理
+				{
+					err = tbA2DataWriteBack.AfterEditEvent(type, listid.ToString(), GetUser(), model, prcno);
+				}
+				if (string.IsNullOrEmpty(err))
+				{
+					return Json(SuccessTip("操作成功！", listid.ToString()));
+				}
+				else
+				{
+					return Json(ErrorTip("操作失败！<br>" + err));
+				}
+			}
+			catch (Exception ex)
+			{
+				Record.AddErr(listid.ToString(), _flowid, "A2DataWriteBackController:NextStep", ex);
+				return Json(ErrorTip(ex));
+			}
+		}
+
+		/// <summary>
+		/// 结束|提交--保存数据并结束流程，点击结束|提交按钮触发
+		/// </summary>
+		/// <param name="model">主表数据model</param>
+		/// <param name="gridlist">子表数据列表，移动端保存时为空</param>
+		/// <param name="listid">listid=0表示增加</param>
+		/// <param name="prcno">流程步骤编码</param>
+		/// <param name="type">add或edit</param>
+		/// <param name="att">附件id</param>
+		/// <returns></returns>
+		[HttpPost]
+		public ActionResult Finish(A2DataWriteBackModel model, IEnumerable<GridListEntity> gridlist, long listid, string prcno, string type, string att)
+		{
+			if(type == "add")
+			{
+				return Json(ErrorTip("首次保存不能提交|结束，请保存后再操作"));
+			}
+			string err = "";
+
+			try
+			{
+				if (listid != 0)//编辑
+				{
+					err = tbA2DataWriteBack.EditData(GetUser(), model, gridlist, listid, prcno, "finish");//编辑主子表数据，调用子表的AfterGridFinish事件
+				}
+				else
+				{
+					listid = tbA2DataWriteBack.AddData(ref err, GetUser(), model, prcno);//添加主表数据
+				}
+				if (string.IsNullOrEmpty(err) && type == "add")
+				{
+					AttachmentService.DealWithAttachments(listid, _flowid, att);//处理listid=0时添加了附件
+				}
+				if (string.IsNullOrEmpty(err))//自定义事件处理
+				{
+					err = tbA2DataWriteBack.AfterFinishEvent(type, listid.ToString(), GetUser(), model, prcno);
+				}
+				if (string.IsNullOrEmpty(err))
+				{
+					return Json(SuccessTip("操作成功！", listid.ToString()));
+				}
+				else
+				{
+					return Json(ErrorTip("操作失败！<br>" + err));
+				}
+			}
+			catch (Exception ex)
+			{
+				Record.AddErr(listid.ToString(), _flowid, "A2DataWriteBackController:Finish", ex);
+				return Json(ErrorTip(ex));
+			}
+		}
+
+        /// <summary>
+        /// 点击打印按钮触发，将rdlc模板填充数据后转化pdf
+        /// </summary>
+        /// <param name="type">类别</param>
+        /// <param name="listid">数据id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Print(string type, string listid)
+        {
+            string err = "";
+            RdlcDeviceEntity device = A2DataWriteBackService.GetRdlcDevice(listid, GetHostUrl(HttpContext.Request), GetUser());
+            if (string.IsNullOrEmpty(device.Err))
+            {
+                //录入表管理/前端设置/pdf文档尺寸可设置pdf文档大小，以适应不同文档和打印尺寸
+                byte[] _byte = RDLCReport.ExportPdf(ref err, device);
+                if (!string.IsNullOrEmpty(err))
+                {
+                    return Json(err);
+                }
+                FileContentResult file = File(_byte, "application/pdf");
+                return file;
+            }
+            else
+            {
+                return Json(device.Err);
+            }
+        }
+
+		/// <summary>
+		/// 下拉选择、弹出选择及扫码后触发调用，完成数据读取功能
+		/// 数据读取在录入表管理/数据读取中自定义
+		/// </summary>
+		/// <param name="controlslist">封装主表控件的list，包括id与value</param>
+		/// <param name="gridlist">子表当前行数据</param>
+		/// <param name="listid">主表数据id</param>
+		/// <param name="id">子表数据id或者_n</param>
+		/// <param name="tbid">_main或子表编码等</param>
+		/// <param name="indexid">触发控件的指标编码</param>
+		/// <param name="value">触发控件的Value</param>
+		/// <returns>返回List前端再解析</returns>
+        [HttpPost]
+        public ActionResult AfterControlSelect(IEnumerable<ControlEntity> controlslist, IEnumerable<ControlEntity> gridlist, string listid, string id, string tbid, string indexid, string value)
+        {
+            string err = "";
+            string grid = "";//子表id，子表写入数据时会修改该值，前端根据该值刷新子表数据
+            string newid = listid;
+            string _tbid = tbid;
+            if (tbid == "_gridColumn")//来源于子表纵列
+            {
+                _tbid = BasicHelp.GetGridIdByIndexid(indexid);//得到子表id
+            }
+
+            try
+            {
+                List<ControlEntity> list = new List<ControlEntity>();
+				if (_tbid == "_main")
+				{
+					list = tbA2DataWriteBack.ReadValue(ref err, ref newid, ref grid, GetUser(), controlslist, indexid, value);
+				}
+                if(!string.IsNullOrEmpty(err))
+                {
+                    return Json(ErrorTip(err));
+                }
+                //返回的list交由前端myJS.setValueByList(lists)为控件赋值
+                return Json(SuccessTip("", list, newid, grid));
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr(listid, _flowid, "A2DataWriteBackController:AfterControlSelect", ex);
+                return Json(ErrorTip(ex));
+            }
+        }
+        #endregion Form编辑页面
+
+
+
+        #region 弹出处理--文本框设置了数据规范（单列、多列或树形选择），点击文本框将弹出选择页面
+        /// <summary>
+        /// 统一处理弹出数据选择页面,如果文本框设置了数据规范（单列、多列或树形选择），点击文本框将被触发
+        /// </summary>
+		/// <param name="tbid">_main或子表编码</param>
+		/// <param name="indexid">触发弹出选择页面的指标编码</param>
+        /// <param name="id">子表数据列表id或空</param>
+        /// <param name="strv">子表哪一列触发如v1、v2</param>
+        /// <param name="from">list或edit，list时会自动解除条件参数中包含的系统指标，如用户登录名等</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult PopUpPage(string tbid, string indexid, string id, string strv, string from)
+        {
+           object param = BasicHelp.GetParamObject(GetUser());
+
+            ViewBag.PuTbId = tbid == null ? "" : tbid;
+            ViewBag.PuIndexId = indexid == null ? "" : indexid;
+            ViewBag.PuId = id == null ? "" : id;
+            ViewBag.PuV = strv == null ? "" : strv.Replace("v","");
+            ViewBag.PuFrom = from == null ? "" : from;
+            //弹出选择页面的查询条件有下拉选择时，为其绑定动态数据源
+            ViewBag.SelectList = tbA2DataWriteBack.GetSelectListForQuery(tbid, indexid, from, param);
+            return View("Grid_" + indexid);
+        }
+
+        /// <summary>
+        /// 统一处理弹出选择页面获取数据列表
+        /// </summary>
+        /// <param name="type">为1表示当前页打开(非弹窗)，以keyword为关键词搜索</param>
+        /// <param name="pageInfo">页面信息，包括行数、排序等</param>
+        /// <param name="indexid">主表触发时为指标编码，子表触发时为子表编码+指标编码</param>
+        /// <param name="keyword">搜索关键词</param>
+        /// <param name="list">封装查询条件</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult GetPopUpPageList(PageInfoEntity pageInfo, string type, string fwid, string indexid, string from, string keyword, IEnumerable<valueTextEntity> list)
+        {
+            long total = 0;
+            type = string.IsNullOrEmpty(type) ? "" : type;//为1表示当前页打开(非弹窗)
+            try
+            {
+                IEnumerable<dynamic> _list = tbA2DataWriteBack.GetPopUpListForPage(ref total, pageInfo, type, keyword, indexid, from, list, GetUser());
+                if (_list == null)
+                {
+                    return Json(new { msg = "<span>数据列表为空，可能存在错误</span>", count = -1 });
+                }
+                else
+                {
+                    return Json(new { code = 0, msg = "", count = total, data = _list });
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr("", _flowid, "A2DataWriteBackController:GetPopUpPageList", ex);
+                return Json(new { msg = "Err：<br>" + ex.Message, count = -1 });
+            }
+        }
+
+        /// <summary>
+        /// 弹出选择页面点击确定后统一调用，默认什么也不做
+        /// </summary>
+        /// <param name="tbid">_main或子表编码</param>
+        /// <param name="indexid">触发弹出选择页面的指标编码，主表时为指标编码，子表时为子表编码+指标编码</param>
+        /// <param name="id">子表数据列表id或空</param>
+        /// <param name="value">选择的值</param>
+        /// <param name="v">子表弹出时使用，第几列</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult AfterPopUpSelect(string tbid, string indexid, string id, string value, string v)
+        {
+            //默认什么也不做--可自定义
+            if (tbid == "_main")//主表
+            {
+                 //自定义 如
+                //if (indexid == "xxx")
+                //{
+                //}
+            }
+            else//子表
+            {
+                //自定义 如
+                //if (indexid == "xxx")
+                //{
+                //}
+            }
+            return Json("");
+        }
+        #endregion 弹出处理--文本框设置了数据规范（单列、多列或树形选择），点击文本框将弹出选择页面
+
+        #region 预留 - 通过其他页面打开(通过自定义链接或自定义按钮打开页面等)，默认调用_TBController类的函数
+        /// <summary>
+        /// 新增数据,从其他页面打开（通过设置自定义按钮事件为打开页面）
+        /// 通过传递参数为录入指标赋初始值
+        /// </summary>
+        /// <param name="frm">从哪个页面打开的</param>
+        /// <param name="btnId">触发事件的按钮ID</param>
+        /// <param name="mobile">移动端为y跳转到MobileForm，否则Form页面</param>
+        /// <param name="disableStr">禁用的控件字符,控制页面控件状态，格式[controlid1][controlid1]</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Add(string frm, string btnId, string mobile, string disableStr)
+        {
+            string err = "";
+            mobile = string.IsNullOrEmpty(mobile) ? "n" : mobile;
+            ViewBag.Type = "add";
+            ViewBag.Split = _split;//字符分割，checkbox多选时使用
+            ViewBag.FId = _flowid;//流程编码
+            ViewBag.Frm = string.IsNullOrEmpty(frm) ? "list" : frm;//List页面或从其他页面跳转
+            ViewBag.UserId = GetUserId();//当前用户id
+            //禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置
+            ViewBag.DisableBut = tbA2DataWriteBack.GetDisableButStr("form", GetUser());
+            ViewBag.DisableStr = string.IsNullOrEmpty(disableStr) ? "" : disableStr;//控制页面控件状态
+            //为下拉选择等...选项赋值
+            ViewBag.SelectList = tbA2DataWriteBack.GetSelectList("add", BasicHelp.GetParamObject(GetUser()));
+
+            CurrentPrcsEntity mPrcs = FlowCom.GetFistStept(_flowid);//获取步骤第一步
+            err = mPrcs == null ? "" : mPrcs.ERR;
+            if (!string.IsNullOrEmpty(err))
+            {
+                return Json(err);
+            }
+            err = tbA2DataWriteBack.CheckedBeforeAdd(mPrcs, GetUser());//添加前检测
+            if (!string.IsNullOrEmpty(err))
+            {
+                return Json(err);
+            }
+            //添加前处理，如自动编号及子表数据初始化等--主表需插入一条空数据，并返回自增长id
+            long newid = tbA2DataWriteBack.BeforeAdd(ref err, mPrcs, GetUser());
+            if (!string.IsNullOrEmpty(err))
+            {
+                return Json(err);
+            }
+
+            ViewBag.PrcId = mPrcs == null ? "-1" : mPrcs.PrcsId;//当前流程步骤id
+            ViewBag.PrcNo = FlowCom.GetFlowNoByID(_flowid, ViewBag.PrcId);//流程步骤编码
+            ViewBag.UpFields = A2DataWriteBackService.GetUpdateFields(ViewBag.PrcNo, GetUser());//可修改字段
+            ViewBag.HiddenFields = PageCom.GetHiddenIndexStr(GetUser(), _maintbid, "y");//保密字段
+            ViewBag.ListId = newid;
+
+            //为录入指标赋初始值--系统指标或默认值;同时从HttpContext.Request获取值
+            A2DataWriteBackModel model = tbA2DataWriteBack.GetModel("add", newid, GetUser(), HttpContext.Request);
+            if (model != null)
+            {
+                if (mobile == "y")
+                {
+                    return View("~/Views/" + _maintbid.Replace("tb_", "") + "/MobileForm.cshtml", model);
+                }
+                else
+                {
+                    return View("~/Views/" + _maintbid.Replace("tb_", "") + "/Form.cshtml", model);
+                }
+            }
+            else
+            {
+                return Json("数据不存在");
+            }
+        }
+
+        /// <summary>
+        /// 编辑数据,从其他页面打开（通过设置自定义按钮事件为打开页面）
+        /// 传递参数（为业务主键）为确定listid
+        /// </summary>
+        /// <param name="frm">从哪个页面打开的</param>
+        /// <param name="btnId">触发事件的按钮ID</param>
+        /// <param name="mobile">移动端为y跳转到MobileForm，否则Form页面</param>
+        /// <param name="disableStr">禁用的控件字符,控制页面控件状态，格式[controlid1][controlid1]</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Edit(string frm, string btnId, string mobile, string disableStr)
+        {
+            string err = "";
+            mobile = string.IsNullOrEmpty(mobile) ? "n" : mobile;//y跳转到手机端
+            //根据传递的参数（通常为业务主键）确定listid
+            long listid = PageCom.GeListIdByHttpRequest(_maintbid, HttpContext.Request);
+            if (listid == 0)
+            {
+                return Json("根据传递的参数找不到数据");
+            }
+            if (listid == -100)
+            {
+                return Json("找到多个数据，依据传入的参数应能确定唯一数据");
+            }
+
+            ViewBag.Frm = string.IsNullOrEmpty(frm) ? "list" : frm;//List页面或从其他页面跳转
+            ViewBag.Type = "edit";
+            ViewBag.Split = _split;//字符分割，checkbox多选时使用
+            ViewBag.FId = _flowid;//流程编码
+            ViewBag.UserId = GetUserId();//当前用户id
+            //禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置
+            ViewBag.DisableBut = tbA2DataWriteBack.GetDisableButStr("form", GetUser());
+            ViewBag.DisableStr = string.IsNullOrEmpty(disableStr) ? "" : disableStr;//控制页面控件状态
+            //为下拉选择等...选项赋值
+            ViewBag.SelectList = tbA2DataWriteBack.GetSelectList("edit", BasicHelp.GetParamObject(GetUser()));
+
+            CurrentPrcsEntity mPrcs = FlowCom.GetCurrentStept(_flowid, listid.ToString()); //当前流程步骤
+            err = mPrcs == null ? "" : mPrcs.ERR;
+            if (string.IsNullOrEmpty(err))
+            {
+                err = tbA2DataWriteBack.CheckedBeforeEdit(listid.ToString(), mPrcs, GetUser());//编辑前检测
+                if (string.IsNullOrEmpty(err))
+                {
+                    err = tbA2DataWriteBack.BeforeEdit(listid.ToString(), mPrcs, GetUser());//编辑前数据处理
+                }
+            }
+
+            ViewBag.PrcId = mPrcs == null ? "-1" : mPrcs.PrcsId;//当前流程步骤id
+            ViewBag.PrcNo = FlowCom.GetFlowNoByID(_flowid, ViewBag.PrcId);//流程步骤编码
+            ViewBag.UpFields = A2DataWriteBackService.GetUpdateFields(ViewBag.PrcNo, GetUser());//可修改字段
+            ViewBag.HiddenFields = PageCom.GetHiddenIndexStr(GetUser(), _maintbid, "y");//保密字段
+            ViewBag.ListId = listid;
+
+            //根据lisitid得到model
+            A2DataWriteBackModel model = tbA2DataWriteBack.GetModel("edit", listid, GetUser());
+            if (model != null)
+            {
+                if (mobile == "y")
+                {
+                    return View("~/Views/" + _maintbid.Replace("tb_", "") + "/MobileForm.cshtml", model);
+                }
+                else
+                {
+                    return View("~/Views/" + _maintbid.Replace("tb_", "") + "/Form.cshtml", model);
+                }
+            }
+            else
+            {
+                return Json("数据不存在");
+            }
+        }
+
+        /// <summary>
+        /// 显示数据,从其他页面打开（通过设置自定义按钮事件为打开页面）,传递参数（为业务主键）为确定listid
+        /// </summary>
+        /// <param name="frm">从哪个页面打开的</param>
+        /// <param name="btnId">触发事件的按钮ID</param>
+        /// <param name="mobile">移动端为y跳转到MobileForm，否则Form页面</param>
+        /// <param name="type">html或pdf</param>
+        /// <returns></returns>
+        [HttpGet]
+        public ActionResult Show(string frm, string btnId, string mobile, string type)
+        {
+            string err = "";
+            mobile = string.IsNullOrEmpty(mobile) ? "n" : mobile;//y跳转到手机端
+            type = string.IsNullOrEmpty(type) ? "html" : type;
+            //根据的传递参数（为业务主键）确定listid
+            long listid = PageCom.GeListIdByHttpRequest(_maintbid, HttpContext.Request);
+            if (listid == 0)
+            {
+                return Json("根据传递的参数找不到数据");
+            }
+            if (listid == -100)
+            {
+                return Json("找到多个数据，依据传入的参数应能确定唯一数据");
+            }
+
+            ViewBag.ListId = listid;
+            ViewBag.UserId = GetUserId();
+            if (mobile == "y")
+            {
+                return View("MobileDetail");//移动端
+            }
+
+            FileContentResult file = null;
+            RdlcDeviceEntity device = A2DataWriteBackService.GetRdlcDevice(listid.ToString(), GetHostUrl(HttpContext.Request));
+            if (!string.IsNullOrEmpty(device.Err))
+            {
+                return Json(ErrorTip(device.Err));
+            }
+
+            if (type == "html" || type == "_html")
+            {
+                byte[] _byte = RDLCReport.ExportHtml(ref err, device);
+                file = File(_byte, "text/html");
+            }
+            if (type == "pdf")
+            {
+                //录入表管理/前端设置/pdf文档尺寸可设置pdf文档大小，以适应不同文档和打印尺寸
+                byte[] _byte = RDLCReport.ExportPdf(ref err, device);
+                file = File(_byte, "application/pdf");
+            }
+
+            if (string.IsNullOrEmpty(err))
+            {
+                return file;
+            }
+            else
+            {
+                return Json(ErrorTip(err));
+            }
+        }
+        #endregion 预留 - 通过其他页面打开(通过自定义链接或自定义按钮打开页面等)，默认调用_TBController类的函数
+    }
+}

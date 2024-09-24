@@ -1,0 +1,47 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inCoding",
+        "label": "编码",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编码",
+        "_default": "",
+        "width": 100,
+        "required": true,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 2,
+        "tag": "input",
+        "name": "inName",
+        "label": "名称",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入名称",
+        "_default": "",
+        "width": 100,
+        "required": true,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 3,
+        "tag": "input",
+        "name": "inRemarks",
+        "label": "备注",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入备注",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    }
+]

@@ -1,0 +1,149 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbValueCheckEntity;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="id" value="@ViewBag.id">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <div class="layui-form-item">
+        <label class="layui-form-label">录入表</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbNmae" id="TbNmae" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">适用范围</label>
+        <div class="layui-input-block">
+            <input style="display:none" name="FlowStr" id="FlowStr">
+            <textarea class='layui-textarea' id='FlowStr_Exa' name='FlowStr_Exa' lay-verify="required" readonly="readonly" rows="2"></textarea>
+            <span style="position: absolute;bottom: 6px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-edit" style="color:blue" id="editFlowStr"></i></a>
+            </span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">校验公式</label>
+        <div class="layui-input-block">
+            <div class="layui-inline">
+                <textarea class='layui-textarea' id='LeftValue' name='LeftValue' lay-verify="required" style="width:400px"></textarea>
+                <span style="position: absolute;bottom: 6px; right: 5px;">
+                    <a href="javascript:;"><i class="fa fa-edit" style="color:blue" id="editLeftValue"></i></a>
+                </span>
+            </div>
+            <div class="layui-inline">
+                <select name="Compare" id="Compare">
+                    <option value="大于">大于</option>
+                    <option value="大于等于">大于等于</option>
+                    <option value="小于">小于</option>
+                    <option value="小于等于">小于等于</option>
+                    <option value="等于">等于</option>
+                    <option value="不等于">不等于</option>
+                </select>
+            </div>
+            <div class="layui-inline">
+                <textarea class='layui-textarea' id='RightValue' name='RightValue' lay-verify="required" style="width:400px"></textarea>
+                <span style="position: absolute;bottom: 6px; right: 5px;">
+                    <a href="javascript:;"><i class="fa fa-edit" style="color:blue" id="editRightValue"></i></a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">信息提示</label>
+        <div class="layui-input-block">
+            <textarea class='layui-textarea' id='Explain' name='Explain' lay-verify="required" placeholder="必填 未满足校验时系统予以的提示说明"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">空值处理</label>
+        <div class="layui-input-block">
+            <select name="NullCase" id="NullCase">
+                <option value="0">输入为空的数字视为0||输入为空的日期视为9999-12-31</option>
+                <option value="1">计算式存在输入为空的数字或日期，则不做校验</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="IOrder" placeholder="必填 序号 系统将按照顺序进行校验" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">启用</label>
+        <div class="layui-input-block">
+            <select name="isUse" id="isUse">
+                <option value="1">启用</option>
+                <option value="0">禁用</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.val("formUser", {
+            "TbNmae": "@Model.TbNmae"
+            , "FlowStr": "@Model.FlowStr"
+            , "FlowStr_Exa": "@Model.FlowStr_Exa"
+            , "LeftValue": "@Model.LeftValue"
+            , "RightValue": "@Model.RightValue"
+            , "Compare": "@Model.Compare"
+            , "Explain": "@Model.Explain"
+            , "NullCase": "@Model.NullCase"
+            , "IOrder": "@Model.IOrder"
+            , "TbId": "@Model.TbId"
+            , "isUse": "@Model.isUse"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbValueCheck/Edit?id=" + $("#id").val(), "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbValueCheck/GetList?tbid=" + $(window.parent.document).find("#tbid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //选择适用范围
+        $('#FlowStr_Exa').on('click', function () {
+            exLayer.open("选择", "/SysTable/TbValueCheck/PUflow?tbid=" + $("#tbid").val(), '500px', '300px', '100px', '400px', null, null);
+        });
+        $('#editFlowStr').on('click', function () {
+            exLayer.open("选择", "/SysTable/TbValueCheck/PUflow?tbid=" + $("#tbid").val(), '500px', '300px', '100px', '400px', null, null);
+        });
+
+        //选择校验
+        $('#editLeftValue').on('click', function () {
+            exLayer.open("左侧校验", "/SysTable/TbValueCheck/PUFormula?fid=left&tbid=" + $("#tbid").val() + "&some=" + $("#LeftValue").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //选择
+        $('#editRightValue').on('click', function () {
+            exLayer.open("右侧校验", "/SysTable/TbValueCheck/PUFormula?fid=right&tbid=" + $("#tbid").val() + "&some=" + $("#RightValue").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $(document).ready(function () {
+            $('#LeftValue').val(formatSql($('#LeftValue').val()));
+            $('#RightValue').val(formatSql($('#RightValue').val()));
+        });
+    });
+</script>

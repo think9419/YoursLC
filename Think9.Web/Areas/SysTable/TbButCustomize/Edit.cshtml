@@ -1,0 +1,466 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbButCustomizeEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+<style type="text/css">
+    #sltIcon {
+        height: 38px;
+        line-height: 38px;
+        margin-left: 10px;
+        float: left;
+        display: block;
+    }
+
+    #spnIcon {
+        font-size: 24px;
+        line-height: 38px;
+        float: left;
+        margin-left: 12px;
+    }
+</style>
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="Guid" value="">
+    <input style="display:none" id="_tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="Id" value="@Model.Id">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所在页面</label>
+        <div class="layui-input-block">
+            <select id="PageType" name="PageType" lay-filter="PageType" lay-verify='required' disabled="disabled">
+                <option value="list">List页面</option>
+                <optgroup label="Form页面 建设中...">
+                </optgroup>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+            <label class="layui-form-label required">录入表</label>
+            <div class="layui-input-block">
+                <select id="TbId" name="TbId" lay-filter="TbId" lay-verify='required' disabled="disabled">
+                    @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "#table#"))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+            <label class="layui-form-label required">执行方式</label>
+            <div class="layui-input-inline">
+                <input type="radio" name="IsBatch" value="2" title="批处理" disabled="disabled">
+                <i class="layui-icon layui-icon-about" lay-tips="List页面选择批处理或Form页面选择子表和批处理时，按钮默认排列在数据列表顶部" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+            <div class="layui-input-inline">
+                <input type="radio" name="IsBatch" value="1" title="单处理" disabled="disabled">
+                <i class="layui-icon layui-icon-about" lay-tips="Form页面选择主表时只能选择单处理，List页面选择单处理或Form页面选择子表并选择单处理时，按钮在数据列表中" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">按钮编码</label>
+        <div class="layui-input-block layui-col-space3">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <input type="text" name="BtnId" id="BtnId" placeholder="按钮编码" autocomplete="off" class="layui-input" disabled="disabled">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+            <label class="layui-form-label required">按钮名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="BtnText" id="BtnText" placeholder="按钮名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="7">
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+            <label class="layui-form-label">按钮图标</label>
+            <div class="layui-input-block">
+                <div class="layui-col-xs10 layui-col-sm10 layui-col-md10">
+                    <input type="text" id="Icon" name="Icon" placeholder="按钮图标 批处理时才有效" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-col-xs2 layui-col-sm2 layui-col-md2">
+                    <a id="sltIcon" href="javascript:;" style="color:blue"><i class="fa fa-check"></i>选择</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">提示信息</label>
+        <div class="layui-input-block">
+            <input type="text" name="BtnWarn" id="BtnWarn" placeholder="提示信息" autocomplete="off" class="layui-input" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">执行类别</label>
+        <div>
+            <div class="layui-input-inline">
+                <input type="radio" name="IsLink" value="1" title="打开页面" checked="checked" id="Sort_1" lay-filter="selectSort" disabled="disabled">
+                <i class="layui-icon layui-icon-about" lay-tips="打开录入表页面或统计报表，可为页面传递参数" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+            <div class="layui-input-inline">
+                <input type="radio" name="IsLink" value="2" title="后台处理" id="Sort_2" lay-filter="selectSort" disabled="disabled">
+                <i class="layui-icon layui-icon-about" lay-tips="执行自定义SQL语句或已定义的存储过程" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+        </div>
+    </div>
+    <div id="div02">
+        <div class="layui-form-item">
+            <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+        </div>
+    </div>
+
+    <div id="div01">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">打开页面</label>
+            <div class="layui-input-block layui-col-space3">
+                <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                    <select id="LinkFlag" name="LinkFlag" lay-filter="LinkFlag">
+                        <option value="">==需首先选择 - 选择已定义的录入表(主表)或统计表==</option>
+                        <optgroup label="已定义的录入表">
+                            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "#table2#"))
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </optgroup>
+                        <optgroup label="已定义的统计表">
+                            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "#table3#"))
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                    <select name="LinkFlag2" id="LinkFlag2">
+                        <option value="Show">Show页面</option>
+                        <option value="Add">Add页面</option>
+                        <option value="Edit">Edit页面</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey">打开录入表页面：Add页面:传递参数可实现为打开的页面控件赋值;Show\Edit页面:传入『业务主键』值从而确定数据ID || 打开统计表页面：传递参数可为查询条件赋值</legend>
+            <div class="layui-form-item">
+                <div class="layui-input-block layui-col-space3" style="margin-left:0;">
+                    <div class="layui-col-xs12 layui-col-sm5 layui-col-md5">
+                        <select id="ParaName" name="ParaName">
+                            <option value="">==选择参数 需先从『打开页面』选择录入表或统计表==</option>
+                        </select>
+                    </div>
+                    <div class="layui-col-xs12 layui-col-sm5 layui-col-md5">
+                        <input type="text" name="ParaValue" id="ParaValue" placeholder="请输入或选择参数值" autocomplete="off" class="layui-input">
+                        <span style="position: absolute;top: 0px; left: 0px;">
+                            <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="
+@@+指标编码表示从当前数据取该指标值" data-offset="4"></i>
+                        </span>
+                        <span style="position: absolute;bottom: 10px; right: 5px;">
+                            <a href="javascript:;">
+                                <i class="fa fa-check-square-o" id="selectValue" lay-tips="
+选择指标值，从当前数据取值"></i>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="layui-col-xs12 layui-col-sm2 layui-col-md2">
+                        <button type="button" class="layui-btn" id="addPara"><i class="fa fa-plus"></i>添加参数</button>
+                    </div>
+                </div>
+            </div>
+            <div style='text-align: Left;'><span class="layui-word-tip">参数传递采用get方式，即ParameterName=ParameterValue，其中ParameterName为参数，ParameterValue为参数值，参数值如果为@@+指标编码表示从当前数据取该指标值</span></div>
+            <div class="layui-form-item">
+                <table class="layui-hide" id="ParaTable" lay-filter="tableFilter"></table>
+            </div>
+        </fieldset>
+    </div>
+    <br>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="备注" name="Remarks" id="Remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        formValExa();
+
+        form.val("formUser", {
+            "PageType": "@Model.PageType",
+            "TbId": "@Model.TbId",
+            "BtnId": "@Model.BtnId",
+            "BtnText": "@Model.BtnText",
+            "IsBatch": "@Model.IsBatch",
+            "BtnWarn": "@Model.BtnWarn",
+            "Remarks": "@Model.Remarks",
+            "Icon": "@Model.Icon",
+            "IsLink": "@Model.IsLink",
+            "LinkFlag": "@Model.LinkFlag",
+            "LinkFlag2": "@Model.LinkFlag2",
+            "Id": "@Model.Id"
+        });
+
+        function formValExa() {
+            $("#div01").attr("style", "display:none;");
+            $("#div02").attr("style", "display:none;");
+            //执行存储过程
+            if (@Model.IsLink == '1') {
+                GetSelectValueField('@Model.LinkFlag');
+                $("#div01").attr("style", "display:block;");
+            }
+            else {
+                $("#div02").attr("style", "display:block;");
+            }
+        }
+
+        // 添加参数值
+        $('#addPara').on('click', function () {
+            var _id = $("#Id").val();
+            var _name = $("#ParaName").val();
+            var _value = $("#ParaValue").val();
+            var _type = "string";
+
+            if (_name == '') {
+                exLayer.yellowSighMsg("请输入参数名称");
+                return false;
+            }
+            if (_value == '') {
+                exLayer.yellowSighMsg("请选择或输入参数值");
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/TbButCustomize/AddPara2", "post", { id: _id, name: _name, value: _value, type: _type, tbid: $("#TbId").val() }, true).done(function (response) {
+                exUtils.tableSuccessMsg(response.message);
+                $("#ParaValue").val('');
+                ParaTable.reload({
+                    url: "/SysTable/TbButCustomize/GetParaList?id=" + _id
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //选择参数值
+        $('#selectValue').on('click', function () {
+            exLayer.openMiddle("", "/SysTable/SqlTemplet/SelectIndex?tbid=" + $("#TbId").val(), '600px', '400px', layui.device().mobile);
+        });
+
+        $("#sltIcon").on("click", function () {
+            exLayer.open("选择图标", "/SysBasic/Module/Icon", '100%', '100%', '0px', '0px', null, null);
+        })
+
+        form.on('select(LinkFlag)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                GetSelectValueField(data.value);
+                layer.close(loading);
+            }, 2000);
+        })
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbButCustomize/Edit", "post", { model: data.field, id: $("#Id").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbButCustomize/GetList?tbid=" + $(window.parent.document).find('#TbId').val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#BtnText").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#BtnId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbButCustomize/GetEventList?id=" + $("#Id").val(),
+            defaultToolbar: [{ title: '刷新', layEvent: 'refreshEvent', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ExecuteType", title: "执行类别", width: 100, sort: true, templet: "#ExecuteType" },
+                { field: "ExecuteSql", title: "Sql语句 || 存储过程" },
+                { field: "OrderNo", title: "序号", width: 80, sort: true },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let ParaTable = table.render({
+            elem: "#ParaTable",
+            url: "/SysTable/TbButCustomize/GetParaList?id=" + @Model.Id,
+            page: false,
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ParaName", title: "参数" },
+                { field: "ParaValue", title: "参数值" },
+                { title: "", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#ParaTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "addEvent":
+                    addEvent();
+                    break;
+                case "refreshEvent":
+                    refreshEvent();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "editEvent":
+                    editEvent(data.Id);
+                    break;
+                case "delEvent":
+                    delEvent(data.Id);
+                    break;
+                case "delPara":
+                    delPara(data.Id);
+                    break;
+            }
+        });
+
+        function GetSelectValueField(id) {
+            var controlid = "#ParaName";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbButCustomize/GetSelectValueField", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    if (item.ClassID == 'err') {
+                        layer.msg(item.Text, { icon: 5, time: 20000, btn: ['关闭'] });
+                    }
+                    else {
+                        $("" + controlid + "").append(new Option(item.Text, item.Value));
+                    }
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        function addEvent() {
+            exLayer.open("添加按钮事件", "/SysTable/TbButCustomize/AddEvent?id=" + $("#Id").val() + "&tbid=" + $("#TbId").val(), '80%', '80%', '0px', '0px', null, null);
+        }
+
+        function editEvent(id, type) {
+            exLayer.open("编辑按钮事件", "/SysTable/TbButCustomize/EditEvent?id=" + id + "&tbid=" + $("#TbId").val(), '80%', '80%', '0px', '0px', null, null);
+        }
+
+        function delEvent(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/TbButCustomize/DeleteButEvent", "get", { id: id, btnId: $("#Id").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    refreshEvent();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refreshEvent() {
+            ThisTable.reload({
+                url: "/SysTable/TbButCustomize/GetEventList?id=" + $("#Id").val()
+            });
+        }
+
+        function delPara(id) {
+            exUtils.ajax("/SysTable/TbButCustomize/DeletePara", "get", { id: id }, true).done(function (response) {
+                ParaTable.reload({
+                    url: "/SysTable/TbButCustomize/GetParaList?id=" + @Model.Id
+                                                                         });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="addEvent" id="addEvent"><i class="fa fa-plus"></i>添加按钮事件</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="editEvent" id="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delEvent" id="del">删除</a>
+</script>
+<script type="text/html" id="ParaTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delPara" id="delPara"><i class="fa fa-close"></i></a>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="ExecuteType">
+    {{#  if(d.ExecuteType == '1'){ }}
+    sql语句
+    {{#  }else{ }}
+    存储过程
+    {{#  } }}
+</script>

@@ -1,0 +1,56 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:35:17
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体参数类【统计表】  生成时间：2024-09-24 13:35:17
+	/// </summary>
+	public class BasedOnMainTable01Model : BasicReportEntity
+	{
+		/// <summary>
+		/// 类别
+		/// </summary>
+		public string inCategory { get; set; }
+		/// <summary>
+		/// 类别
+		/// </summary>
+		public string inCategory_Exa { get; set; }
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		public string inSpecificationAndModel { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string inUnit { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string inUnit_Exa { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? inUnitPrice { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? inUnitPrice_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+	}
+}

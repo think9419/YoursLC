@@ -1,0 +1,68 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="type" value="@ViewBag.type">
+<input style="display:none" id="frm" value="@ViewBag.frm">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/IndexStats/GetIndexListBySearch?type=" + $("#type").val(),
+            method: "get",
+            page: false,
+            defaultToolbar: [],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "radio" }
+                , { field: "IndexId", title: "指标编码" }
+                , { field: "IndexName", title: "指标名称" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "OK":
+                    getSelect(obj);
+                    break;
+            }
+        });
+
+        //确定选择
+        function getSelect(obj) {
+            var _v = '';
+            var checkStatus = table.checkStatus(obj.config.id); //获取选中行状态
+            if (checkStatus.data.length > 0) {
+                _v = checkStatus.data[0].IndexId;
+            }
+
+            if ($("#frm").val() == 'formula') {
+                var str = $(window.parent.document).find('#FormulaStr').val() + ' ' + _v
+                $(window.parent.document).find('#FormulaStr').val(str);
+            }
+
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        }
+
+    })</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn layui-btn-normal" lay-event="OK" id="OK">确定选择</button>
+</script>

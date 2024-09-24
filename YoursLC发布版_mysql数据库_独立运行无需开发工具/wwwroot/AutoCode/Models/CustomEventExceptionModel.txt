@@ -1,0 +1,38 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:14
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:14
+	/// </summary>
+	 [Table("tb_CustomEventException")]
+	public class CustomEventExceptionModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 省
+		/// </summary>
+		public string inProvince { get; set; }
+		/// <summary>
+		/// 省 【附加】
+		/// </summary>
+		[Computed]
+		public string inProvince_Exa { get; set; }
+		/// <summary>
+		/// 市县
+		/// </summary>
+		public string inCityAndCounty { get; set; }
+		/// <summary>
+		/// 市县 【附加】
+		/// </summary>
+		[Computed]
+		public string inCityAndCounty_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

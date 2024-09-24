@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+    <legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询&nbsp;<span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form" action="">
+            <div class="layui-inline">
+                <input class="layui-input" placeholder="关键词搜索" name="key" id="key" autocomplete="off">
+            </div>
+            <div class="layui-inline">
+                <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button><button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/Organize/GetList?key=" + $("#key").val(),
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "Value", title: "编码", width: 200 },
+                { field: "Text", title: "名称", width: layui.device().mobile ? 300 : null },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+                case "refresh":
+                    $("#searchfield").hide();
+                    ThisTable.reload({
+                        url: "/SysBasic/Organize/GetList",
+                        page: { curr: 1 }
+                    });
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.Value);
+                    break;
+                case "del":
+                    del(data.Value);
+                    break;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        //查询
+        $("#search").click(function () {
+            search();
+        });
+
+        function search() {
+            ThisTable.reload({
+                url: "/SysBasic/Organize/GetList?key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+            if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+            return false;
+        }
+
+        function add() {
+            exLayer.openMiddle("新建单位(部门)", "/SysBasic/Organize/Add", '500px', '450px', layui.device().mobile);
+        }
+
+        function edit(id) {
+            exLayer.openMiddle("编辑单位(部门)", "/SysBasic/Organize/Edit/" + id, '500px', '450px', layui.device().mobile);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysBasic/Organize/Delete", "get", { id: id }, true).done(function (response) {
+                    ThisTable.reload({
+                    });
+                    exUtils.tableSuccessMsg(response.message);
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+        //关闭搜索
+        $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                search();
+            }
+        });
+    });
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建单位（部门）</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>

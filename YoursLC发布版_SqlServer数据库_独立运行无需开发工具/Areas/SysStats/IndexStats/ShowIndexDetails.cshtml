@@ -1,0 +1,49 @@
+﻿@using Think9.Models;
+@model Think9.Models.IndexStatsEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="id" value="@ViewBag.id">
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="margin-left:5px;">
+            <textarea name='IndexExplain' id='IndexExplain' class='layui-textarea'>@ViewBag.Details</textarea>
+            <span style="position: absolute;top: 0px; left: 0px;">
+                <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipStr"></i>
+            </span>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        layui.code();
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        $('#tipStr').attr("lay-tips", "@ViewBag.Explain");
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['80%', '60%'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

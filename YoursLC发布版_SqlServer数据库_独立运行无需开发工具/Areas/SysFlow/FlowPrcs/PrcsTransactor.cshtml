@@ -1,0 +1,42 @@
+﻿@using Think9.Models;
+@model Think9.Models.FlowPrcsEntity
+@{
+    ViewBag.Title = "";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="id" value="@ViewBag.ClassID">
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">满足人员、单位及角色其中一项便能办理</legend>
+        <div style="margin: 5px 5px 5px 5px">
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsUser" id="PrcsUser">
+                    <textarea value="" name="PrcsUser_Exa" id="PrcsUser_Exa" class="layui-textarea" readonly="readonly" placeholder='人员(用户)...'>@Model.PrcsUser_Exa</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsDept" id="PrcsDept">
+                    <textarea value="" name="PrcsDept_Exa" id="PrcsDept_Exa" class="layui-textarea" readonly="readonly" placeholder='单位部门...'>@Model.PrcsDept_Exa</textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsPriv" id="PrcsPriv">
+                    <textarea value="" name="PrcsPriv_Exa" id="PrcsPriv_Exa" class="layui-textarea" readonly="readonly" placeholder='角色...'>@Model.PrcsPriv_Exa</textarea>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+    });
+</script>

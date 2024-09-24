@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+<blockquote class="layui-elem-quote layui-text">
+    点击『生成』按钮，系统会拷贝源文件替换目标文件（即代码的『模板文件』），再次生成代码时，会拷贝最新生成的『模板文件』
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/TempletCode/GetCreateList?tbid=" + $("#tbid").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "SourceFilePath", title: "源文件路径", sort: true },
+                { field: "SourceFileCreatTime", title: "源文件最后修改", sort: true, width: 150 },
+                { field: "TargetFilePath", title: "目标文件路径", sort: true, width: layui.device().mobile ? 200 : null },
+                { field: "TargetFileCreatTime", title: "目标文件最后修改", sort: true, width: 150 },
+                { title: "操作", width: 160, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "creat":
+                    creat();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    detail(data.SourceFilePath);
+                    break;
+                case "detail2":
+                    detail(data.TargetFilePath);
+                    break;
+            }
+        });
+
+        function creat() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].SourceFilePath + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+
+            exLayer.confirm("确定要生成吗？", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysBasic/TempletCode/Creat", "post", { idsStr: idsStr, tbid: $("#tbid").val() }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        parent.layer.closeAll();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysBasic/TempletCode/GetCreateList?tbid=" + $("#tbid").val()
+            });
+        }
+
+        function detail(path) {
+            exLayer.open("查看", "/SysBasic/TempletCode/CodeDetail?path=" + path, '100%', '100%', '0px', '0px', null, null);
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="creat" id="creat"><i class="fa fa-files-o"></i>生成</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" lay-event="detail" id="detail">源文件</a>
+    <a class="layui-btn layui-btn-normal layui-btn-xs" href="javascript:;" lay-event="detail2" id="detail2">目标文件</a>
+</script>

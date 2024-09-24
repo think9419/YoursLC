@@ -1,0 +1,90 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <LangVersion>9.0</LangVersion>
+    <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+    <Version>1.22</Version>
+    <AssemblyVersion>1.22</AssemblyVersion>
+    <FileVersion>1.22</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.Reporting" Version="2.1.0" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="Autofac.Extras.DynamicProxy" Version="7.1.0" />
+    <PackageReference Include="iTextSharp.LGPLv2.Core" Version="3.4.13" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.5" />
+    <PackageReference Include="Quartz" Version="3.8.0" />
+    <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.19" />
+    <PackageReference Include="System.IO.Packaging" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="ZKWeb.System.Drawing" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Think9.Base\Think9.Base.csproj" />
+    <ProjectReference Include="..\Think9.Basic\Think9.Basic.csproj" />
+    <ProjectReference Include="..\Think9.Common\Think9.Common.csproj" />
+    <ProjectReference Include="..\Think9.Dapper\Think9.Dapper.csproj" />
+    <ProjectReference Include="..\Think9.ExtApi\Think9.ExtApi.csproj" />
+    <ProjectReference Include="..\Think9.IRepository\Think9.IRepository.csproj" />
+    <ProjectReference Include="..\Think9.Model\Think9.Models.csproj" />
+    <ProjectReference Include="..\Think9.Repository\Think9.Repository.csproj" />
+    <ProjectReference Include="..\Think9.Util\Think9.Util.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="AppTempletFile\Controllers\" />
+    <Folder Include="Areas\Base\" />
+    <Folder Include="Controllers\DataSource\" />
+    <Folder Include="wwwroot\upload\" />
+    <Folder Include="wwwroot\UserFile\" />
+  </ItemGroup>
+
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JsonSchema="" properties_4launchsettings_1json__JsonSchema="" />
+
+      </VisualStudio>
+  </ProjectExtensions>
+
+  <ItemGroup>
+    <Reference Include="Hardware.Info">
+      <HintPath>App_DLL\Hardware.Info.dll</HintPath>
+    </Reference>
+    <Reference Include="Think9.CreatCode">
+      <HintPath>App_DLL\Think9.CreatCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Think9.Settings">
+      <HintPath>App_DLL\Think9.Settings.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Areas\Com\FileManage\FileUplaod.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\SysTable\TbBasic\TbSearchMode.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

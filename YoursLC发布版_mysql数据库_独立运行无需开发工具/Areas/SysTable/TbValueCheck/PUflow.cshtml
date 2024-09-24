@@ -1,0 +1,70 @@
+﻿@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbValueCheck/GetSelectFlowList?tbid=" + $("#tbid").val(),
+            method: "get",
+            page: false,
+            defaultToolbar: [],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox" }
+                , { field: "Value", title: "", hide: true }
+                , { field: "Text", title: "" }
+            ]],
+            done: function (res, curr, count) {
+                $('th').hide();//表头隐藏的样式
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "OK":
+                    getSelect(obj);
+                    break;
+            }
+        });
+
+        //确定选择
+        function getSelect(obj) {
+
+            var idsStr2 = "";
+            var idsStr = ";";
+            var checkStatus = table.checkStatus(obj.config.id);
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].Value + ";";
+                    idsStr2 += checkStatus.data[i].Text + " ";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+            }
+
+            $(window.parent.document).find('#FlowStr_Exa').val(idsStr2);
+            $(window.parent.document).find('#FlowStr').val(idsStr);
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        }
+
+    })</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="OK" id="OK">确定选择</button>
+</script>

@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = "事件记录";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TableList/GetRecordList?tbid=" + $("#tbid").val(),
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "TbId", title: "编码", width: 150, sort: true },
+                { field: "Info", title: "说明",  sort: true },
+                { field: "Num", title: "记录数", width: 120, sort: true },
+                { title: "详细", width: 60, templet: "#operation_Record" },
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TableList/GetRecordList?tbid=" + $("#tbid").val(),
+            });
+        }
+    });
+</script>
+
+<script type="text/html" id="toolbarTpl">
+    <sapn style='color: #FE7300;'>包括录入表的自定义事件、自定义按钮及数据回写的执行记录</sapn>
+</script>
+<script type="text/html" id="operation_Record">
+    <a href="{{d.Link}}" target="_blank" id="print" class="layui-btn layui-btn-primary layui-btn-xs">
+        <i class='fa fa-file-text-o'></i>
+    </a>
+</script>

@@ -1,0 +1,150 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<input style="display:none" id="formid" value="@ViewBag.formid">
+
+<form class="layui-form" action="" id="_formid">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <div class="layui-block">
+                <textarea class='layui-textarea' id='formula' name='formula'>@ViewBag.some</textarea>
+                <span style="position: absolute;top: 18px; left: 18px;">
+                    <i class="fa fa-question" lay-tips="tips" data-offset="4" id="tipsFormula"></i>
+                </span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn01">加+</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn02">减-</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn03">乘*</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn04">除/</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn05">括号(</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn06">括号)</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn07"><i class="fa fa-question"> </i></a>
+            </div>
+            <div class="layui-inline">
+                <button type="button" class="layui-btn" lay-submit lay-filter="OK">确定</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "element"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetIndexListByTbID?tbid=" + $("#tbid").val() + "&fid=" + $("#formid").val(),
+            method: "GET",
+            cols: [[
+                , { field: "Value", title: "", hide: true }
+                , { field: "Text", title: "点击选择", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                if (count == 0) {
+                    $(".layui-table-main").html('<div class="layui-none">无满足条件指标-计算式可用指标包括数值型指标及子表可统计指标等</div>');
+                }
+            }
+        });
+
+        $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "select":
+                    addSelect(data.Value);
+                    break;
+            }
+        });
+
+        $('#btn01').on('click', function () {
+            addSelect(' 加 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+        $('#btn02').on('click', function () {
+            addSelect(' 减 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+        $('#btn03').on('click', function () {
+            addSelect(' 乘 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+        $('#btn04').on('click', function () {
+            addSelect(' 除 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+        $('#btn05').on('click', function () {
+            addSelect('(');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+        $('#btn06').on('click', function () {
+            addSelect(')');
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+        });
+
+        form.on("submit(OK)", function (data) {
+            var some = $("#formula").val();
+            $(window.parent.document).find("#Auto02").val(some);
+            $(window.parent.document).find("#tipsAuto02").attr("lay-tips", GetTips(some));
+
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        });
+
+        function addSelect(selectid) {
+            var some = $("#formula").val() + selectid;
+            $("#formula").val(some);
+            $('#tipsFormula').attr("lay-tips", GetTips($("#formula").val()));
+            document.body.scrollTop = document.documentElement.scrollTop = 0;
+        }
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <span> <a lay-event="select" id="select"> <span>{{d.Text}}</span></a></span>
+</script>

@@ -1,0 +1,164 @@
+﻿@{
+    ViewBag.Title = "表单设计";
+    Layout = "~/Areas/Shared/_LayuiTbJson.cshtml";
+}
+
+<input style="display:none" id="_tbid" value="@ViewBag.TbId">
+<input style="display:none" id="formBuilder" value="">
+<blockquote class="layui-elem-quote  layui-text">
+    所有『选项卡序号』均为空，则页面无选项卡；『选项卡序号』相同的组件在同一个标签页(即TAB选项卡)排列；『选项卡序号』『行序号』都相同，排列在同一行；一行最多排列6个组件；『行序号』为空的组件按照『默认处理』排列<br>
+    『表单设计页面』选择『按照排列生成』，点击『快速生成』按钮，将按照设置生成表单设计页面
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<form class="layui-form" action="">
+    <div class="layui-form">
+        <div class="layui-form-item" style="text-align: right;">
+            <div class="layui-inline" style="padding-top: 10px;">
+                默认处理：
+            </div>
+            <div class="layui-inline" style="padding-top: 10px;width:250px;">
+                <select lay-verify="required" name="NColumns" id="NColumns">
+                    <option value="1">『行序号』为空组件每行1列排列</option>
+                    <option value="2" selected>『行序号』为空组件每行2列排列</option>
+                    <option value="3">『行序号』为空组件每行3列排列</option>
+                    <option value="4">『行序号』为空组件每行4列排列</option>
+                    <option value="6">『行序号』为空组件每行6列排列</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</form>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //更新全部表单数据
+
+        form.val("formUser", {
+            "NColumns": "@ViewBag.NColumns"
+        });
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        //渲染表格，url数据接口参数；cols设置显示字段...
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetTbFormList?tbid=" + $('#_tbid').val(),
+            method: "POST",
+            limits: [10, 20, 30, 50, 100, 200],
+            limit: 200,
+            page: true,
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "Id", hide: true }
+                , { type: "checkbox", fixed: 'left' }
+                , { type: "numbers", title: "NO.", fixed: 'left' }
+                , { field: "IndexId", title: "组件编码", width: 200, sort: true }
+                , { field: "IndexName", title: "组件名称", width: 280 }
+                , { field: "NLabel", title: "选项卡序号", width: 150, sort: true, templet: '#T_NLabel' }
+                , { field: "NLine", title: "行序号", width: 150, sort: true, templet: '#T_NLine' }
+                , { field: "NColumn", title: "列序号", width: 150, sort: true, templet: '#T_NColumn' }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+        //toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "EDIT"://编辑
+                    edit();
+                    $(window.parent.document).find('#NColumns').val($('#NColumns').val());
+                    break;
+                case "Look"://预览
+                    edit();
+                    $(window.parent.document).find('#NColumns').val($('#NColumns').val());
+                    $(window.parent.document).find('#AutoType').val('99');
+                    $(window.parent.document).find('#creatjson').click();
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    break;
+                case "OK"://保存并关闭
+                    edit();
+                    $(window.parent.document).find('#NColumns').val($('#NColumns').val());
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    break;
+                case "refresh"://刷新按钮事件-显示全部数据
+                    ThisTable.reload({
+                        url: "/SysTable/TbSetUp/GetTbFormList?ini=y&tbid=" + $('#_tbid').val()
+                    });
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            alert('11');
+            switch (obj.event) {
+                case "edit01":
+                    break;
+            }
+        });
+
+        function edit() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+                var Id = tdArr.eq(0).text();
+                if (Id != 0) {
+                    var _row = {};
+                    _row.Id = Id;
+                    _row.NLabel = tdArr.eq(5).find('input').val();//
+                    _row.NLine = tdArr.eq(6).find('input').val();//
+                    _row.NColumn = tdArr.eq(7).find('input').val();//
+                    _list.push(_row);
+                }
+            }
+
+            exUtils.ajax("/SysTable/TbSetUp/EditTbFormList", "post", { tbid: $('#_tbid').val(), list: _list }, true).done(function (response) {
+                ThisTable.reload({
+                    url: "/SysTable/TbSetUp/GetTbFormList?tbid=" + $('#_tbid').val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        $(document).ready(function () {
+            $('#NColumns').val("@ViewBag.NColumns");
+            form.render();
+        });
+    });
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="EDIT" id="EDIT">保 存</button>
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="OK" id="OK">保存并关闭</button>
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="Look" id="look"  style="display:none">保存并预览</button>
+</script>
+<!-- 标签 -->
+<script type="text/html" id="T_NLabel">
+    <input type='text' name='NLabel'  value = "{{d.NLabel ==  99999 ? '' : d.NLabel}}" autocomplete='off' class='layui-input'  maxlength='2'  style='height:30px;'  placeholder='请输入整数'  lay-verify='number'>
+</script>
+<!-- 行 -->
+<script type="text/html" id="T_NLine">
+    <input type='text' name='NLine' value = "{{d.NLine ==  99999 ? '' : d.NLine}}" autocomplete='off' class='layui-input'  maxlength='3'  style='height:30px;'  placeholder='请输入整数'   lay-verify='number'>
+</script>
+<!-- 列 -->
+<script type="text/html" id="T_NColumn">
+    <input type='text' name='NColumn' value = "{{d.NColumn ==  99999 ? '' : d.NColumn}}" autocomplete='off' class='layui-input'  maxlength='1'  style='height:30px;'  placeholder='请输入整数'   lay-verify='number'>
+</script>

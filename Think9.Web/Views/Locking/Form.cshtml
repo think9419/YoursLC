@@ -1,0 +1,372 @@
+﻿@*锁定 ---根据表单设计生成 PC端编辑页面 - 列表新增数据或编辑按钮打开此页面*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:28:55 添加或编辑-此文件放置于Views/Locking /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Form";
+	Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+<style>
+	/* 设置下拉框的高度与表格单元相同 */
+	td .layui-form-select {
+		margin-top: -3px;
+		margin-left: -7px;
+		margin-right: -7px;
+	}
+</style>
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+<input style="display:none" id="_isDebug" value="debug">@*debug为调试；release为发布*@
+<input style="display:none" id="_upFields" value="@ViewBag.UpFields">@*可编辑字段*@
+<input style="display:none" id="_hiddenFields" value="@ViewBag.HiddenFields">@*保密字段*@
+<input style="display:none" id="_isMobile" value="n">@*y为移动端*@
+<input style="display:none" id="_disableStr" value="@ViewBag.DisableStr">@*禁用控件字符，格式[controlid1],备用*@
+<input style="display:none" id="_listid" value="@ViewBag.ListId">@*数据主键，添加时为0*@
+<input style="display:none" id="_plit" value="@ViewBag.Split">@*多选框字符分割*@
+<input style="display:none" id="_frm" value="@ViewBag.Frm">@*从哪里跳转来的?默认list*@
+<input style="display:none" id="_type" value="@ViewBag.Type">@*add或edit*@
+<input style="display:none" id="_userid" value="@ViewBag.UserId">@*用户id*@
+<input style="display:none" id="_attachmentId">@*附件id*@
+<input style="display:none" id="_fwid" value="@ViewBag.FId">@*当前流程编码*@
+<input style="display:none" id="prc_id" value="@ViewBag.PrcId">@*当前流程步骤id*@
+<input style="display:none" id="prc_no" value="@ViewBag.PrcNo">@*当前流程步骤编码*@
+@*弹出选择时页面间传递数据*@
+<input style="display:none" id="pu_value">@*弹出选择时使用-弹出页面选择的值*@
+<input style="display:none" id="pu_tbid">@*弹出选择时使用-触发弹出页面的表id，_main或子表编码*@
+<input style="display:none" id="pu_indexid">@*弹出选择时使用-触发弹出页面的指标编码(子表弹出时为子表编码+指标编码)*@
+<input style="display:none" id="pu_rowid">@*弹出选择时使用-子表弹出，对应tableid 哪一行*@
+<input style="display:none" id="pu_column">@*弹出选择时使用-子表弹出，第几列*@
+<div class="layui-form">
+ <div class="layui-form-item"  style="text-align: right;">
+	<div class="layui-btn-container">
+			@*<a href="" target="_blank" id="print" class="layui-btn">打印</a>*@
+			<button type="button" class="layui-btn" id="att">附件</button>
+			<button type="button" class="layui-btn" lay-submit lay-filter="edit" id="edit">保存</button>
+			@*<button type="button" class="layui-btn" lay-submit lay-filter="next"  id="next">转交</button>*@
+			<button type="button" class="layui-btn" lay-submit lay-filter="finish" id="finish">提交</button>
+	 </div>
+  </div>
+
+		<div class="layui-form-item">
+			 <blockquote class="layui-elem-quote">除流程步骤可以设置控件不可编辑，设置录入表指标属性也可以管理控件的可编辑状态</blockquote>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"  style="width:110px;">编辑时锁定</label>
+			<div class="layui-input-block"  style="margin-left:110px;">
+				<input type='text' name='inLockDuringEditing' id='inLockDuringEditing' autocomplete='off' class='layui-input'  maxlength='30'     placeholder='请输入编辑时锁定'  >
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"  style="width:110px;">锁定</label>
+			<div class="layui-input-block"  style="margin-left:110px;">
+				<input type='text' name='inLocking' id='inLocking' autocomplete='off' class='layui-input layui-disabled'  maxlength='30'   disabled='disabled'    placeholder='请输入锁定'  >
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label"  style="width:110px;">不锁定</label>
+			<div class="layui-input-block"  style="margin-left:110px;">
+				<input type='text' name='inNotLocked' id='inNotLocked' autocomplete='off' class='layui-input'  maxlength='30'     placeholder='请输入不锁定'  >
+			</div>
+		</div>
+		<div class="layui-table-box" id="div_tb_Subtable04">
+			<table class="layui-hide" id="tb_Subtable04" lay-filter="tableFilter"> </table></div>
+		<span class='layui-word-aux'>双击打开编辑页面<i class='fa fa-angle-double-up'></i></span>
+</div>
+
+
+</form>
+<script>
+	layui.config({
+		base: '/Self_JS/'  /*自定义的js--wwwroot\Self_JS\Locking.js*/
+	});
+	layui.use(["form", "exLayer", "element", "exUtils",  "table", "tableSelect", "Locking"], function () {
+		let form = layui.form;
+		let layer = layui.layer;
+		let table = layui.table;
+		let exLayer = layui.exLayer;
+		let exUtils = layui.exUtils;
+		let element = layui.element;
+		let tableSelect = layui.tableSelect;
+		let myJS = layui.Locking;
+		let $ = layui.$;
+
+		form.render();//更新全部表单数据
+		formValExa();//控件赋值-复选框和图片
+
+		//Tab选项
+		element.on('tab(element_Filter)', function (data) {
+        });
+		//赋值--不包括多选框和图片
+		form.val("formUser", {
+			"inLockDuringEditing": "@Model.inLockDuringEditing"
+			,"inLocking": "@Model.inLocking"
+			,"inNotLocked": "@Model.inNotLocked"
+		});
+		//控件赋值，用于多选框和图片的显示
+		function formValExa() {
+
+
+		}
+
+
+
+
+		//附件上传
+		$('#att').on('click', function () {
+			exLayer.open('附件上传', '/Com/FileManage/Attachment?fwid=' + $('#_fwid').val() + '&listid=' + $('#_listid').val() + '&prcid=' + $('#prc_id').val() + '&userid=' + $('#_userid').val() + '&attid=' + $('#_attachmentId').val(), '100%', '100%', '0px', '0px', null, null);
+		});
+		//点击保存按钮 发布模式调用_TB/SaveData，调试模式调用Locking/SaveData
+		form.on("submit(edit)", function (data) {
+			var _gridList = myJS.foreachGridTable();//遍历子表取数，在自定义js中定义，无子表返回空
+			exUtils.ajax('/_TB/SaveData', 'post', {
+				model: data.field, 'gridlist': _gridList, listid: $('#_listid').val(), prcno: $('#prc_no').val(), type: $('#_type').val(), att: $('#_attachmentId').val(), fwid: $('#_fwid').val(), json: JSON.stringify(data.field, null, 4) }, true).done(function (response) {
+				exLayer.greenTickMsg(response.message, function () {
+				if ($('#_frm').val() == 'list') {
+					//从List页面跳转需刷新列表
+					$(window.parent.document).find('#search').click();
+				}
+				parent.layer.close(parent.layer.getFrameIndex(window.name));
+			});
+		}).fail(function (error) {
+			console.log(error);
+		});
+			return false;
+		});
+		//点击结束|提交按钮 发布模式调用_TB/Finish，调试模式调用Locking/Finish
+		form.on("submit(finish)", function (data) {
+			exLayer.confirm('数据将被锁定，您确定继续吗?', function () {
+				var _gridList = myJS.foreachGridTable();//遍历子表取数，在自定义js中定义，无子表返回空
+				exUtils.ajax('/_TB/Finish', 'post', {
+					model: data.field, 'gridlist': _gridList, listid: $('#_listid').val(), prcno: $('#prc_no').val(), type: $('#_type').val(), att: $('#_attachmentId').val(), fwid: $('#_fwid').val(), json: JSON.stringify(data.field, null, 4) }, true).done(function (response) {
+					exLayer.greenTickMsg(response.message, function () {
+					if ($('#_frm').val() == 'list') {
+						//从List页面跳转需刷新列表
+						$(window.parent.document).find('#search').click();
+					}
+					parent.layer.close(parent.layer.getFrameIndex(window.name));
+				});
+			}).fail(function (error) {
+				console.log(error);
+			});
+			return false;
+			})
+		});
+
+			
+		//渲染表格，url数据接口参数；cols设置显示字段...
+		let tb_Subtable04 = table.render({
+			elem: "#tb_Subtable04",
+			url: "/_TB/GetGridList?tbid=tb_Subtable04"+"&listid=" + $('#_listid').val() + "&from=" + $('#_type').val() + "&fwid=" + $('#_fwid').val()+ "&mobile=" + $('#_isMobile').val(),
+			page: false,
+			cols: [[
+					@*flag与Vn(n为大于等于1的整数)之间不能手动插入或删除列，不能更改次序，否则会有错误*@
+				{ field: "flag",  hide: true }
+				,{ field: "tb_Subtable04v1", title: "锁定", width: 180, templet: '#tb_Subtable04v1'  }
+				,{ field: "tb_Subtable04v2", title: "不锁定", width: 180, templet: '#tb_Subtable04v2'  }
+				,{ field: "tb_Subtable04v3", title: "编辑时锁定", width: 180, templet: '#tb_Subtable04v3'  }
+				,{ field: "tb_Subtable04v4", title: "按行锁定", width: 180, templet: '#tb_Subtable04v4'  }
+			]],
+			done: function (res, curr, count) {
+				//移动端设定div宽度，否则表头显示不全
+				if ($(window).width() < 768) {
+					$('#div_tb_Subtable04').css({ 'width': '860'});
+				}
+				$('.layui-table .layui-table-cell > span').css({ 'font-weight': 'bold' });
+				if (count == -1) {
+					layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+				}
+				/*防止table的下拉列表被隐藏*/
+				$(".layui-table-body").css('overflow', 'visible');
+				$(".layui-table-box").css('overflow', 'visible');
+				$(".layui-table-cell").css('overflow', 'visible');
+				$("th[name='layui-table']").css('overflow', 'hidden');
+				$("th[name='layui-table-view']").css('overflow', 'hidden');
+				form.render();//刷新表单
+			}
+		
+		});
+       //tool监听事件(处理table单元格，按钮和文本框)
+	   table.on("tool(tableFilter)", function (obj) {
+		let data = obj.data;
+		switch (obj.event) {
+			case "addGrid":
+				addGrid(data);
+				break;
+			case "delGrid":
+				delGrid(data);
+				break;
+
+		 }
+		});
+		//子表添加一条数据，点击右侧添加按钮调用，发布模式调用_TB/AddGrid，调试模式调用Locking/AddGrid
+		function addGrid(data) {
+			var _controlsList = myJS.getControlValueList();//主表所有控件，后端转化为model
+            var _gridList = myJS.getFirstGridTable();//只取子表数据首行
+			exUtils.ajax("/_TB/AddGrid", "post", { "list": _gridList, tbid: data.TbId, listid: $('#_listid').val(), fwid: $("#_fwid").val(), controlslist: _controlsList }, true).done(function (response) {
+				$("#_listid").val(response.extra);//listid为零时，添加子表数据需首先主表添加数据，需返回listid
+				tableRender(data.TbId);//子表数据刷新
+			}).fail(function (error) {
+				console.log(error);
+			});
+		}
+
+		//子表删除一条数据，点击右侧删除按钮调用，发布模式调用_TB/DelGrid，调试模式调用Locking/DelGrid
+		function delGrid(data) {
+		    var _controlsList = myJS.getControlValueList();//主表所有控件
+			exLayer.confirm("确定要删除吗？", function () {
+				exUtils.ajax("/_TB/DelGrid", "post", { flag: data.flag, listid: data.ListId, fwid: $("#_fwid").val(), controlslist: _controlsList }, true).done(function (response) {
+					tableRender(data.TbId);//子表数据刷新
+					exUtils.tableSuccessMsg('删除成功！');
+				}).fail(function (error) {
+					console.log(error);
+				});
+			})
+		}
+
+		//子表刷新 发布模式调用_TB/GetGridList，调试模式调用Locking/GetGridList
+		function tableRender(tbid) {
+			if (tbid == 'tb_Subtable04' || tbid.indexOf('#tb_Subtable04#') > -1) {
+				tb_Subtable04.reload({
+					url: "/_TB/GetGridList?tbid=tb_Subtable04" + "&listid=" + $('#_listid').val() + "&from=" + $('#_type').val() + "&fwid=" + $('#_fwid').val()+ "&mobile=" + $('#_isMobile').val()
+				});
+			}
+		}
+		//toolbar监听事件(处理table顶部按钮)
+		table.on("toolbar(tableFilter)", function (obj) {
+			switch (obj.event) {
+			}
+		});
+		//监听事件 触发子表行双击事件 打开子表纵列编辑页面
+		table.on('rowDouble(tableFilter)', function (obj) {
+			if (obj.data.Id != -1) {
+				if (obj.data.Id == 0) {
+					exLayer.openMiddle('新增数据', '/_TB/GridForm?type=add&grid=' + obj.data.TbId + '&listid=' + $('#_listid').val() + '&fwid=' + $('#_fwid').val() + '&prcno=' + $('#prc_no').val() + '&frm=' + $('#_type').val(), '500px', '450px', layui.device().mobile);
+				}
+				else {
+					exLayer.openMiddle('编辑数据', '/_TB/GridForm?type=edit&listid=' + $('#_listid').val() + '&fwid=' + $('#_fwid').val() + '&prcno=' + $('#prc_no').val() + '&flag=' + replaceAll(obj.data.flag, '#', '!') + '&frm=' + $('#_type').val(), '500px', '450px', layui.device().mobile);
+				}
+			}
+		});
+		//弹出页面关闭时为父页面控件赋值并执行数据读取，在弹出的子页面中被调用
+		$("#pu_value").click(function () {
+		    //弹出页面关闭时以下组件已被赋值
+			var _tbid = $('#pu_tbid').val();//表id，主表为_main，子表纵列为_gridColumn
+			var _indexid = $('#pu_indexid').val();//指标编码，触发弹出选择的控件id
+			var _rowid = $('#pu_rowid').val();//子表数据主键
+			var _value = $('#pu_value').val();//弹出页面选择的值
+			var _column = $('#pu_column').val();//第几列--子表弹出时有用
+			//弹出页面关闭后，选择的Value为触发弹出页面的input赋值，wwwroot\Self_JS\Locking.js中定义
+			myJS.getValueFromPopUp(_tbid, _indexid, _rowid, _column, _value);
+			//执行数据读取，每个弹出选择都调用，如果没有设置数据读取后台返回空，前端也不会执行控件赋值
+			readValue(_tbid, _indexid, _rowid, _value);
+		});
+		//数据读取，后端返回lists，再调用myJS.setValueByList(lists)完成为控件赋值
+		function readValue(_tbid, _indexid, _rowid, _value) {
+		    //取子表当前行数据，wwwroot\Self_JS\Locking.js中定义,无子表则返回空
+			var _gridList = myJS.getCurrentGridTable(_tbid, _rowid);
+			//读取主表所有控件ID和Value，wwwroot\Self_JS\Locking.js中定义
+            var _controlsList = myJS.getControlValueList();
+			//后台取数据，发布模式调用_TB/AfterControlSelect，调试模式调用Locking/AfterControlSelect
+			exUtils.ajax("/_TB/AfterControlSelect", "post", { controlslist: _controlsList, "gridlist": _gridList, id: _rowid, tbid: _tbid, indexid: _indexid, value: _value, fwid: $('#_fwid').val(), listid: $('#_listid').val() }, true).done(function (response) {
+				var lists = response.list;//后台返回的数据
+				var _listid = response.extra;
+                var _grid = response.extra2;
+				if (_listid != "") {
+                    $('#_listid').val(_listid);
+                }
+                if (lists != null) {
+				    //使用后台返回的lists，为控件赋值，wwwroot\Self_JS\Locking.js中定义
+                    myJS.setValueByList(lists, _tbid, _rowid);
+				}
+				if (_grid != "") {
+                    tableRender(_grid);//子表数据刷新
+				}
+				form.render();//更新表单数据，一定要加
+			}).fail(function (error) {
+				console.log(error);
+			});
+			return false;
+		}
+		//打印 发布模式调用_TB/Print，调试模式调用Locking/Print
+        function setPrint() {
+            $("#print").attr("href", "/_TB/Print?listid=" + $('#_listid').val() + "&type=pdf&fwid=" + $('#_fwid').val());
+        }
+
+        //图片预览|消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var tips = $(this).data("offset") || 4;
+			var type = $(this).prop('type');
+			if (type == 'text') {
+				var _value = $(this).val();
+				if (_value != '') {
+					var last4 = _value.substring(_value.length - 4).toLowerCase();
+					var last5 = _value.substring(_value.length - 5).toLowerCase();
+					if (last4 == '.jpg' || last4 == '.png' || last4 == '.gif' || last4 == '.bmp' || last5 == '.jpeg') {
+						var src = '/UserImg/' + _value;
+						var imgHtml = "<img src='" + src + "' style='width: 60px;height:60px'/>";
+						layer.tips(imgHtml, this, {
+							time: -1,
+							tips: [tips, $(this).data("color") || '#ffffff'],
+							area: ['auto', 'auto'],
+						});
+					}
+				}
+			}
+			else {
+				var remind = $(this).attr("lay-tips");
+				layer.tips(remind, this, {
+					time: -1,
+					tips: [tips, $(this).data("color") || '#88858e'],
+					area: ['auto', 'auto'],
+				});
+			}
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+		$(document).ready(function () {
+		    setPrint();//打印
+			myJS.lockForEditing($('#_type').val());//编辑时锁定
+			myJS.disableFormBtn("@ViewBag.DisableBut");//控制页面按钮状态
+		    myJS.disabledControls($('#prc_no').val(), ',' + $('#_upFields').val() + ',', ';' + $('#_hiddenFields').val() + ';');//根据步骤编码或可编辑字段设置控件属性
+			form.render('select');//要加上，否则下拉选择disabled设置无效
+			form.render('checkbox');//
+			form.render('radio');
+
+			if (layui.device().mobile) {
+				$(".layui-btn").attr("class", "layui-btn layui-btn-sm");//移动端
+            }
+        });
+	});
+</script>
+<!-- 添加或删除 排除了统计行 -->
+<script type='text/html' id='addordelitem'>
+    {{#  if(d.Id >= 0){ }}
+    {{#  if(d.Id == 0){ }}
+    <button type="button" class='layui-btn layui-btn-xs' title='添加数据' lay-event='addGrid' id='addGrid'><i class='fa fa-plus'></i></button>
+    {{#  } else{ }}
+    <button type="button" class='layui-btn layui-btn-danger layui-btn-xs' title='删除数据' lay-event='delGrid' id='delGrid'><i class='fa fa-minus'></i></button>
+    {{#  } }}
+    {{#  } }}
+</script>
+<!-- 锁定 -->
+<script type="text/html" id="tb_Subtable04v1">
+	<input type='text' name='tb_Subtable04v1' value = '{{d.v1_Exa}}' autocomplete='off' class='layui-input'  maxlength='30'  style='height:33px;'  placeholder='锁定' {{d.v1_Lock}} >
+</script>
+<!-- 不锁定 -->
+<script type="text/html" id="tb_Subtable04v2">
+	<input type='text' name='tb_Subtable04v2' value = '{{d.v2_Exa}}' autocomplete='off' class='layui-input'  maxlength='30'  style='height:33px;'  placeholder='不锁定' {{d.v2_Lock}} >
+</script>
+<!-- 编辑时锁定 -->
+<script type="text/html" id="tb_Subtable04v3">
+	<input type='text' name='tb_Subtable04v3' value = '{{d.v3_Exa}}' autocomplete='off' class='layui-input'  maxlength='30'  style='height:33px;'  placeholder='编辑时锁定' {{d.v3_Lock}} >
+</script>
+<!-- 按行锁定 -->
+<script type="text/html" id="tb_Subtable04v4">
+	<input type='text' name='tb_Subtable04v4' value = '{{d.v4_Exa}}' autocomplete='off' class='layui-input'  maxlength='15'  style='height:33px;'  placeholder='按行锁定' {{d.v4_Lock}} >
+</script>
+<!--弹出选择页面，子表onclick调用-->
+<script>
+    //弹出数据选择页面，控件为文本框时数据规范设置为单列选择、多列选择、树形选择，点击后弹出数据选择
+	function PopUpPage(tbid, indexid, id) {
+		var url = '/_TB/PopUpPage?';
+		popSelectValue(tbid, indexid, id, url, document.getElementById("_fwid").value);
+	}
+</script>

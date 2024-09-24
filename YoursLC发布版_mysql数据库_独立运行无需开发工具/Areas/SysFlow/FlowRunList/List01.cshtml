@@ -1,0 +1,327 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">待接手</li>
+            <li lay-id="2">办理中</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-row  layui-col-space10" style="display: none" id="searchfield01">
+                    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                        <select id="flist1" name="flist1">
+                            <option value="">==请选择==</option>
+                            @foreach (valueTextEntity item in ((IEnumerable
+                            <valueTextEntity>
+                            )ViewBag.SelectList).Where(x => x.ClassID == "flow"))
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                        <input class="layui-input" placeholder="关键词搜索" id="key1" autocomplete="off">
+                    </div>
+                    <div class="layui-col-xs2 layui-col-sm2 layui-col-md2">
+                        <button type="button" class="layui-btn layui-btn-primary" id="search1"><i class="layui-icon layui-icon-search"></i></button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="tableId01" lay-filter="tableFilter"></table>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-row  layui-col-space10" style="display: none" id="searchfield02">
+                    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                        <select id="flist2" name="flist2">
+                            <option value="">==请选择==</option>
+                            @foreach (valueTextEntity item in ((IEnumerable
+                            <valueTextEntity>
+                            )ViewBag.SelectList).Where(x => x.ClassID == "flow"))
+                            {
+                                <option value="@item.Value">@item.Text</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                        <input class="layui-input" placeholder="关键词搜索" id="key2" autocomplete="off">
+                    </div>
+                    <div class="layui-col-xs2 layui-col-sm2 layui-col-md2">
+                        <button type="button" class="layui-btn layui-btn-primary" id="search2"><i class="layui-icon layui-icon-search"></i></button>
+                    </div>
+                </div>
+                <table class="layui-hide" id="tableId02" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "element", "exLayer", "exUtils", "table"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+        let $ = layui.$;
+
+        form.render();
+
+        element.on('tab(tabTag_Filter)', function (data) {
+
+        });
+
+        let ThisTable01 = table.render({
+            elem: "#tableId01",
+            url: "/SysFlow/FlowRunList/GetToBeReceivedList?flid=" + $("#flist1").val() + "&key=" + $("#key1").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            toolbar: "#toolbarTpl",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow01', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh01', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' }
+                , { title: "", width: 50, templet: "#islock" }
+                , { field: "ruNumber", title: "编号", width: 100, sort: true, hide: layui.device().mobile ? true : false }
+                , { field: "runName", title: "名称", sort: true, width: layui.device().mobile ? 300 : null }
+                , { field: "createUser", title: "发起人", width: 100, sort: true }
+                , { field: "createTime", title: "创建日期", sort: true, width: 150 }
+                , { title: "状态", templet: "#runFlag", width: 100, sort: true }
+                , { field: "currentPrcsName", title: "流程步骤", templet: "#PrcsList", width: 100, sort: true }
+                , { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        let ThisTable02 = table.render({
+            elem: "#tableId02",
+            url: "/SysFlow/FlowRunList/GetInProcessList",
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            toolbar: "#toolbarTp2",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow02', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh02', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' }
+                , { title: "", width: 50, templet: "#islock" }
+                , { field: "ruNumber", title: "编号", width: 100, sort: true, hide: layui.device().mobile ? true : false }
+                , { field: "runName", title: "名称", sort: true, width: layui.device().mobile ? 300 : null }
+                , { field: "createUser", title: "发起人", width: 100, sort: true }
+                , { field: "createTime", title: "创建日期", sort: true, width: 150 }
+                , { title: "状态", templet: "#runFlag", width: 100, sort: true }
+                , { field: "currentPrcsName", title: "流程步骤", templet: "#PrcsList", width: 100, sort: true }
+                , { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh01":
+                    ThisTable01.reload({
+                        url: "/SysFlow/FlowRunList/GetToBeReceivedList?flid=" + $("#flist1").val() + "&key=" + $("#key1").val()
+                    });
+                    $("#searchfield01").hide();
+                    break;
+                case "refresh02":
+                    ThisTable02.reload({
+                        url: "/SysFlow/FlowRunList/GetInProcessList"
+                    });
+                    $("#searchfield02").hide();
+                    break;
+
+                case "searchShow01":
+                    var display = $('#searchfield01').css('display');
+                    if (display == 'none') {
+                        $("#searchfield01").show();
+                    }
+                    else {
+                        $("#searchfield01").hide();
+                    }
+                    break;
+                case "searchShow02":
+                    var display = $('#searchfield02').css('display');
+                    if (display == 'none') {
+                        $("#searchfield02").show();
+                    }
+                    else {
+                        $("#searchfield02").hide();
+                    }
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    //select弹出页面选择 pdf直接打开pdf文件 wwwroot|Report文件夹中可设计样式
+                    var _listId;
+                    $.ajax({
+                        url: "/Base/ChangeListId",
+                        type: "get",
+                        data: { listid: data.listid },
+                        dataType: "json",
+                        async: false,
+                        success: function (result) {
+                            _listId = result;
+                        }
+                    });
+                    detail(_listId, data.FlowId, 'html');
+                    break;
+                case "edit1":
+                    edit01(data.listid, data.FlowId, data.runName);
+                    break;
+                case "prcsList":
+                    prcsList(data.listid, data.FlowId);
+                    break;
+            }
+        });
+
+        function edit01(id, flowid, runName) {
+            exUtils.ajax("/SysFlow/FlowRunList/BeforeWorkHand", "post", { fwid: flowid, listid: id }, true).done(function (response) {
+                if (response.extra2 == '2') {
+                    //调试模式
+                    var url = "/" + flowid.replace(/fw_/, "") + "/Form?listid=" + id + "&pid=" + response.extra + "&type=edit";
+                    exLayer.open(runName + "-工作办理", url, '100%', '100%', '0px', '0px', null, null);
+                }
+                else {
+                    var url = "/_TB/Form?listid=" + id + "&pid=" + response.extra + "&type=edit" + "&fwid=" + flowid;
+                    //发布模式
+                    exLayer.open(runName + "-工作办理", url, '100%', '100%', '0px', '0px', null, null);
+                }
+
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function detail(id, fwid, tyep) {
+            if (tyep == 'select') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['380px', '150px'],
+                    anim: 2,
+                    content: "/" + fwid.replace(/fw_/, "") + "/Detail?listid=" + id + ""
+                });
+            }
+            if (tyep == 'pdf') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['100%', '100%'],
+                    anim: 2,
+                    content: "/Com/RDLCReport/ExportPdf?listid=" + id + "&fwid=" + fwid
+                });
+            }
+            if (tyep == 'html') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['100%', '100%'],
+                    anim: 2,
+                    maxmin: true,
+                    content: "/Com/RDLCReport/ExportHtml?listid=" + id + "&fwid=" + fwid
+                });
+            }
+        }
+
+        function prcsList(id, fwid) {
+            exLayer.openMiddle("记录查看", '/SysFlow/FlowRunList/RecordList?listid=' + id + "&fwid=" + fwid, '600px', '450px', layui.device().mobile);
+        }
+
+        $('#search1').on('click', function () {
+            ThisTable01.reload({
+                where: { flid: $("#flist1").val(), key: $("#key1").val() },
+                page: { curr: 1 }
+            });
+            // $("#searchfield01").hide();
+            return false;
+        });
+
+        $('#search2').on('click', function () {
+            ThisTable02.reload({
+                where: { flid: $("#flist2").val(), key: $("#key2").val() },
+                page: { curr: 1 }
+            });
+            // $("#searchfield02").hide();
+            return false;
+        });
+
+        $('#key1').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                ThisTable01.reload({
+                    where: { flid: $("#flist1").val(), key: $("#key1").val() },
+                    page: { curr: 1 }
+                });
+                return false;
+            }
+        });
+
+        $('#key2').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                ThisTable02.reload({
+                    where: { flid: $("#flist2").val(), key: $("#key2").val() },
+                    page: { curr: 1 }
+                });
+                return false;
+            }
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type='text/html' id='islock'>
+    {{#  if(d.isLock == '1'){ }}
+    <i class='fa fa-lock'></i>
+    {{#  }else{ }}
+    <i class='fa fa-unlock'></i>
+    {{#  } }}
+</script>
+<script type='text/html' id='runFlag'>
+    {{#  if(d.runFlag == '1'){ }}
+    <span style='color: #FE7300;'>待接手</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '2'){ }}
+    <span style='color: blue;'>办理中</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '3'){ }}
+    <span>已办结</span>
+    {{#  } }}
+</script>
+<script type='text/html' id='PrcsList'>
+    <a class='layui-btn-primary layui-btn-sm' href='javascript:;'  style=' border: 1px solid #fff;'  lay-event='prcsList' id='prcsList' >{{d.currentPrcsName}}</a>
+</script>
+<script type='text/html' id='PrcsList2'>
+    {{#  if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[listprcs]") > -1){ }}
+    <a class='layui-btn-primary layui-btn-sm'  style='color: blue; border: 1px solid #fff;' href='javascript:;' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  }else{ }}
+    {{#  if(d.runFlag == '1'){ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: #FE7300; border: 1px solid #fff;' href='javascript:;' lay-event='prcslist' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  }else{ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: blue; border: 1px solid #fff;' href='javascript:;' lay-event='prcslist' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  } }}
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+    <a href='javascript:;' class='layui-btn layui-btn-normal layui-btn-xs' lay-event="detail" id="detail">详细</a>
+    <a class='layui-btn layui-btn-warm layui-btn-xs' href='javascript:;' lay-event='edit1' id='edit'>办理</a>
+</script>

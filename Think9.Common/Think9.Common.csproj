@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="C:\Users\DELL\.nuget\packages\dotnetcore.npoi\1.2.3\contentFiles\any\netstandard2.0\NOTICE.TXT" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.NPOI" Version="1.2.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Think9.Base\Think9.Base.csproj" />
+    <ProjectReference Include="..\Think9.Basic\Think9.Basic.csproj" />
+    <ProjectReference Include="..\Think9.Model\Think9.Models.csproj" />
+    <ProjectReference Include="..\Think9.Util\Think9.Util.csproj" />
+  </ItemGroup>
+
+</Project>

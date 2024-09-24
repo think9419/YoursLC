@@ -1,0 +1,45 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label">Seo描述</label>
+        <div class="layui-input-block">
+            <input type="text" id="F_SeoDescription" name="F_SeoDescription" autocomplete="off" class="layui-input" placeholder="不填写则自动截取内容前255字符">
+        </div>
+    </div>
+    <div class="layui-form-item layui-hide">
+        <label class="layui-form-label required">内容描述</label>
+        <div class="layui-input-block">
+            <textarea class=" layui-hide" id="F_Description" name="F_Description" lay-verify="required" type="text/plain" style="width:100%;height:400px;"></textarea>
+            <div id="editor"></div>
+        </div>
+    </div>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script src="~/js/lay-config.js?v=2.0.0" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "wangEditor"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        let wangEditor = layui.wangEditor;
+        var editor = new wangEditor("#editor");
+        // 配置服务器端地址
+        editor.config.uploadImgServer = '/FileManage/Uploadfile/Upload';
+        editor.config.uploadImgMaxSize = 3 * 1024 * 1024;
+        editor.config.uploadImgMaxLength = 5;
+        editor.config.uploadImgParams = { filetype: 1, fileby: '新闻管理/编辑器' };
+        editor.config.showLinkImg = false;
+        editor.create();
+    })
+</script>

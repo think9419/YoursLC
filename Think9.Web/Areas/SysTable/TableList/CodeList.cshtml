@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.Title = @ViewBag.tbid + " - CodeList";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/TempletCode/GetCodeList?tbid=" + $("#tbid").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "Type", title: "类别", width: 60 },
+                { field: "FilePath", title: "路径", sort: true },
+                { field: "CreationTime", title: "创建时间", sort: true, width: 160 },
+                { field: "LastWriteTime", title: "最后修改", sort: true, width: 160, templet: "#T_LastWriteTime" },
+                { field: "Description", title: "备注", sort: true },
+                { title: "记录", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tp9" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+
+</script>
+<!-- 行工具栏模板 fa-ellipsis-h -->
+<script type="text/html" id="operation_Tp9">
+    <a class="layui-btn layui-btn-primary layui-btn-xs" href="/SysBasic/TempletCode/CodeRecord?filePath={{d.FilePath}}" target="_blank" id="detail"><i class="fa fa-ellipsis-h"></i></a>
+</script>
+<!-- 行工具栏模板(锁定) -->
+<script type='text/html' id='T_LastWriteTime'>
+    {{#  if(d.CreationTime == d.LastWriteTime){ }}
+    {{d.LastWriteTime}}
+    {{#  }else{ }}
+    <span  style='color: blue;'>{{d.LastWriteTime}}</span>
+    {{#  } }}
+</script>

@@ -1,0 +1,95 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_9558e65d5fcf49df9fdc243ef0058e19",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inWorkOrderNumber",
+                        "label": "工单编号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入工单编号",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": true,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "input",
+                        "name": "inRegisteredPerson",
+                        "label": "登记人",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入登记人",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "date",
+                        "name": "inRegistrationDate",
+                        "label": "登记日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd HH:mm:ss",
+                        "placeholder": "yyyy-MM-dd HH:mm:ss",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "textarea",
+        "name": "inRegistrationContent",
+        "label": "登记内容",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入登记内容",
+        "_default": "登记内容33333",
+        "width": 100,
+        "required": true,
+        "disabled": false
+    },
+    {
+        "index": 3,
+        "tag": "textarea",
+        "name": "inRemarks2",
+        "label": "备注",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入备注",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false
+    }
+]

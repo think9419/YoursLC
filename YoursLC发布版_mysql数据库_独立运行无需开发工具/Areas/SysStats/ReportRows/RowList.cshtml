@@ -1,0 +1,921 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="frm" value="@ViewBag.frm">
+<input style="display:none" id="maxNum" value="@ViewBag.MaxNum">
+<input style="display:none" id="colsNum" value="@ViewBag.colsNum">
+<input style="display:none" id="rpId" value="@ViewBag.rpId">
+<input style="display:none" id="rpName" value="@ViewBag.rpName">
+
+<input style="display:none" id="_width1" value="@ViewBag.WidthN1">
+<input style="display:none" id="_width2" value="@ViewBag.WidthN2">
+<input style="display:none" id="_width3" value="@ViewBag.WidthN3">
+<input style="display:none" id="_width4" value="@ViewBag.WidthN4">
+<input style="display:none" id="_width5" value="@ViewBag.WidthN5">
+<input style="display:none" id="_width6" value="@ViewBag.WidthN6">
+<input style="display:none" id="_width7" value="@ViewBag.WidthN7">
+<input style="display:none" id="_width8" value="@ViewBag.WidthN8">
+<input style="display:none" id="_width9" value="@ViewBag.WidthN9">
+<input style="display:none" id="_width10" value="@ViewBag.WidthN10">
+
+<input style="display:none" id="_width11" value="@ViewBag.WidthN11">
+<input style="display:none" id="_width12" value="@ViewBag.WidthN12">
+<input style="display:none" id="_width13" value="@ViewBag.WidthN13">
+<input style="display:none" id="_width14" value="@ViewBag.WidthN14">
+<input style="display:none" id="_width15" value="@ViewBag.WidthN15">
+<input style="display:none" id="_width16" value="@ViewBag.WidthN16">
+<input style="display:none" id="_width17" value="@ViewBag.WidthN17">
+<input style="display:none" id="_width18" value="@ViewBag.WidthN18">
+<input style="display:none" id="_width19" value="@ViewBag.WidthN19">
+<input style="display:none" id="_width20" value="@ViewBag.WidthN20">
+
+<input style="display:none" id="_width21" value="@ViewBag.WidthN21">
+<input style="display:none" id="_width22" value="@ViewBag.WidthN22">
+<input style="display:none" id="_width23" value="@ViewBag.WidthN23">
+<input style="display:none" id="_width24" value="@ViewBag.WidthN24">
+<input style="display:none" id="_width25" value="@ViewBag.WidthN25">
+<input style="display:none" id="_width26" value="@ViewBag.WidthN26">
+<input style="display:none" id="_width27" value="@ViewBag.WidthN27">
+<input style="display:none" id="_width28" value="@ViewBag.WidthN28">
+<input style="display:none" id="_width29" value="@ViewBag.WidthN29">
+<input style="display:none" id="_width30" value="@ViewBag.WidthN30">
+
+<input style="display:none" id="_width31" value="@ViewBag.WidthN31">
+<input style="display:none" id="_width32" value="@ViewBag.WidthN32">
+<input style="display:none" id="_width33" value="@ViewBag.WidthN33">
+<input style="display:none" id="_width34" value="@ViewBag.WidthN34">
+<input style="display:none" id="_width35" value="@ViewBag.WidthN35">
+<input style="display:none" id="_width36" value="@ViewBag.WidthN36">
+<input style="display:none" id="_width37" value="@ViewBag.WidthN37">
+<input style="display:none" id="_width38" value="@ViewBag.WidthN38">
+<input style="display:none" id="_width39" value="@ViewBag.WidthN39">
+<input style="display:none" id="_width40" value="@ViewBag.WidthN40">
+
+<input style="display:none" id="_width41" value="@ViewBag.WidthN41">
+<input style="display:none" id="_width42" value="@ViewBag.WidthN42">
+<input style="display:none" id="_width43" value="@ViewBag.WidthN43">
+<input style="display:none" id="_width44" value="@ViewBag.WidthN44">
+<input style="display:none" id="_width45" value="@ViewBag.WidthN45">
+<input style="display:none" id="_width46" value="@ViewBag.WidthN46">
+<input style="display:none" id="_width47" value="@ViewBag.WidthN47">
+<input style="display:none" id="_width48" value="@ViewBag.WidthN48">
+<input style="display:none" id="_width49" value="@ViewBag.WidthN49">
+<input style="display:none" id="_width50" value="@ViewBag.WidthN50">
+
+<blockquote class="layui-elem-quote layui-text">
+    『统计表』行分为『表头』及『数据行』<br>
+    『统计表』的单元格可设置为『统计指标』、『条件参数』或字符（表头只能设置为字符），如设置为『统计指标』，需为『统计指标』包含的『条件参数』赋值
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "layer"], function () {
+        let layer = layui.layer;
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/ReportRows/GetList?rpId=" + $("#rpId").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            cellMinWidth: 'auto',
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox" },
+
+                { field: "Type", templet: "#_Type", title: "类别", width: 60, align: "center" },
+                { field: "OrderNo", title: "行序号", width: 80, align: "center" },
+
+                { field: "T1", templet: "#_Tl", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=1&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列1'><i class='fa fa-pencil'></i></a>列1" },
+                { field: "T2", templet: "#_T2", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=2&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列2'><i class='fa fa-pencil'></i></a>列2" },
+                { field: "T3", templet: "#_T3", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=3&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列3'><i class='fa fa-pencil'></i></a>列3" },
+                { field: "T4", templet: "#_T4", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=4&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列4'><i class='fa fa-pencil'></i></a>列4" },
+                { field: "T5", templet: "#_T5", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=5&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列5'><i class='fa fa-pencil'></i></a>列5" },
+                { field: "T6", templet: "#_T6", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=6&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列6'><i class='fa fa-pencil'></i></a>列6" },
+                { field: "T7", templet: "#_T7", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=7&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列7'><i class='fa fa-pencil'></i></a>列7" },
+                { field: "T8", templet: "#_T8", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=8&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列8'><i class='fa fa-pencil'></i></a>列8" },
+                { field: "T9", templet: "#_T9", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=9&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列9'><i class='fa fa-pencil'></i></a>列9" },
+                { field: "T10", templet: "#_Tl0", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=10&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列10'><i class='fa fa-pencil'></i></a>列10" },
+                { field: "T11", templet: "#_Tl1", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=11&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列11'><i class='fa fa-pencil'></i></a>列11" },
+                { field: "T12", templet: "#_T12", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=12&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列12'><i class='fa fa-pencil'></i></a>列12" },
+                { field: "T13", templet: "#_T13", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=13&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列13'><i class='fa fa-pencil'></i></a>列13" },
+                { field: "T14", templet: "#_T14", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=14&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列14'><i class='fa fa-pencil'></i></a>列14" },
+                { field: "T15", templet: "#_T15", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=15&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列15'><i class='fa fa-pencil'></i></a>列15" },
+                { field: "T16", templet: "#_T16", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=16&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列16'><i class='fa fa-pencil'></i></a>列16" },
+                { field: "T17", templet: "#_T17", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=17&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列17'><i class='fa fa-pencil'></i></a>列17" },
+                { field: "T18", templet: "#_T18", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=18&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列18'><i class='fa fa-pencil'></i></a>列18" },
+                { field: "T19", templet: "#_T19", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=19&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列19'><i class='fa fa-pencil'></i></a>列19" },
+                { field: "T20", templet: "#_T20", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=20&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列20'><i class='fa fa-pencil'></i></a>列20" },
+                { field: "T21", templet: "#_T2l", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=21&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列21'><i class='fa fa-pencil'></i></a>列21" },
+                { field: "T22", templet: "#_T22", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=22&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列22'><i class='fa fa-pencil'></i></a>列22" },
+                { field: "T23", templet: "#_T23", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=23&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列23'><i class='fa fa-pencil'></i></a>列23" },
+                { field: "T24", templet: "#_T24", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=24&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列24'><i class='fa fa-pencil'></i></a>列24" },
+                { field: "T25", templet: "#_T25", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=25&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列25'><i class='fa fa-pencil'></i></a>列25" },
+                { field: "T26", templet: "#_T26", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=26&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列26'><i class='fa fa-pencil'></i></a>列26" },
+                { field: "T27", templet: "#_T27", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=27&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列27'><i class='fa fa-pencil'></i></a>列27" },
+                { field: "T28", templet: "#_T28", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=28&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列28'><i class='fa fa-pencil'></i></a>列28" },
+                { field: "T29", templet: "#_T29", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=29&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列29'><i class='fa fa-pencil'></i></a>列29" },
+                { field: "T30", templet: "#_T30", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=30&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列30'><i class='fa fa-pencil'></i></a>列30" },
+
+                { field: "T31", templet: "#_T3l", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=31&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列31'><i class='fa fa-pencil'></i></a>列31" },
+                { field: "T32", templet: "#_T32", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=32&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列32'><i class='fa fa-pencil'></i></a>列32" },
+                { field: "T33", templet: "#_T33", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=33&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列33'><i class='fa fa-pencil'></i></a>列33" },
+                { field: "T34", templet: "#_T34", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=34&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列34'><i class='fa fa-pencil'></i></a>列34" },
+                { field: "T35", templet: "#_T35", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=35&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列35'><i class='fa fa-pencil'></i></a>列35" },
+                { field: "T36", templet: "#_T36", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=36&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列36'><i class='fa fa-pencil'></i></a>列36" },
+                { field: "T37", templet: "#_T37", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=37&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列37'><i class='fa fa-pencil'></i></a>列37" },
+                { field: "T38", templet: "#_T38", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=38&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列38'><i class='fa fa-pencil'></i></a>列38" },
+                { field: "T39", templet: "#_T39", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=39&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列39'><i class='fa fa-pencil'></i></a>列39" },
+                { field: "T40", templet: "#_T40", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=40&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列40'><i class='fa fa-pencil'></i></a>列40" },
+
+                { field: "T41", templet: "#_T4l", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=41&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列41'><i class='fa fa-pencil'></i></a>列41" },
+                { field: "T42", templet: "#_T42", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=42&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列42'><i class='fa fa-pencil'></i></a>列42" },
+                { field: "T43", templet: "#_T43", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=43&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列43'><i class='fa fa-pencil'></i></a>列43" },
+                { field: "T44", templet: "#_T44", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=44&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列44'><i class='fa fa-pencil'></i></a>列44" },
+                { field: "T45", templet: "#_T45", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=45&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列45'><i class='fa fa-pencil'></i></a>列45" },
+                { field: "T46", templet: "#_T46", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=46&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列46'><i class='fa fa-pencil'></i></a>列46" },
+                { field: "T47", templet: "#_T47", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=47&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列47'><i class='fa fa-pencil'></i></a>列47" },
+                { field: "T48", templet: "#_T48", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=48&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列48'><i class='fa fa-pencil'></i></a>列48" },
+                { field: "T49", templet: "#_T49", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=49&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列49'><i class='fa fa-pencil'></i></a>列49" },
+                { field: "T50", templet: "#_T50", title: "<a target='_blank' href='/SysStats/ReportRows/SetArrange?n=50&id=@ViewBag.rpId' class='layui-btn layui-btn-normal layui-btn-xs' lay-tips='编辑列50'><i class='fa fa-pencil'></i></a>列50" },
+                { title: "操作", width: 130, align: "left", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tp2" }
+            ]],
+            done: function (res, curr, count) {
+                var colsNum = $("#colsNum").val();
+                var maxNum = $("#maxNum").val();
+                for (let i = 1; i <= 50; i++) {
+                    var tN = "T" + i;
+                    if (i > colsNum) {
+                        $("[data-field='" + tN + "']").css('display', 'none');
+                    }
+                    else {
+                        var _width = $("#_width" + i).val();
+                        $("[data-field='" + tN + "'] div").css('width', _width);
+                    }
+                }
+
+                if (layui.device().mobile) {
+                    $("#batchDel").html('<i class="fa fa-trash-o"></i>删除');
+                    $("#sort").html('<i class="fa fa-paste"></i>分类');
+                    $("#add").html('<i class="fa fa-plus"></i>新建');
+
+                    $("#check").attr("style", "display:none");
+                    $("#parmList").attr("style", "display:none");
+                    $("#dynamicList").attr("style", "display:none");
+                    $("#editQuery").attr("style", "display:none");
+                    $("#check").attr("style", "display:none");
+                    $("#check").attr("style", "display:none");
+                }
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "addRows":
+                    addRows();
+                    break;
+                case "editCols":
+                    editCols();
+                    break;
+                case "parmList":
+                    parmList();
+                    break;
+                case "editQuery":
+                    editQuery();
+                    break;
+                case "dynamicList":
+                    dynamicList();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "T1":
+                    openSetCells($("#rpId").val(), data.Id, 1);
+                    break;
+                case "T2":
+                    openSetCells($("#rpId").val(), data.Id, 2);
+                    break;
+                case "T3":
+                    openSetCells($("#rpId").val(), data.Id, 3);
+                    break;
+                case "T4":
+                    openSetCells($("#rpId").val(), data.Id, 4);
+                    break;
+                case "T5":
+                    openSetCells($("#rpId").val(), data.Id, 5);
+                    break;
+                case "T6":
+                    openSetCells($("#rpId").val(), data.Id, 6);
+                    break;
+                case "T7":
+                    openSetCells($("#rpId").val(), data.Id, 7);
+                    break;
+                case "T8":
+                    openSetCells($("#rpId").val(), data.Id, 8);
+                    break;
+                case "T9":
+                    openSetCells($("#rpId").val(), data.Id, 9);
+                    break;
+                case "T10":
+                    openSetCells($("#rpId").val(), data.Id, 10);
+                    break;
+
+                case "T11":
+                    openSetCells($("#rpId").val(), data.Id, 11);
+                    break;
+                case "T12":
+                    openSetCells($("#rpId").val(), data.Id, 12);
+                    break;
+                case "T13":
+                    openSetCells($("#rpId").val(), data.Id, 13);
+                    break;
+                case "T14":
+                    openSetCells($("#rpId").val(), data.Id, 14);
+                    break;
+                case "T15":
+                    openSetCells($("#rpId").val(), data.Id, 15);
+                    break;
+                case "T16":
+                    openSetCells($("#rpId").val(), data.Id, 16);
+                    break;
+                case "T17":
+                    openSetCells($("#rpId").val(), data.Id, 17);
+                    break;
+                case "T18":
+                    openSetCells($("#rpId").val(), data.Id, 18);
+                    break;
+                case "T19":
+                    openSetCells($("#rpId").val(), data.Id, 19);
+                    break;
+                case "T20":
+                    openSetCells($("#rpId").val(), data.Id, 20);
+                    break;
+                case "T21":
+                    openSetCells($("#rpId").val(), data.Id, 21);
+                    break;
+                case "T22":
+                    openSetCells($("#rpId").val(), data.Id, 22);
+                    break;
+                case "T23":
+                    openSetCells($("#rpId").val(), data.Id, 23);
+                    break;
+                case "T24":
+                    openSetCells($("#rpId").val(), data.Id, 24);
+                    break;
+                case "T25":
+                    openSetCells($("#rpId").val(), data.Id, 25);
+                    break;
+                case "T26":
+                    openSetCells($("#rpId").val(), data.Id, 26);
+                    break;
+                case "T27":
+                    openSetCells($("#rpId").val(), data.Id, 27);
+                    break;
+                case "T28":
+                    openSetCells($("#rpId").val(), data.Id, 28);
+                    break;
+                case "T29":
+                    openSetCells($("#rpId").val(), data.Id, 29);
+                    break;
+                case "T30":
+                    openSetCells($("#rpId").val(), data.Id, 30);
+                    break;
+
+                case "T31":
+                    openSetCells($("#rpId").val(), data.Id, 31);
+                    break;
+                case "T32":
+                    openSetCells($("#rpId").val(), data.Id, 32);
+                    break;
+                case "T33":
+                    openSetCells($("#rpId").val(), data.Id, 33);
+                    break;
+                case "T34":
+                    openSetCells($("#rpId").val(), data.Id, 34);
+                    break;
+                case "T35":
+                    openSetCells($("#rpId").val(), data.Id, 35);
+                    break;
+                case "T36":
+                    openSetCells($("#rpId").val(), data.Id, 36);
+                    break;
+                case "T37":
+                    openSetCells($("#rpId").val(), data.Id, 37);
+                    break;
+                case "T38":
+                    openSetCells($("#rpId").val(), data.Id, 38);
+                    break;
+                case "T39":
+                    openSetCells($("#rpId").val(), data.Id, 39);
+                    break;
+                case "T40":
+                    openSetCells($("#rpId").val(), data.Id, 40);
+                    break;
+
+                case "T41":
+                    openSetCells($("#rpId").val(), data.Id, 41);
+                    break;
+                case "T42":
+                    openSetCells($("#rpId").val(), data.Id, 42);
+                    break;
+                case "T43":
+                    openSetCells($("#rpId").val(), data.Id, 43);
+                    break;
+                case "T44":
+                    openSetCells($("#rpId").val(), data.Id, 44);
+                    break;
+                case "T45":
+                    openSetCells($("#rpId").val(), data.Id, 45);
+                    break;
+                case "T46":
+                    openSetCells($("#rpId").val(), data.Id, 46);
+                    break;
+                case "T47":
+                    openSetCells($("#rpId").val(), data.Id, 47);
+                    break;
+                case "T48":
+                    openSetCells($("#rpId").val(), data.Id, 48);
+                    break;
+                case "T49":
+                    openSetCells($("#rpId").val(), data.Id, 49);
+                    break;
+                case "T50":
+                    openSetCells($("#rpId").val(), data.Id, 50);
+                    break;
+
+                case "D1":
+                    openDetail(data.T1, data.I1);
+                    break;
+                case "D2":
+                    openDetail(data.T2, data.I2);
+                    break;
+                case "D3":
+                    openDetail(data.T3, data.I3);
+                    break;
+                case "D4":
+                    openDetail(data.T4, data.I4);
+                    break;
+                case "D5":
+                    openDetail(data.T5, data.I5);
+                    break;
+                case "D6":
+                    openDetail(data.T6, data.I6);
+                    break;
+                case "D7":
+                    openDetail(data.T7, data.I7);
+                    break;
+                case "D8":
+                    openDetail(data.T8, data.I8);
+                    break;
+                case "D9":
+                    openDetail(data.T9, data.I9);
+                    break;
+                case "D10":
+                    openDetail(data.T10, data.I10);
+                    break;
+
+                case "D11":
+                    openDetail(data.T11, data.I11);
+                    break;
+                case "D12":
+                    openDetail(data.T12, data.I12);
+                    break;
+                case "D13":
+                    openDetail(data.T13, data.I13);
+                    break;
+                case "D14":
+                    openDetail(data.T14, data.I14);
+                    break;
+                case "D15":
+                    openDetail(data.T15, data.I15);
+                    break;
+                case "D16":
+                    openDetail(data.T16, data.I16);
+                    break;
+                case "D17":
+                    openDetail(data.T17, data.I17);
+                    break;
+                case "D18":
+                    openDetail(data.T18, data.I18);
+                    break;
+                case "D19":
+                    openDetail(data.T19, data.I19);
+                    break;
+                case "D20":
+                    openDetail(data.T20, data.I20);
+                    break;
+
+                case "D21":
+                    openDetail(data.T21, data.I21);
+                    break;
+                case "D22":
+                    openDetail(data.T22, data.I22);
+                    break;
+                case "D23":
+                    openDetail(data.T23, data.I23);
+                    break;
+                case "D24":
+                    openDetail(data.T24, data.I24);
+                    break;
+                case "D25":
+                    openDetail(data.T25, data.I25);
+                    break;
+                case "D26":
+                    openDetail(data.T26, data.I26);
+                    break;
+                case "D27":
+                    openDetail(data.T27, data.I27);
+                    break;
+                case "D28":
+                    openDetail(data.T28, data.I28);
+                    break;
+                case "D29":
+                    openDetail(data.T29, data.I29);
+                    break;
+                case "D30":
+                    openDetail(data.T30, data.I30);
+                    break;
+
+                case "D31":
+                    openDetail(data.T31, data.I31);
+                    break;
+                case "D32":
+                    openDetail(data.T32, data.I32);
+                    break;
+                case "D33":
+                    openDetail(data.T33, data.I33);
+                    break;
+                case "D34":
+                    openDetail(data.T34, data.I34);
+                    break;
+                case "D35":
+                    openDetail(data.T35, data.I35);
+                    break;
+                case "D36":
+                    openDetail(data.T36, data.I36);
+                    break;
+                case "D37":
+                    openDetail(data.T37, data.I37);
+                    break;
+                case "D38":
+                    openDetail(data.T38, data.I38);
+                    break;
+                case "D39":
+                    openDetail(data.T39, data.I39);
+                    break;
+                case "D40":
+                    openDetail(data.T40, data.I40);
+                    break;
+
+                case "D41":
+                    openDetail(data.T41, data.I41);
+                    break;
+                case "D42":
+                    openDetail(data.T42, data.I42);
+                    break;
+                case "D43":
+                    openDetail(data.T43, data.I43);
+                    break;
+                case "D44":
+                    openDetail(data.T44, data.I44);
+                    break;
+                case "D45":
+                    openDetail(data.T45, data.I45);
+                    break;
+                case "D46":
+                    openDetail(data.T46, data.I46);
+                    break;
+                case "D47":
+                    openDetail(data.T47, data.I47);
+                    break;
+                case "D48":
+                    openDetail(data.T48, data.I48);
+                    break;
+                case "D49":
+                    openDetail(data.T49, data.I49);
+                    break;
+                case "D50":
+                    openDetail(data.T50, data.I50);
+                    break;
+
+                case "dynamic":
+                    exLayer.open($("#rpName").val() + ' - 动态行', '/SysStats/Report/DYNParmList?rpId=' + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "editLine":
+                    exLayer.open($("#rpName").val() + ' - 行设置', '/SysStats/ReportRows/SetLine?rowId=' + data.Id + "&rpId=" + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "look":
+                    exLayer.open($("#rpName").val() + ' - 行设置', '/SysStats/ReportRows/RowCellsList?rowId=' + data.Id + "&rpId=" + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "delLine":
+                    delLine(data.Id, data.DynamicId);
+                    break;
+            }
+        });
+
+        function openSetCells(rpId, rowId, colN) {
+            exLayer.open($("#rpName").val() + ' - 单元格设置', '/SysStats/ReportRows/SetCells?rowId=' + rowId + "&rpId=" + rpId + "&colN=" + colN, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function openDetail(name, id) {
+            var _name = "统计指标 - " + id;
+            if (id.startsWith('@@')) {
+                _name = "条件参数 - " + id;
+            }
+            exLayer.openMiddle(_name, "/SysStats/IndexStats/ShowIndexDetails?id=" + id, '500px', '220px', layui.device().mobile);
+        }
+
+        function addRows() {
+            exLayer.openMiddle("添加行", "/SysStats/Report/AddReportRows?rpId=" + $("#rpId").val(), '500px', '200px', layui.device().mobile);
+        }
+
+        function editCols() {
+            exLayer.openMiddle("添加 || 移除列", "/SysStats/Report/EditReportCols?frm=list&rpId=" + $("#rpId").val(), '500px', '450px', layui.device().mobile);
+        }
+
+        function parmList() {
+            exLayer.open('赋值参数', '/SysStats/Report/ParmAssignList?rpId=' + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function editQuery() {
+            exLayer.open('查询参数管理', '/SysStats/Report/QueryParmList?rpId=' + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function dynamicList() {
+            exLayer.open('动态行管理', '/SysStats/Report/DYNParmList?rpId=' + $("#rpId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        $("#pu_value").click(function () {
+            /*  myJS.getValueFromPopUp();//*/
+        });
+
+        function delLine(rowId, dynId) {
+            exLayer.confirm("您确定删除吗？", function () {
+                exUtils.ajax("/SysStats/ReportRows/DelLine", "post", { rowId: rowId, rpId: $("#rpId").val(), dynId: dynId }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    ThisTable.reload({
+                        url: "/SysStats/ReportRows/GetList?rpId=" + $("#rpId").val()
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].Id + ",";
+                }
+                exLayer.confirm("确定要删除吗？", function (index) {
+                    layer.close(index);
+
+                    if (idsStr) {
+                        exUtils.ajax("/SysStats/ReportRows/BatchDelLine", "post", { rpId: $("#rpId").val(), idsStr: idsStr }, true).done(function (response) {
+                            exUtils.tableSuccessMsg(response.message);
+                            $(".layui-laypage-btn")[0].click();
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg("未选择有效数据");
+            }
+        }
+
+        function refresh() {
+            exUtils.ajax("/SysStats/ReportRows/Refresh", "post", { rpId: $("#rpId").val() }, true).done(function (response) {
+                $("#colsNum").val(response.extra);
+                var lists = response.list;
+                if (lists != null) {
+                    for (var item in lists) {
+                        var _value = lists[item].ControlValue;
+                        var _id = lists[item].ControlID;
+                        $("#" + _id).val(_value);
+                    }
+                }
+                ThisTable.reload({
+                    url: "/SysStats/ReportRows/GetList?rpId=" + $("#rpId").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel" lay-tips="批量删除"><i class="fa fa-trash-o"></i></button>
+    <a href="/SysStats/Report/Warn?idsStr=@ViewBag.rpId" target="_blank" class="layui-btn layui-btn-sm layui-btn " id="check" lay-tips="检测"><i class="fa fa-warning"></i></a>
+    &nbsp;&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="parmList" id="parmList"><i class="fa fa-at"></i>已赋值参数</button>
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="dynamicList" id="dynamicList"><i class='fa fa-list-ul'></i>动态行管理</button>
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="editQuery" id="editQuery"><i class="fa fa-search"></i>查询参数管理</button>
+    &nbsp;&nbsp;&nbsp;
+    <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" lay-event="editCols" id="editCols"><i class="fa fa-pencil"></i>添加 || 移除列</button>
+    <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" lay-event="addRows"><i class="fa fa-plus"></i>添加行</button>&nbsp;&nbsp;&nbsp;
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="refresh" id="refresh"><i class='layui-icon layui-icon-refresh'></i></button>
+    <span class="layui-word-aux"><i class="fa fa-angle-double-left"></i>刷新后查看更新</span>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+</script>
+<script type="text/html" id="operation_Tp2">
+    {{# if(d.Type == '1'){ }}
+    <div class="layui-btn-group">
+        <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="editLine" lay-tips="编辑整行"><i class='fa fa-pencil'></i></a>
+        <a href='javascript:;' class="layui-btn layui-btn-xs" lay-event="look" lay-tips="行设置"><i class='fa fa-wrench'></i></a>
+        <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delLine" lay-tips="删除行"><i class='fa fa-trash-o'></i></a>
+    </div>
+    {{# } }}
+
+    {{# if(d.Type == '2'){ }}
+    <div class="layui-btn-group">
+        <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="editLine" lay-tips="编辑整行"><i class='fa fa-pencil'></i></a>
+
+        {{#  if(d.DynamicId == null || d.DynamicId == ''){ }}
+        <a href='javascript:;' class="layui-btn layui-btn-primary layui-btn-xs" lay-event="dynamic" lay-tips="动态行管理"><i class='fa fa-list-ul'></i></a>
+        {{#  } else { }}
+        <a href='javascript:;' class="layui-btn layui-btn-warm layui-btn-xs" lay-event="dynamic" lay-tips="动态行管理"><i class='fa fa-list-ul'></i></a>
+        {{#  } }}
+
+        <a href='javascript:;' class="layui-btn  layui-btn-xs" lay-event="look" lay-tips="行设置"><i class='fa fa-wrench'></i></a>
+        <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delLine" lay-tips="删除行"><i class='fa fa-trash-o'></i></a>
+    </div>
+    {{# } }}
+
+    {{# if(d.Type == '3'){ }}
+    <div class="layui-btn-group">
+        <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="editLine" lay-tips="编辑整行"><i class='fa fa-pencil'></i></a>
+        <a href='javascript:;' class="layui-btn layui-btn-warm layui-btn-xs" lay-event="dynamic" lay-tips="动态行管理"><i class='fa fa-list-ul'></i></a>
+        <a href='javascript:;' class="layui-btn  layui-btn-xs" lay-event="look" lay-tips="行设置"><i class='fa fa-wrench'></i></a>
+        <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delLine" lay-tips="删除行"><i class='fa fa-trash-o'></i></a>
+    </div>
+    {{# } }}
+</script>
+<script type="text/html" id="_Tl">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T1" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T1}}
+</script>
+<script type="text/html" id="_T2">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T2" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T2}}
+</script>
+<script type="text/html" id="_T3">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T3" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T3}}
+</script>
+<script type="text/html" id="_T4">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T4" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T4}}
+</script>
+<script type="text/html" id="_T5">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T5" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T5}}
+</script>
+<script type="text/html" id="_T6">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T6" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T6}}
+</script>
+<script type="text/html" id="_T7">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T7" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T7}}
+</script>
+<script type="text/html" id="_T8">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T8" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T8}}
+</script>
+<script type="text/html" id="_T9">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T9" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T9}}
+</script>
+<script type="text/html" id="_Tl0">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T10" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T10}}
+</script>
+<script type="text/html" id="_Tl1">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T11" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T11}}
+</script>
+<script type="text/html" id="_T12">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T12" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T12}}
+</script>
+<script type="text/html" id="_T13">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T13" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T13}}
+</script>
+<script type="text/html" id="_T14">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T14" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T14}}
+</script>
+<script type="text/html" id="_T15">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T15" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T15}}
+</script>
+<script type="text/html" id="_T16">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T16" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T16}}
+</script>
+<script type="text/html" id="_T17">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T17" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T17}}
+</script>
+<script type="text/html" id="_T18">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T18" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T18}}
+</script>
+<script type="text/html" id="_T19">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T19" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T19}}
+</script>
+<script type="text/html" id="_T20">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T20" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T20}}
+</script>
+<script type="text/html" id="_T2l">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T21" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T21}}
+</script>
+<script type="text/html" id="_T22">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T22" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T22}}
+</script>
+<script type="text/html" id="_T23">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T23" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T23}}
+</script>
+<script type="text/html" id="_T24">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T24" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T24}}
+</script>
+<script type="text/html" id="_T25">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T25" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T25}}
+</script>
+<script type="text/html" id="_T26">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T26" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T26}}
+</script>
+<script type="text/html" id="_T27">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T27" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T27}}
+</script>
+<script type="text/html" id="_T28">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T28" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T28}}
+</script>
+<script type="text/html" id="_T29">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T29" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T29}}
+</script>
+<script type="text/html" id="_T30">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T30" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T30}}
+</script>
+<script type="text/html" id="_T31">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T31" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T31}}
+</script>
+<script type="text/html" id="_T32">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T32" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T32}}
+</script>
+<script type="text/html" id="_T33">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T33" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T33}}
+</script>
+<script type="text/html" id="_T34">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T34" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T34}}
+</script>
+<script type="text/html" id="_T35">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T35" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T35}}
+</script>
+<script type="text/html" id="_T36">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T36" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T36}}
+</script>
+<script type="text/html" id="_T37">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T37" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T37}}
+</script>
+<script type="text/html" id="_T38">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T38" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T38}}
+</script>
+<script type="text/html" id="_T39">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T39" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T39}}
+</script>
+<script type="text/html" id="_T40">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T40" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T40}}
+</script>
+<script type="text/html" id="_T4l">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T41" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T41}}
+</script>
+<script type="text/html" id="_T42">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T42" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T42}}
+</script>
+<script type="text/html" id="_T43">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T43" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T43}}
+</script>
+<script type="text/html" id="_T44">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T44" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T44}}
+</script>
+<script type="text/html" id="_T45">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T45" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T45}}
+</script>
+<script type="text/html" id="_T46">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T46" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T46}}
+</script>
+<script type="text/html" id="_T47">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T47" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T47}}
+</script>
+<script type="text/html" id="_T48">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T48" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T48}}
+</script>
+<script type="text/html" id="_T49">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T49" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T49}}
+</script>
+<script type="text/html" id="_T50">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="T50" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.T50}}
+</script>
+<script type="text/html" id="_Type">
+    {{# if(d.Type == '1'){ }}
+    <span lay-tips='表头'><i class='fa fa-header'></i></span>
+    {{# } }}
+
+    {{# if(d.Type == '2'){ }}
+    <span lay-tips='数据行'><i class='fa fa-database'></i></span>
+    {{# } }}
+
+    {{# if(d.Type == '3'){ }}
+    <span lay-tips='表尾'>Bottom</span>
+    {{# } }}
+</script>
+<script type="text/html" id="titleTpl">
+</script>

@@ -1,0 +1,309 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<fieldset class="table-fieldset" id="searchfield">
+    <legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询&nbsp;<span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form layui-form-pane" action="" id="_formid">
+            <div class="layui-row  layui-col-space10" id="searchfield01">
+                <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+                    <select id="fwid" name="fwid" lay-filter="selectfilter">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectFW))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                    <input type='text' name="key" id="key" autocomplete='off' class='layui-input' placeholder="关键词搜索">
+                </div>
+                <div class="layui-col-xs2 layui-col-sm2 layui-col-md2">
+                    <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search'><i class='layui-icon layui-icon-search'></i></button>
+                    <button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let miniPage = layui.miniPage;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        var openWH = miniPage.getOpenWidthHeight();
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysFlow/FlowRunManage/GetManageList?fwid=" + $("#fwid").val() + "&islock=" + $("#isLock").val() + "&userid=" + $("#userid").val() + "&key=" + $("#key").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            method: "POST",
+            page: true,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' }
+                , { type: "numbers", title: "NO.", fixed: 'left' }
+                , { title: "", width: 45, title: "<i class='fa fa-unlock-alt'></i>", templet: "#is_lock" }
+                , { field: "ruNumber", title: "编号", width: 100, sort: true, hide: true }
+                , { field: "runName", title: "名称", sort: true, width: layui.device().mobile ? 200 : null }
+                , { field: "createUser", title: "发起人", width: 100, sort: true }
+                , { field: "createTime", title: "创建日期", width: 120, sort: true }
+                , { title: "状态", templet: "#runFlag", width: 100, sort: true }
+                , { field: "currentPrcsName", title: "流程步骤", templet: "#PrcsList", width: 100, sort: true }
+                , { title: "操作", width: 180, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+            ]],
+            done: function (res, curr, count) {
+                if (layui.device().mobile) {
+                    $("#batchDel").html('<i class="fa fa-trash-o"></i>删除');
+                }
+                if (count == -1) {
+                }
+            }
+        });
+
+        //查询
+        form.on("submit(search)", function (data) {
+            ThisTable.reload({
+                url: "/SysFlow/FlowRunManage/GetManageList?fwid=" + $("#fwid").val() + "&islock=" + $("#isLock").val() + "&userid=" + $("#userid").val() + "&key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+            if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+            return false;
+        });
+
+        form.on('select(selectfilter)', function (data) {
+            $("#key").val('');
+            ThisTable.reload({
+                url: "/SysFlow/FlowRunManage/GetManageList?fwid=" + data.value + "&islock=" + $("#isLock").val() + "&userid=" + $("#userid").val() + "&key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+        })
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "batchDel":
+                    batchDel();
+                    break;
+                case "lock":
+                    batchlock(1);
+                    break;
+                case "unlock":
+                    batchlock(0);
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    // 改变listid，连续的id很容易被猜
+                    var _listId;
+                    $.ajax({
+                        url: "/Base/ChangeListId",
+                        type: "get",
+                        data: { listid: data.listid },
+                        dataType: "json",
+                        async: false,
+                        success: function (result) {
+                            _listId = result;
+                        }
+                    });
+                    //select弹出页面选择 pdf直接打开pdf文件 wwwroot|Report文件夹中可设计样式
+                    detail(_listId, data.FlowId, 'html');
+                    break;
+                case "passon":
+                    passon(data.listid, data.FlowId, data.flowType);
+                    break;
+                case "record":
+                    record(data.listid, data.FlowId);
+                    break;
+                case "prcsList":
+                    prcsList(data.listid, data.FlowId);
+                    break;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        function detail(id, fwid, tyep) {
+            if (tyep == 'select') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['380px', '150px'],
+                    anim: 2,
+                    content: "/" + fwid.replace(/fw_/, "").replace(/bi_/, "") + "/Detail?listid=" + id + ""
+                });
+            }
+            if (tyep == 'pdf') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['100%', '100%'],
+                    anim: 2,
+                    content: "/Com/RDLCReport/ExportPdf?listid=" + id + "&fwid=" + fwid
+                });
+            }
+            if (tyep == 'html') {
+                layer.open({
+                    type: 2,
+                    title: "查看数据",
+                    shade: 0.5,
+                    area: ['100%', '100%'],
+                    anim: 2,
+                    maxmin: true,
+                    content: "/Com/RDLCReport/ExportHtml?listid=" + id + "&fwid=" + fwid
+                });
+            }
+        }
+
+        function record(id, fwid) {
+            exLayer.open('流程步骤', '/SysFlow/FlowRunList/RecordList?listid=' + id + "&fwid=" + fwid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+
+        function passon(id, fwid, type) {
+            if (type != '0') {
+                exLayer.open('流程转交', '/SysFlow/FlowRunManage/Next?listid=' + id + '&flid=' + fwid + '&type=' + type, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("基本信息不能被转交");
+            }
+        }
+
+        function getSelect() {
+            var strv = '#';
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    strv += checkStatus.data[i].listid + ";" + checkStatus.data[i].FlowId + "#";
+                }
+            }
+            return strv;
+        }
+
+        function batchDel() {
+            var strv = getSelect();
+            if (strv == '#') {
+                layer.msg("未选择有效数据");
+            }
+            else {
+                exLayer.confirm("确定要删除吗？将不执行自定义的AfterDelete和AfterGridDel事件", function () {
+                    exUtils.ajax("/SysFlow/FlowRunManage/BatchDel", "post", { idsStr: strv }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        $(".layui-laypage-btn")[0].click();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                })
+            }
+
+        }
+
+        function batchlock(flag) {
+            var strv = getSelect();
+            if (strv == '#') {
+                layer.msg("未选择有效数据");
+            }
+            else {
+                exLayer.confirm("确定要锁定数据吗？", function () {
+                    exUtils.ajax("/SysFlow/FlowRunManage/BatchLock", "post", { idsStr: strv, flag: flag }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        $(".layui-laypage-btn")[0].click();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                })
+            }
+        }
+
+        //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+        //关闭搜索
+        $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                ThisTable.reload({
+                    url: "/SysFlow/FlowRunManage/GetManageList?fwid=" + $("#fwid").val() + "&islock=" + $("#isLock").val() + "&userid=" + $("#userid").val() + "&key=" + $("#key").val(),
+                    page: { curr: 1 }
+                });
+                if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                    $("#searchfield").hide();
+                }
+                return false;
+            }
+        });
+    });
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i>批量删除</button>
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="lock" id="lock"><i class='fa fa-lock'></i>锁定</button>
+    <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="unlock" id="unlock"><i class='fa fa-unlock'></i>解锁</button>
+</script>
+<!-- 锁定 -->
+<script type='text/html' id='is_lock'>
+    {{#  if(d.isLock == '0'){ }}
+    <i class='fa fa-unlock'></i>
+    {{#  }else{ }}
+    <i class='fa fa-lock'></i>
+    {{#  } }}
+</script>
+<script type='text/html' id='runFlag'>
+    {{#  if(d.runFlag == '1'){ }}
+    <span style='color: #FE7300;'>待接手</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '2'){ }}
+    <span style='color: blue;'>办理中</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '3'){ }}
+    <span>已办结</span>
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail" id="detail">详细</a>
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="record" id="record">记录</a>
+    <a href="javascript:;" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="passon" id="passon">转交</a>
+</script>

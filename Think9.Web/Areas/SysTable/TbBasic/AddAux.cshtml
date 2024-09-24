@@ -1,0 +1,466 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbBasicEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiStepForm.cshtml";
+}
+
+<input style="display: none" name="id" id="id">
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+        <div class="layui-fluid">
+            <div class="layui-card">
+                <div style="padding-top: 10px;">
+                    <div class="layui-carousel" id="stepForm" lay-filter="stepForm">
+                        <div carousel-item>
+                            <div>
+                                <form class="layui-form" style="padding-top: 10px;">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">选择分类</label>
+                                        <div class="layui-input-block">
+                                            @Html.DropDownList("TbSort", (IEnumerable<SelectListItem>)ViewBag.TbSortList, "==请选择分类==", new Dictionary<string, object> { })
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required">表编码</label>
+                                        <div class="layui-input-block layui-col-space3">
+                                            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                                                <input type="text" name="TbId" id="TbId" placeholder="表编码" autocomplete="off" class="layui-input" style="width:300px;" maxlength="30" lay-verify="required|id">
+                                            </div>
+                                            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                                                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                                                    <option value="">⇓自动生成编码</option>
+                                                    <option value="英文">英文</option>
+                                                    <option value="全拼">全拼</option>
+                                                    <option value="首拼">首拼</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required">表名称</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="TbName" id="TbName" placeholder="表名称" autocomplete="off" class="layui-input" maxlength="30" lay-verify="required">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required">序 号</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序号" autocomplete="off" class="layui-input" maxlength="3" lay-verify="required|number">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">备 注</label>
+                                        <div class="layui-input-block">
+                                            <textarea placeholder="" value="" maxlength="200" name="TbExplain" id="TbExplain" class="layui-textarea"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item" style="text-align: left;">
+                                        <div class="layui-input-block">
+                                            <button type="button" class="layui-btn" lay-submit lay-filter="formStep">
+                                                下一步
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div>
+                                <form class="layui-form" style="padding-top: 10px;">
+                                    <div class="layui-form-item" id="searchfield" style="display:none">
+                                        <div class="layui-inline">
+                                            @Html.DropDownList("IndexSortID", (IEnumerable<SelectListItem>)ViewBag.IndexSortList, "==所有分类==", new Dictionary<string, object> { })
+                                        </div>
+                                        <div class="layui-inline">
+                                            <select id="IndexDataType" name="IndexDataType" lay-filter="IndexDataType">
+                                                @foreach (IndexDtaeTypeEntity item in ((List<IndexDtaeTypeEntity>)ViewBag.DtaeTypeList))
+                                                {
+                                                    <option value="@item.TypeId">@item.TypeName</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="layui-inline">
+                                            <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                                        </div>
+                                        <div class="layui-inline">
+                                            <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button>
+                                            <button type="button" class="layui-btn layui-btn-primary" title="新建录入指标" id="add_index"><i class="layui-icon layui-icon-add-1"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="layui-row">
+                                        <div class="layui-col-md5">
+                                            <table class="layui-hide" id="lefttable" lay-filter="tableFilter"></table>
+                                        </div>
+                                        <div style="text-align: center; vertical-align: middle; ">
+                                            <div class="layui-col-md2" style="padding-top: 100px;" id="divBut">
+                                                <button type="button" class="layui-btn" id="addindex">
+                                                    添加指标&nbsp;<i class=" fa fa-angle-double-right
+fa-angle-"></i>
+                                                </button><br /><br />
+                                                <button type="button" class="layui-btn layui-btn-danger" id="delindex"><i class="fa fa-angle-double-left"></i>&nbsp;移除指标</button>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-md5">
+                                            <table class="layui-hide" id="righttable" lay-filter="tableFilter"></table>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="layui-form-item" style="text-align: left;">
+                                        <div class="layui-input-block">
+                                            <button type="button" class="layui-btn" lay-submit lay-filter="formStep2">
+                                                下一步
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div>
+                                <div style="text-align: center;margin-top: 90px;">
+                                    <textarea placeholder="" value="" name="TBCreatDB" id="TBCreatDB" class="layui-textarea" readonly></textarea>
+                                </div>
+                                <div style="text-align: center;margin-top: 50px;">
+                                    <button type="button" class="layui-btn" lay-submit lay-filter="formStep3">
+                                        创建数据表
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(["table", 'form', 'step', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let step = layui.step;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //指标新增
+        $("#add_index").click(function () {
+            exLayer.openMiddle("新建录入指标", "/SysTable/IndexBasic/Add", '500px', '450px', layui.device().mobile);
+        });
+
+        //指标查询
+        $("#search").click(function () {
+            var ishow = 'n';
+            LeftTable.reload({
+                where: { key: $("#key").val(), sort: $("#IndexSortID").val(), type: $("#IndexDataType").val(), tbid: $("#TbId").val(), show: ishow }
+            });
+            $("#searchfield").hide();
+            return false;
+        });
+
+        //添加指标
+        $("#addindex").click(function () {
+            var checkStatus = table.checkStatus('lefttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                ids.push(o.IndexId);
+            });
+            if (ids.length < 1) {
+                layer.msg('无选中项');
+                return false;
+            }
+            ids = ids.join(",");
+            layer.confirm('确定要添加指标吗？', function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/AddTbIndexByStr", "post", { tbid: $("#TbId").val(), si: ids }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        RightTable.reload({
+                            where: { tbid: $("#TbId").val() }
+                        });
+                        $("input[type='checkbox'][name='layTableCheckbox']").prop('checked', false);
+                        form.render("checkbox");
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            });
+
+            return false;
+        });
+
+        //移除指标
+        $("#delindex").click(function () {
+            var checkStatus = table.checkStatus('righttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                ids.push(o.IndexId);
+            });
+            if (ids.length < 1) {
+                layer.msg('无选中项');
+                return false;
+            }
+            ids = ids.join(",");
+            layer.confirm("<span style='color: red;'>此操作将数据表对应字段移除，该字段的数据会被删除，并且不可恢复，确定要移除指标吗？</span>", function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexByStr", "post", { tbid: $("#TbId").val(), si: ids }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        RightTable.reload({
+                            where: { tbid: $("#TbId").val() }
+                        });
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+
+            return false;
+        });
+
+        let LeftTable = table.render({
+            elem: "#lefttable",
+            url: "/SysTable/IndexBasic/GetIndexListBySearch?key=" + $("#key").val() + "&sort=" + $("#IndexSortID").val() + "&type=" + $("#IndexDataType").val(),
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '新建录入指标', layEvent: 'add_index', icon: 'layui-icon-add-1' }],
+            toolbar: "#toolbarTpl",
+            height: layui.device().mobile ? 220 : 312,
+            limits: [10, 50, 100, 200, 500],
+            limit: 10,
+            page: true,
+            method: "post",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "IndexId", title: "编码", width: 120, sort: true },
+                { field: "IndexName", title: "名称", width: 150, sort: true },
+                { field: "DataTypeName", title: "类型", width: 120, sort: true, templet: "#DataType" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let RightTable = table.render({
+            elem: "#righttable",
+            url: "/SysTable/TbSetUp/GetTbIndexList?tbid=" + $("#TbId").val(),
+            defaultToolbar: [],
+            toolbar: "#toolbarTp2",
+            height: layui.device().mobile ? 220 : 312,
+            limits: [200],
+            limit: 200,
+            page: true,
+            method: "post",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "IndexId", title: "编码", width: 120, sort: true },
+                { field: "IndexName", title: "名称", sort: true, width: 150 },
+                { field: "DataTypeName", title: "类型", sort: true, width: 150 }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add_index":
+                    exLayer.openMiddle("新建录入指标", "/SysTable/IndexBasic/Add", '500px', '450px', layui.device().mobile);
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        step.render({
+            elem: '#stepForm',
+            filter: 'stepForm',
+            width: '100%', //设置容器宽度
+            stepWidth: layui.device().mobile ? '250px' : '450px',
+            height: layui.device().mobile ? '750px' : '600px',
+            stepItems: [{
+                title: '新建'
+            }, {
+                title: '添加指标'
+            }, {
+                title: '建数据表'
+            }]
+        });
+
+        //第1步
+        form.on('submit(formStep)', function (data) {
+            exUtils.ajax("/SysTable/TbBasic/AddAux", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    step.next('#stepForm');
+                    $(window.parent.document).find('#btn_refresh').click();//刷新
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //第2步
+        form.on('submit(formStep2)', function (data) {
+            exUtils.ajax("/SysTable/TbBasic/GetCreatDBStr", "post", { tbid: $("#TbId").val() }, true).done(function (response) {
+                $("#TBCreatDB").val(response.extra);
+                step.next('#stepForm');
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //生成数据表
+        form.on('submit(formStep3)', function (data) {
+            var sql = $("#TBCreatDB").val();
+            exUtils.ajax("/SysTable/TbBasic/CreatDB", "post", { sql: sql, tbid: $("#TbId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('.pre').click(function () {
+            step.pre('#stepForm');
+        });
+
+        $('.next').click(function () {
+            step.next('#stepForm');
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#TbName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return;
+            }
+
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#TbId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        })
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                var ishow = 'n';
+                LeftTable.reload({
+                    where: { key: $("#key").val(), sort: $("#IndexSortID").val(), type: $("#IndexDataType").val(), tbid: $("#TbId").val(), show: ishow }
+                });
+                return false;
+            }
+        });
+
+        document.addEventListener('keyup', function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); // 阻止默认行为
+            }
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#divBut").attr("style", "text-align: center; ");
+                $("#addindex").html('从待选项中添加');
+                $("#delindex").html('从已选项中移除');
+            }
+        });
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="DataType">
+    {{# if(d.IndexDataType == '1000'){ }}
+    <span>日期</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2000'){ }}
+    <span>字符(不限定长度)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2010'){ }}
+    <span>字符(长度10以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2030'){ }}
+    <span>字符(长度30以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2100'){ }}
+    <span>字符(长度100以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2200'){ }}
+    <span>字符(长度200以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2500'){ }}
+    <span>字符(长度500以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3000'){ }}
+    <span>整数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3002'){ }}
+    <span>2位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3004'){ }}
+    <span>4位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3006'){ }}
+    <span>6位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3102'){ }}
+    <span>金额</span> {{# } }}
+
+    {{# if(d.IndexDataType == '5200'){ }}
+    <span>图片</span> {{# } }}
+
+    {{# if(d.IndexDataType == '4100'){ }}
+    <span>附件</span> {{# } }}
+</script>
+<script type="text/html" id="toolbarTpl">
+    <span>待选项</span>
+</script>
+<script type="text/html" id="toolbarTp2">
+    <span>已选项</span>
+</script>

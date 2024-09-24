@@ -1,0 +1,9 @@
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\bin\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.deps.json
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\bin\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.dll
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\bin\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.pdb
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.GeneratedMSBuildEditorConfig.editorconfig
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.AssemblyInfoInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.AssemblyInfo.cs
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.csproj.CoreCompileInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.dll
+D:\A_Think9_NetCore_Y2021\Think9.Dapper\obj\x64\Release\netcoreapp3.1\win-x64\Think9.Dapper.pdb

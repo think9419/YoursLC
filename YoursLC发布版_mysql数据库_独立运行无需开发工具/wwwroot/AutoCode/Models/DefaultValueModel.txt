@@ -1,0 +1,68 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:28
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:28
+	/// </summary>
+	 [Table("tb_DefaultValue")]
+	public class DefaultValueModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 隐藏并赋值
+		/// </summary>
+		public string inHideAndAssignValues { get; set; }
+		/// <summary>
+		/// 文本框
+		/// </summary>
+		public string inTextBox { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		/// <summary>
+		/// 日期
+		/// </summary>
+		public DateTime? inDate { get; set; }
+		/// <summary>
+		/// 日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inDate_Exa { get; set; }
+		/// <summary>
+		/// 小数02
+		/// </summary>
+		public decimal? inXS02 { get; set; }
+		/// <summary>
+		/// 小数02 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS02_Exa { get; set; }
+		/// <summary>
+		/// 小数03
+		/// </summary>
+		public decimal? inXS03 { get; set; }
+		/// <summary>
+		/// 小数03 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS03_Exa { get; set; }
+		/// <summary>
+		/// 小数04
+		/// </summary>
+		public decimal? inXS04 { get; set; }
+		/// <summary>
+		/// 小数04 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS04_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

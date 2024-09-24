@@ -1,0 +1,101 @@
+﻿@model Think9.Models.OrganizeEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">上级机构</label>
+        <div class="layui-input-block">
+            <input type="text" id="ParentId" name="ParentId" placeholder="上级机构" autocomplete="off" class="layui-input" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">机构编码</label>
+        <div class="layui-input-block layui-col-space3">
+            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                <input type="text" name="EnCode" id="EnCode" placeholder="机构编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="30">
+            </div>
+            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                    <option value="">⇓自动生成编码</option>
+                    <option value="英文">英文</option>
+                    <option value="全拼">全拼</option>
+                    <option value="首拼">首拼</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">机构名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="FullName" id="FullName" placeholder="机构名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新 建</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "treeSelect", "exLayer", "exUtils"], function () {
+        let treeSelect = layui.treeSelect;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        form.render(); //
+
+        treeSelect.render({
+            elem: "#ParentId",
+            data: "/SysBasic/Organize/GetOrganizeTreeSelect",
+            type: "GET"
+        });
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysBasic/Organize/Add", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/Organize/GetList" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#FullName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#EnCode").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

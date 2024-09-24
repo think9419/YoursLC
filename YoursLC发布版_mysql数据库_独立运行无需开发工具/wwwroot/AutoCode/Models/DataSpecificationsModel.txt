@@ -1,0 +1,60 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:28:51
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:28:51
+	/// </summary>
+	 [Table("tb_DataSpecifications")]
+	public class DataSpecificationsModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 下拉树
+		/// </summary>
+		public string inDropdownTree { get; set; }
+		/// <summary>
+		/// 下拉树 【附加】
+		/// </summary>
+		[Computed]
+		public string inDropdownTree_Exa { get; set; }
+		/// <summary>
+		/// 弹出选择
+		/// </summary>
+		public string inPopUpSelection { get; set; }
+		/// <summary>
+		/// 多选
+		/// </summary>
+		public string inMultipleChoice { get; set; }
+		/// <summary>
+		/// 多选 【附加】
+		/// </summary>
+		[Computed]
+		public string inMultipleChoice_Exa { get; set; }
+		/// <summary>
+		/// 单选
+		/// </summary>
+		public string inSingleChoice { get; set; }
+		/// <summary>
+		/// 单选 【附加】
+		/// </summary>
+		[Computed]
+		public string inSingleChoice_Exa { get; set; }
+		/// <summary>
+		/// 下拉选择
+		/// </summary>
+		public string inDropdownSelection { get; set; }
+		/// <summary>
+		/// 下拉选择 【附加】
+		/// </summary>
+		[Computed]
+		public string inDropdownSelection_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

@@ -1,0 +1,216 @@
+﻿@*货品类别 ---录入表样式按照默认方式一行两列生成，可能是因为未设计表单样式 适配移动端*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:28:33 添加或编辑-此文件放置于Views/HPLB /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "MobileForm";
+	Layout = "~/Areas/Shared/_LayuiMobileForm.cshtml"; }
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+<input style="display:none" id="_isDebug" value="debug">@*debug为调试；release为发布*@
+<input style="display:none" id="_upFields" value="@ViewBag.UpFields">@*可编辑字段*@
+<input style="display:none" id="_hiddenFields" value="@ViewBag.HiddenFields">@*保密字段*@
+<input style="display:none" id="_isMobile" value="y">@*y为移动端*@
+<input style="display:none" id="_listid" value="@ViewBag.ListId">
+<input style="display:none" id="_plit" value="@ViewBag.Split">@*多选框字符分割*@
+<input style="display:none" id="_frm" value="@ViewBag.Frm">@*从哪里跳转来的?默认list*@
+<input style="display:none" id="_type" value="@ViewBag.Type">@*add或edit*@
+<input style="display:none" id="_userid" value="@ViewBag.UserId">@*用户id*@
+<input style="display:none" id="_attachmentId">@*附件id*@
+<input style="display:none" id="_fwid" value="@ViewBag.FId">@*当前流程编码*@
+<input style="display:none" id="prc_id" value="@ViewBag.PrcId">@*当前流程步骤id*@
+<input style="display:none" id="prc_no" value="@ViewBag.PrcNo">@*当前流程步骤编码*@
+@*弹出选择时页面间传递数据*@
+<input style="display:none" id="pu_value">@*弹出选择时使用-弹出页面选择的值*@
+<input style="display:none" id="pu_tbid">@*弹出选择时使用-触发弹出页面的表id，_main或子表编码*@
+<input style="display:none" id="pu_indexid">@*弹出选择时使用-触发弹出页面的指标编码*@
+<input style="display:none" id="pu_rowid">@*弹出选择时使用-子表弹出，对应tableid 哪一行*@
+<input style="display:none" id="pu_column">@*弹出选择时使用-子表弹出，第几列*@
+<div class="layui-form">
+	<div class="layui-form layui-row layui-col-space10">
+		<div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+			<label class="layui-form-label">编码</label>
+			<div class="layui-input-block">
+				<input type='text' name='inCoding' id='inCoding' autocomplete='off' class='layui-input layui-disabled'  maxlength='100'   disabled='disabled'    placeholder='编码'>
+			</div>
+		</div>
+		<div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+			<label class="layui-form-label">名称</label>
+			<div class="layui-input-block">
+				<input type='text' name='inName' id='inName' autocomplete='off' class='layui-input'  maxlength='100'     placeholder='名称'>
+			</div>
+		</div>
+	 </div>
+
+</div>
+ <br />
+ <div class="layui-form-item"  style="text-align: center;">
+	<div class="layui-btn-container">
+			@*<a href="" target="_blank" id="print" class="layui-btn">打印</a>*@
+			<button type="button" class="layui-btn" id="att">附件</button>
+			<button type="button" class="layui-btn" lay-submit lay-filter="edit" id="edit">保存</button>
+			@*<button type="button" class="layui-btn" lay-submit lay-filter="next"  id="next">转交</button>*@
+			<button type="button" class="layui-btn" lay-submit lay-filter="finish" id="finish">提交</button>
+	      <button type="button" class="layui-btn layui-btn-primary" id="close">关闭</button>
+	 </div>
+  </div>
+</form>
+<script>
+	layui.config({
+		base: '/Self_JS/'  /*自定义的js - wwwroot\Self_JS\HPLB.js*/
+	});
+	layui.use(["form", "exLayer", "element", "exUtils",  "table", "HPLB"], function () {
+		let form = layui.form;
+		let layer = layui.layer;
+		let table = layui.table;
+		let exLayer = layui.exLayer;
+		let exUtils = layui.exUtils;
+		let element = layui.element;
+		let myJS = layui.HPLB;
+		let $ = layui.$;
+
+		form.render();//更新全部表单数据
+		formValExa();//控件赋值-复选框和图片
+
+		//Tab选项
+		element.on('tab(element_Filter)', function (data) {
+        });
+		//赋值--不包括多选框和图片
+		form.val("formUser", {
+			"inCoding": "@Model.inCoding"
+			,"inName": "@Model.inName"
+		});
+		//自定义控件赋值，用于多选框和图片的显示
+		function formValExa() {
+
+
+		}
+
+
+
+		//附件上传 点击附件上传按钮会被调用
+		$('#att').on('click', function () {
+			exLayer.openMobile('附件上传', '/Com/FileManage/Attachment?fwid=' + $('#_fwid').val() + '&listid=' + $('#_listid').val() + '&prcid=' + $('#prc_id').val() + '&userid=' + $('#_userid').val() + '&attid=' + $('#_attachmentId').val(), '100%', '100%', '0px', '0px', null, null);
+		});
+		//点击保存按钮 发布模式调用_TB/SaveData，调试模式调用HPLB/SaveData
+		form.on("submit(edit)", function (data) {
+			//var _gridList = myJS.foreachGridTable();//移动端无需遍历子表数据再逐一修改
+			exUtils.ajax('/_TB/SaveData', 'post', {
+				model: data.field, listid: $('#_listid').val(), prcno: $('#prc_no').val(), type: $('#_type').val(), att: $('#_attachmentId').val(), fwid: $('#_fwid').val(), json: JSON.stringify(data.field, null, 4) }, true).done(function (response) {
+				exLayer.greenTickMsg(response.message, function () {
+				if ($('#_frm').val() == 'list') {
+					//从List页面跳转需刷新列表
+					$(window.parent.document).find('#search').click();
+				}
+				parent.layer.close(parent.layer.getFrameIndex(window.name));
+			});
+		}).fail(function (error) {
+			console.log(error);
+		});
+			return false;
+		});
+		//点击结束|提交按钮 发布模式调用_TB/Finish，调试模式调用HPLB/Finish
+		form.on("submit(finish)", function (data) {
+			exLayer.confirm('数据将被锁定，您确定继续吗?', function () {
+				//var _gridList = myJS.foreachGridTable();//移动端无需遍历子表数据再逐一修改
+				exUtils.ajax('/_TB/Finish', 'post', {
+					model: data.field, listid: $('#_listid').val(), prcno: $('#prc_no').val(), type: $('#_type').val(), att: $('#_attachmentId').val(), fwid: $('#_fwid').val(), json: JSON.stringify(data.field, null, 4) }, true).done(function (response) {
+					exLayer.greenTickMsg(response.message, function () {
+					if ($('#_frm').val() == 'list') {
+						//从List页面跳转需刷新列表
+						$(window.parent.document).find('#search').click();
+					}
+					parent.layer.close(parent.layer.getFrameIndex(window.name));
+				});
+			}).fail(function (error) {
+				console.log(error);
+			});
+			return false;
+			})
+		});
+
+		//子表刷新
+		function tableRender(tbid) {
+			//什么也不做,因为无子表，但得有--readValue函数中需要调用
+		}
+        //toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "_event":
+                    break;
+
+            }
+        });
+
+		$("#pu_value").click(function () {
+		    //弹出页面关闭时以下组件已被赋值
+			var _tbid = $('#pu_tbid').val();//表id，主表为_main，子表纵列为_gridColumn
+			var _indexid = $('#pu_indexid').val();//指标编码，触发弹出选择的控件id
+			var _rowid = $('#pu_rowid').val();//子表数据主键
+			var _value = $('#pu_value').val();//弹出页面选择的值
+			var _column = $('#pu_column').val();//第几列--子表弹出时有用
+			//弹出页面关闭后，选择的Value为触发弹出页面的input赋值，wwwroot\Self_JS\HPLB.js中定义
+			myJS.getValueFromPopUp(_tbid, _indexid, _rowid, _column, _value);
+			//执行数据读取，每个弹出选择都调用，如果没有设置数据读取后台返回空，前端也不会执行控件赋值
+			readValue(_tbid, _indexid, _rowid, _value);
+		});
+		//数据读取 发布模式调用_TB/AfterControlSelect，调试模式调用HPLB/AfterControlSelect
+		//后端返回lists，再调用 myJS.setValueByList(lists)完成为控件赋值
+		function readValue(_tbid, _indexid, _rowid, _value) {
+			var _gridList = myJS.getCurrentGridTable(_tbid, _rowid);
+            var _controlsList = myJS.getControlValueList();//主表所有控件ID和Value，wwwroot\Self_JS\HPLB.js中定义
+
+			exUtils.ajax("/_TB/AfterControlSelect", "post", { controlslist: _controlsList, "gridlist": _gridList, id: _rowid, tbid: _tbid, indexid: _indexid, value: _value, fwid: $('#_fwid').val(), listid: $('#_listid').val() }, true).done(function (response) {
+				var lists = response.list;
+				var _listid = response.extra;
+                var _grid = response.extra2;
+				if (_listid != "") {
+                    $('#_listid').val(_listid);
+                }
+                if (lists != null) {
+				    //使用后台返回的lists，为控件赋值，wwwroot\Self_JS\HPLB.js中定义
+                    myJS.setValueByList(lists, _tbid, _rowid);
+				}
+				if (_grid != "") {
+                    tableRender(_grid);//子表数据刷新
+				}
+				form.render();// 更新表单数据，一定要加
+			}).fail(function (error) {
+				console.log(error);
+			});
+			return false;
+		}
+
+		//打印
+        function setPrint() {
+            $("#print").attr("href", "/_TB/Print?listid=" + $('#_listid').val() + "&type=pdf&fwid=" + $('#_fwid').val());
+        }
+		//关闭
+		$('#close').on('click', function () {
+			parent.layer.close(parent.layer.getFrameIndex(window.name));
+		});
+
+		//消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+		$(document).ready(function () {
+		    setPrint();//打印
+
+			myJS.disableFormBtn("@ViewBag.DisableBut");//控制页面按钮状态
+		    myJS.disabledControls($('#prc_no').val(), ',' + $('#_upFields').val() + ',', ';' + $('#_hiddenFields').val() + ';');//根据步骤编码或可编辑字段设置控件属性
+			form.render('select');//更新表单数据 要加上，否则下拉选择disabled设置无效
+			form.render('checkbox');//
+			form.render('radio');
+        });
+	});
+</script>

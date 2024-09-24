@@ -1,0 +1,71 @@
+﻿@model Think9.Models.SortEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<input style="display:none" id="classid" value="@ViewBag.ClassID">
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-form-item">
+        <label class="layui-form-label">编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="SortId" placeholder="分类编码" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">分类名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="SortName" placeholder="分类名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="20">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="SortOrder" placeholder="序号" autocomplete="off" class="layui-input" maxlength="3" lay-verify="required|number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+        var classid = $("#classid").val();
+
+        form.render(); //
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //赋值
+        form.val("formEdit", {
+            "SortId": "@Model.SortID",
+            "SortName": "@Model.SortName",
+            "SortOrder": "@Model.SortOrder"
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysBasic/Sort/Edit?classid=" + classid, "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/Sort/GetList?classid=" + $(window.parent.document).find("#classid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

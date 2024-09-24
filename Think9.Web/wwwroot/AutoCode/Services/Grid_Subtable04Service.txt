@@ -1,0 +1,610 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:28:55
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+
+using System;
+using System.Data;
+using System.Linq;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+using Think9.Models;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+using Think9.Util.Helper;
+
+namespace Think9.Services.CodeBuild
+{
+	/// <summary>
+	/// 子表Service
+	/// </summary>
+	public partial class Subtable04Service : BaseService<Subtable04Model>
+	{
+		private ComService comService = new ComService();
+		private ExtraDbService extraDb = new ExtraDbService();//外部数据源
+		private ExtraDbEntity extraDbModel;//外部数据源
+		private readonly static string _flowid = "bi_Locking";//流程编码 bi_基础信息 fw_一般录入表
+		private readonly string _maintbid = "tb_Locking";//主表编码
+		private readonly static string _gridtbid = "tb_Subtable04";//子表编码
+		private readonly static string _gridtbname = "子表04";//子表名称
+		private readonly string _split = Think9.Services.Base.BaseConfig.ComSplit;//多选项的分割字符
+		private string sql;
+		private string str;
+
+
+        #region 增删改操作
+        /// <summary>
+        /// 子表插入空数据
+        /// </summary>
+		/// <param name="user">当前用户</param>
+        /// <param name="grid">子表id</param>
+        /// <param name="listid">主表数据id</param>
+		/// <param name="model">主表model</param>
+        /// <returns></returns>
+        public string AddGridNull(CurrentUserEntity user, string grid, long listid, LockingModel model)
+        {
+            string err = "";
+			long id = InsertReturnID(GetModelDefault(user, null, listid));
+            if (id > 0)
+            {
+			    Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#子表新增数据##" + _gridtbid + "##Null{1}#");
+                List<string> resultList = AfterGridAdd(ref err, listid.ToString(), user, model, new Subtable04Model() { Id = id }, id.ToString());
+                Record.AddResultList("system", listid.ToString(), _flowid, resultList, "#自定义事件AfterGridAdd#");
+            }
+            else
+            {
+                err = "子表数据新增失败";
+            }
+            return err;
+        }
+
+		/// <summary>
+        /// 子表插入一条数据
+        /// </summary>
+		/// <param name="user">当前用户</param>
+        /// <param name="model">主表model</param>
+        /// <param name="gridlist">子表数据list</param>
+        /// <param name="listid">主表数据id</param>
+        /// <returns></returns>
+        public string AddGrid(CurrentUserEntity user, LockingModel model, IEnumerable<Subtable04Model> gridlist, long listid)
+        {
+            string err = "";
+            foreach (Subtable04Model obj in gridlist)
+            {
+				GetModelDefault(user, obj, listid);
+                //主键和唯一检测
+                err = Think9.Services.Com.CheckCom.CheckGridTbValueBKAndUnique(obj.ListId, obj.TbId, obj, DataTableHelp.ModelToDataTable<Subtable04Model>(obj));
+                if (string.IsNullOrEmpty(err))
+                {
+
+                    long id = base.InsertReturnID(obj);
+					if (id > 0)
+                    {
+                        Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#子表新增数据##" + _gridtbid + "##N{1}#");
+                        obj.Id = id;
+                        List<string> resultList = AfterGridAdd(ref err, listid.ToString(), user, model, obj);
+                        Record.AddResultList("system", listid.ToString(), _flowid, resultList, "#自定义事件AfterGridAdd#");
+                    }
+					else
+                    {
+                        err += "子表数据新增失败";
+                    }
+                }
+            }
+            return err;
+        }
+
+        /// <summary>
+        /// 编辑子表数据
+        /// </summary>
+		/// <param name="user">当前用户</param>
+        /// <param name="model">主表model</param>
+        /// <param name="gridlist">子表数据list</param>
+        /// <param name="listid">主表数据id</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <param name="isFinish">是否完成</param>
+        /// <returns></returns>
+        public string SaveGrid(CurrentUserEntity user, LockingModel model, IEnumerable<Subtable04Model> gridlist, long listid, string prcno, string isFinish)
+        {
+            string err = "";
+            int num = gridlist.Count();
+            if (num < 1)
+            {
+				return "";
+            }
+            string updateFields = GetUpdateFields();//可修改字段，排除了隐藏列
+            if (!string.IsNullOrEmpty(updateFields))
+            {
+			    //唯一及主键检测
+                DataTable dtIndex = TbIndex.GetBKAndUniqueDataTable(_gridtbid);
+                if (dtIndex.Rows.Count > 0)
+                {
+                    foreach (Subtable04Model obj in gridlist)
+                    {
+                        err = Think9.Services.Com.CheckCom.CheckGridTbValueBKAndUnique(listid, obj.Id, _gridtbid, obj, DataTableHelp.ModelToDataTable<Subtable04Model>(obj), dtIndex);
+                        if (err != "")
+                        {
+                            return err;
+                        }
+                    }
+                }
+                foreach (Subtable04Model obj in gridlist)
+                {
+
+                    if (base.UpdateById(obj, updateFields))
+                    {
+                        if (string.IsNullOrEmpty(isFinish))
+                        {
+                            List<string> resultList = AfterGridEdit(ref err, listid.ToString(), prcno, user, model, obj, obj.Id.ToString());
+                            Record.AddResultList("system", listid.ToString(), _flowid, resultList, "#自定义事件AfterGridEdit#");
+                        }
+                        else
+                        {
+                            List<string> resultList = AfterGridFinish(ref err, listid.ToString(), prcno, user, model, obj, obj.Id.ToString());
+                            Record.AddResultList("system", listid.ToString(), _flowid, resultList, "#自定义事件AfterGridFinish#");
+                        }
+                    }
+                }
+				Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#子表编辑数据##" + _gridtbid + "##N{" + num + "}#");
+            }
+            return err;
+        }
+
+		/// <summary>
+        /// 删除一条子表数据
+        /// </summary>
+        /// <param name="listid">主表数据id</param>
+        /// <param name="id">子表数据id</param>
+        /// <param name="user">当前用户</param>
+        /// <param name="model">当前主表数据</param>
+        /// <returns></returns>
+        public string DelGrid(string listid, string id, CurrentUserEntity user, LockingModel model)
+        {
+            string err = "";
+            List<string> resultList = AfterGridDel(ref err, listid, user, null, null, id);
+            Record.AddResultList("system", listid, _flowid, resultList, "#自定义事件AfterGridDel#");
+            if (!string.IsNullOrEmpty(err))
+            {
+                return err;
+            }
+
+			AttachmentService.DelGridImg(long.Parse(id), _gridtbid);//删除图片
+            AttachmentService.DelGridAttachment(long.Parse(listid), long.Parse(id), _flowid, _gridtbid);//删除附件
+            if (comService.ExecuteSql("DELETE FROM " + _gridtbid + " WHERE Id=" + id + "") > 0)
+            {
+                Record.Add(user == null ? "!NullEx" : user.Account, listid, _flowid, "#子表删除数据##" + _gridtbid  + "##N{1}#");
+            }
+            else
+            {
+                err = "Id=" + id + "删除失败；";
+            }
+            return err;
+        }
+		#endregion 增删改操作
+
+		#region After操作 可在录入表管理/自定义事件中设置，未设置则返回null
+		/// <summary>
+		/// 子表添加后数据处理，通过录入表管理/自定义事件可自定义,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="obj">子表当前数据对象</param>
+		/// <param name="model">主表当前数据对象</param>
+		/// <param name="id">子表主键</param>
+		/// <returns>返回处理结果的List，一事件可定义多条sql</returns>
+        private List<string> AfterGridAdd(ref string err, string listid, CurrentUserEntity user, LockingModel model = null, Subtable04Model obj = null, string id = "0")
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 子表编辑后数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="obj">子表当前数据对象</param>
+		/// <param name="model">主表当前数据对象</param>
+		/// <param name="prcno">当前流程步骤编码</param>
+		/// <param name="id">子表主键</param>
+		/// <returns>返回处理结果的List，一事件可定义多条sql</returns>
+		private List<string> AfterGridEdit(ref string err, string listid, string prcno, CurrentUserEntity user, LockingModel model = null, Subtable04Model obj = null, string id = "0")
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 提交|结束后子表数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="obj">子表当前数据对象</param>
+		/// <param name="model">主表当前数据对象</param>
+		/// <param name="prcno">当前流程步骤编码</param>
+		/// <param name="id">子表主键</param>
+		/// <returns>返回处理结果的List，一事件可定义多条sql</returns>
+		private List<string> AfterGridFinish(ref string err, string listid, string prcno, CurrentUserEntity user, LockingModel model = null, Subtable04Model obj = null, string id = "0")
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 子表删除后数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="obj">子表当前数据对象</param>
+		/// <param name="model">主表当前数据对象</param>
+		/// <param name="id">子表主键</param>
+		/// <returns>返回处理结果的List，一事件可定义多条sql</returns>
+		private List<string> AfterGridDel(ref string err, string listid, CurrentUserEntity user, LockingModel model = null, Subtable04Model obj = null, string id = "0")
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+		#endregion After操作 可在录入表管理/自定义事件中设置，未设置则返回null
+
+		#region 查询
+		/// <summary>
+		/// 获取子表数据
+		/// </summary>
+		/// <param name="listid">主表id</param>
+		/// <param name="from">edit或add</param>
+		/// <param name="isMobile">是否移动端,移动端待添加行不显示</param>
+		/// <returns></returns>
+		public List<dynamic> GetGridDataByListId(CurrentUserEntity user, long listid, string from, string isMobile)
+		{
+		    isMobile = string.IsNullOrEmpty(isMobile) ? "" : isMobile;
+			int count = 0;//行号
+			DataTable dtindex = comService.GetDataTable("SELECT IndexId, isLock,isLock2,DataType,ControlType,DefaultV,RuleId,RuleType,ListStat FROM tbindex WHERE TbId = '"+ _gridtbid + "'  ORDER BY IndexNo");
+
+			IEnumerable<valueTextEntity> selectList = this.GetSelectList();
+
+			List<dynamic> list = new List<dynamic>();
+
+
+            //数据行
+			IEnumerable<Subtable04Model> _list = base.GetByWhere("WHERE ListId=" + listid + "", null, null, "ORDER BY id");
+			foreach (Subtable04Model obj in _list)
+			{
+				count++;//第几行 处理按行锁定等
+
+				obj.TbId = _gridtbid;
+				obj.flag = "#" + _gridtbid + "#" + obj.Id.ToString() + "#" + count.ToString() + "#";
+				//文本框锁定
+				obj.v1_Exa = obj.v1 == null ? "" : obj.v1.ToString();
+				obj.v1_Lock = TbIndex.GetGridLockStr(dtindex, "v1", count, from);
+				//文本框不锁定
+				obj.v2_Exa = obj.v2 == null ? "" : obj.v2.ToString();
+				obj.v2_Lock = TbIndex.GetGridLockStr(dtindex, "v2", count, from);
+				//文本框编辑时锁定
+				obj.v3_Exa = obj.v3 == null ? "" : obj.v3.ToString();
+				obj.v3_Lock = TbIndex.GetGridLockStr(dtindex, "v3", count, from);
+				//文本框按行锁定
+				obj.v4_Exa = obj.v4 == null ? "" : obj.v4.ToString();
+				obj.v4_Lock = TbIndex.GetGridLockStr(dtindex, "v4", count, from);
+				list.Add(obj);
+			}
+
+			//合计行
+			Subtable04Model sumobj = GetSumObj(listid, _gridtbid, dtindex);
+			if (sumobj.ListId != -1 && count > 0)//无数据时不显示合计
+			{
+				list.Add(sumobj);
+			}
+			return list;
+		}
+
+	   /// <summary>
+	   /// 将前端返回的list转化为子表对象，并校验
+	   /// </summary>
+	   /// <param name="strErr">错误信息</param>
+	   /// <param name="listid">主表主键</param>
+	   /// <param name="list">子表数据列表</param>
+	   /// <param name="flag">标志位，不为空时表示增加一条数据</param>
+	   /// <returns></returns>
+	   public static List<Subtable04Model> CheckedAndGetList(ref string strErr, long listid, IEnumerable<GridListEntity> list, string flag)
+		{
+			string id = "";
+			string row = "";
+			string err = "";
+			string temp = "";
+			bool isAdd = false;
+
+			List<Subtable04Model> mlist = new List<Subtable04Model>();
+			foreach (GridListEntity obj in list)
+			{
+				isAdd = false;
+				if (!string.IsNullOrEmpty(flag))//添加一条数据
+				{
+					if (obj.flag.StartsWith(flag))
+					{
+						isAdd = true;
+					}
+				}
+				else//编辑列表数据
+				{
+                    //排除首行即增加行
+                    if (obj.flag.StartsWith("#" + _gridtbid + "#") && !obj.flag.EndsWith("#0#0#"))
+                    {
+                        isAdd = true;
+                    }
+				}
+
+				if (isAdd)
+				{
+					err = "";
+					BasicHelp.GetRowAndIdByFlag(obj.flag, ref id, ref row);
+
+					temp = obj.v4 == null ? "" : obj.v4;
+					if (!ValidatorHelper.IsNumberic(temp) && !string.IsNullOrEmpty(temp))
+					{
+						err += row + "按行锁定{" + temp + "}数字格式错误";
+					}
+
+					if (string.IsNullOrEmpty(err))
+					{
+						Subtable04Model model = new Subtable04Model();
+						model.TbId = _gridtbid;
+						model.ListId = listid;
+						model.Id = long.Parse(id);
+						model.v1 = obj.v1 == null ? "" : obj.v1;
+						model.v2 = obj.v2 == null ? "" : obj.v2;
+						model.v3 = obj.v3 == null ? "" : obj.v3;
+						model.v4 = string.IsNullOrEmpty(obj.v4) ? null : ExtConvert.ToDecimalOrNull(obj.v4);
+
+						mlist.Add(model);
+					}
+					else
+					{
+						strErr += _gridtbname + ":" + err + "<br>";
+					}
+				}
+			}
+			return mlist;
+		}
+
+		/// <summary>
+		/// 为下拉选择配置动态数据源，来源于为指标指定的数据规范
+		/// </summary>
+		public IEnumerable<valueTextEntity> GetSelectList()
+		{
+			DataTable dt = DataTableHelp.NewValueTextDt();
+
+            return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+		}
+
+		/// <summary>
+		///返回可修改字段,排除了隐藏列
+		/// </summary>
+		/// <returns></returns>
+		public static string GetUpdateFields(CurrentUserEntity user = null)
+		{
+			 return "v1,v2,v3,v4";
+		}
+
+		/// <summary>
+		/// 主表对象和子表对象合并
+		/// </summary>
+		/// <param name="id">子表当前数据id</param>
+		/// <param name="listid">主表当前数据id</param>
+		/// <param name="model">主表当前对象</param>
+		/// <param name="gridObj">子表当前对象</param>
+		/// <returns></returns>
+		private object GetObj(string id, string listid, CurrentUserEntity user, ref LockingModel model, ref Subtable04Model gridObj)
+        {
+            if (model == null)
+            {
+                LockingService tbMain = new LockingService();
+                model = tbMain.GetByWhereFirst("WHERE listid=" + listid);
+				model = model == null ? new LockingModel() : model;//预防空对象
+            }
+            if (string.IsNullOrEmpty(model.createUser))
+            {
+                MainTBEntity entity = MainTBService.GetMainTBEntity(listid, _flowid);
+                model.isLock = entity.isLock;
+                model.createTime = entity.createTime;
+                model.createUser = entity.createUser;
+                model.createDept = entity.createDept;
+                model.createDeptStr = entity.createDeptStr;
+                model.runName = entity.runName;
+                model.attachmentId = entity.attachmentId;
+            }
+			model.currentUserId = user == null ? "!NullEx" : user.Account;
+			model.currentUserName = user == null ? "!NullEx" : user.RealName;
+            model.currentDeptNo = user == null ? "!NullEx" : user.DeptNo;
+            model.currentDeptName = user == null ? "!NullEx" : user.DeptName;
+            model.currentRoleNo = user == null ? "!NullEx" : user.RoleNo;
+            model.currentRoleName = user == null ? "!NullEx" : user.RoleName;
+            model.timeToday = DateTime.Today;
+            model.timeNow = DateTime.Now;
+
+            if (gridObj == null && id != "0")
+            {
+                gridObj = base.GetByWhereFirst("WHERE id=" + id + "");
+            }
+			if (gridObj == null)
+			{
+				gridObj = new Subtable04Model();//为空会报错
+			}
+
+			return new { ListId = long.Parse(listid), currentUserName = model.currentUserName, currentUserId = model.currentUserId, currentDeptNo = model.currentDeptNo, currentDeptName = model.currentDeptName, currentRoleNo = model.currentRoleNo, currentRoleName = model.currentRoleName, timeToday = model.timeToday, timeNow = model.timeNow, isLock = model.isLock, createTime = model.createTime, createUser = model.createUser, createDept = model.createDept, createDeptStr = model.createDeptStr, runName = model.runName, attachmentId = model.attachmentId, Id = gridObj.Id , inLockDuringEditing = model.inLockDuringEditing, inLocking = model.inLocking, inNotLocked = model.inNotLocked, v1 = gridObj.v1, v2 = gridObj.v2, v3 = gridObj.v3, v4 = gridObj.v4 };
+        }
+		#endregion 查询
+
+		/// <summary>
+		/// 子表数据初始化,通过录入表管理/子表数据初始化设置
+		/// </summary>
+		/// <param name="listid">主表主键</param>
+		/// <param name="user">当前用户</param>
+		public void GridDataInit(long listid, CurrentUserEntity user)
+		{
+			string tbname = "tb_cwsj";
+			string some = "inCoding AS v1,inName AS v2,inCoding AS v3,inCoding AS v4";
+			string where = "";
+			string order = "ORDER BY listid";
+			object param = new { currentUserId = user == null ? "!NullEx" : user.Account, currentUserName = user == null ? "!NullEx" : user.RealName, currentDeptNo = user == null ? "!NullEx" : user.DeptNo, currentDeptName = user == null ? "!NullEx" : user.DeptName, currentRoleNo = user == null ? "!NullEx" : user.RoleNo, currentRoleName = user == null ? "!NullEx" : user.RoleName, timeToday = DateTime.Today, timeNow = DateTime.Now };
+			
+			DataTable dt = comService.GetDataTable(tbname, some, where, order, param);
+			IEnumerable<GridListEntity> list = DataTableHelp.ToEnumerable<GridListEntity>(dt);
+			foreach (GridListEntity obj in list)
+			{
+				Subtable04Model model = new Subtable04Model();
+				model.ListId = listid;
+				model.v1 = obj.v1 == null ? "" : obj.v1;
+				model.v2 = obj.v2 == null ? "" : obj.v2;
+				model.v3 = obj.v3 == null ? "" : obj.v3;
+				if(obj.v4 != null && ValidatorHelper.IsNumberic(obj.v4))
+				{
+					model.v4 = string.IsNullOrEmpty(obj.v4) ? null : ExtConvert.ToDecimalOrNull(obj.v4);
+				}
+				GetModelDefault(user, model, null);//为隐藏指标赋默认值
+				Insert(model);
+			}
+		}
+
+		/// <summary>
+        /// 求合计行，数值类型指标勾选统计求和会统计求和
+        /// </summary>
+        /// <param name="listid">主表主键</param>
+        /// <param name="tbid">子表id</param>
+        /// <param name="dtindex">指标属性数据集</param>
+        /// <returns>返回子表Model</returns>
+		private Subtable04Model GetSumObj(long listid, string tbid, DataTable dtindex)
+		{
+			Subtable04Model obj = new Subtable04Model();
+			obj.ListId = -1;
+			var _index = DataTableHelp.ToEnumerable<TbIndexEntity>(dtindex);
+			if (_index.Where(x => x.ControlType == "1" && x.ListStat == "1" && x.DataType.StartsWith("3")).Count<TbIndexEntity>() > 0)//条件 1数值指标2文本框3统计求和
+			{
+				obj.ListId = listid;
+				obj.Id = -1;
+				obj.TbId = tbid;
+				obj.flag = "";
+				foreach (TbIndexEntity item in _index)
+				{
+				    //1数值指标2文本框3统计求和
+					if (item.ControlType == "1" && item.ListStat == "1" && item.DataType.StartsWith("3"))
+					{
+						switch (item.IndexId)
+						{
+							case "v4":
+								str = comService.GetSingleField("SELECT SUM(" + item.IndexId + ") FROM " + obj.TbId + " WHERE ListId = " + listid + "");
+								obj.v4 = string.IsNullOrEmpty(str) ? null : ExtConvert.ToDecimalOrNull(str);
+								obj.v4_Exa = "∑ = " + str;
+								obj.v4_Lock = "disabled = 'disabled'";
+								break;
+
+							default:
+								break;
+						}
+					}
+					else
+					{
+						switch (item.IndexId)
+						{
+							case "v1":
+								obj.v1_Exa = "∑ =";
+								obj.v1 = "∑ =";
+								obj.v1_Lock = "disabled = 'disabled'";
+								break;
+							case "v2":
+								obj.v2_Exa = "";
+								obj.v2_Lock = "disabled = 'disabled'";
+								break;
+							case "v3":
+								obj.v3_Exa = "";
+								obj.v3_Lock = "disabled = 'disabled'";
+								break;
+							case "v4":
+								obj.v4_Exa = "";
+								obj.v4_Lock = "disabled = 'disabled'";
+								break;
+
+							default:
+								break;
+						}
+					}
+				}
+			}
+			return obj;
+		}
+
+		/// <summary>
+        /// 得到子表model并赋初始值
+        /// </summary>
+        /// <param name="type">add或edit</param>
+        /// <param name="id">子表数据id</param>
+        /// <param name="user">当前用户</param>
+        /// <returns></returns>
+		public Subtable04Model GetModel(string type, long id, CurrentUserEntity user)
+		{
+			Subtable04Model model = new Subtable04Model();
+			if (type == "add")
+			{
+				//子表赋初始值--系统指标或默认值（默认值优先级高于系统指标）
+
+			}
+			else
+			{
+				model = GetByWhereFirst("WHERE id=" + id + "");
+			}
+			return model;
+		}
+
+		/// <summary>
+        /// model赋初始值，同时为隐藏指标赋默认值
+        /// </summary>
+        /// <param name="user">当前用户</param>
+        /// <param name="model">model</param>
+        /// <param name="listid">listid</param>
+        /// <returns></returns>
+		public Subtable04Model GetModelDefault(CurrentUserEntity user, Subtable04Model model, long? listid = null)
+		{
+		    model = model == null ? new Subtable04Model() : model;
+            if (listid != null)
+            {
+                model.ListId = (long)listid;
+            }
+
+			return model;
+		}
+
+		/// <summary>
+        /// 得到子表model
+        /// </summary>
+        /// <param name="controlslist">组件id和vaue列表</param>
+        /// <returns></returns>
+		public GridListEntity ListToModel(IEnumerable<ControlEntity> controlslist)
+        {
+            GridListEntity model = new GridListEntity();
+            str = BasicHelp.GetValueFrmList(controlslist, "listid");
+            model.ListId = string.IsNullOrEmpty(str) ? 0 : long.Parse(str);
+            str = BasicHelp.GetValueFrmList(controlslist, "id");
+            model.Id = string.IsNullOrEmpty(str) ? 0 : long.Parse(str);
+			model.v1 = BasicHelp.GetValueFrmList(controlslist, "v1");//锁定
+			model.v2 = BasicHelp.GetValueFrmList(controlslist, "v2");//不锁定
+			model.v3 = BasicHelp.GetValueFrmList(controlslist, "v3");//编辑时锁定
+			model.v4 = BasicHelp.GetValueFrmList(controlslist, "v4");//按行锁定
+            return model;
+        }
+
+		/// <summary>
+        /// 获取禁用控件字符串，格式如[v1][v2]
+        /// </summary>
+        /// <param name="from">add或edit</param>
+        /// <param name="flag">标志数据</param>
+        /// <returns></returns>
+        public string GetDisabledStr(string from, string flag)
+        {
+			int number = 0;//第几行，新增数据视为第0行
+            if (from == "edit")
+            {
+                number = BasicHelp.GetRowByFlag(flag);
+            }
+            DataTable dtindex = comService.GetDataTable("SELECT IndexId, isLock,isLock2 FROM tbindex WHERE TbId = '" + _gridtbid + "'  ORDER BY IndexNo");
+            return BasicHelp.GetDisabledStrForGridColumn(dtindex, dtindex.Rows.Count, number, from);
+        }
+
+
+	}
+}

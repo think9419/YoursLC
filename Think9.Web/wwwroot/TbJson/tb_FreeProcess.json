@@ -1,0 +1,101 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "一般录入表分为自由流程表和固定流程表，自由流程指下一步由转交人自由确定",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 3,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_1",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "date",
+                        "name": "inDate",
+                        "label": "日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    }
+]

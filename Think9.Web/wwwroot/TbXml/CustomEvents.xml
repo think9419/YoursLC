@@ -1,0 +1,15 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="可对主表的AfterAdd、AfterEdit、AfterFinish、AfterDelete，子表的AfterGridAdd、AfterGridEdit、AfterGridFinish、AfterGridDel事件进行自定义，以上事件分别在添加后、编辑后、提交|结束后、删除后被调用，即点击保存按钮、提交|结束按钮、删除按钮，系统自动执行已设置的sql语句或存储过程
+通过执行自定义包含参数的sql语句或调用已定义的存储过程，完成数据的新增、编辑、删除操作，达到数据同步等目的" horAlignment="None" verAlignment="None" Selectable="True">可对主表的AfterAdd、AfterEdit、AfterFinish、AfterDelete，子表的AfterGridAdd、AfterGridEdit、AfterGridFinish、AfterGridDel事件进行自定义，以上事件分别在添加后、编辑后、提交|结束后、删除后被调用，即点击保存按钮、提交|结束按钮、删除按钮，系统自动执行已设置的sql语句或存储过程
+通过执行自定义包含参数的sql语句或调用已定义的存储过程，完成数据的新增、编辑、删除操作，达到数据同步等目的</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编码" horAlignment="None" verAlignment="None" Selectable="True">编码</lab>
+			 <textField x="125" y="80" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCoding" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inCoding</textField>
+			<lab x="10" y="125" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="名称" horAlignment="None" verAlignment="None" Selectable="True">名称</lab>
+			 <textField x="125" y="125" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inName" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inName</textField>
+			<table2 x="10" y="170" width="790" height="120" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable11" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable11</table2>
+		</staticContent>
+	</content>
+</daReport>

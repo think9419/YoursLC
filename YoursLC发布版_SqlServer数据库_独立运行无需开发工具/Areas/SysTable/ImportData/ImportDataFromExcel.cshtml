@@ -1,0 +1,229 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<style>
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+
+    td .layui-form-select {
+        margin-top: -3px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+
+<input style="display: none" id="isDebug" value="@ViewBag.IsDebug">
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<input style="display: none" id="fwid" value="@ViewBag.fwid">
+<input style="display: none" id="attid" value="@ViewBag.attid">
+<input style="display: none" id="filename">
+<input style="display: none" id="column" value="">
+<div class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-input-block" style="text-align: center;margin-top: 150px;" id="divExcel">
+            <div class='layui-input-inline'>
+                <button class="layui-btn layui-btn-normal layui-border-orange" id="btn_Upload">
+                    <i class='fa fa-file-excel-o'></i>选择文件
+                </button>
+            </div>
+            <div class='layui-input-inline'>
+                <button type="button" class="layui-btn " lay-event="importData" id="importData" style="display: none;"><i class="fa fa-plus"></i>导入数据</button>
+            </div>
+        </div>
+    </div>
+    <div style="text-align: center;">
+        <span id="spanShow" style="color: #FE7300; text-align: center;"></span>
+    </div>
+    <div style="height: 200px; width: 800px; overflow: auto;">
+        <div class="layui-form-item" id="columnList" style="display: none;">
+            <table class="layui-hide" id="tableId" lay-filter="tableFilter"> </table>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <hr class="layui-border-black">
+    </div>
+    <div class="layui-collapse" id="tabList" lay-accordion style="display: none;">
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title" style="color: #FE7300;"><span id="show"></span></h2>
+            <div class="layui-colla-content" style="text-align: left; " id="table">
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(["table", 'form', 'layer', 'upload', 'exLayer', 'exUtils', "element"], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+            let table = layui.table;
+            let exLayer = layui.exLayer;
+            let exUtils = layui.exUtils;
+            let element = layui.element;
+
+            let ThisTable = table.render({
+                elem: "#tableId",
+                url: "/SysTable/ImportData/GetColumnList",
+                where: { columns: $('#column').val(), "tbid": $('#tbid').val() },
+                method: "get",
+                defaultToolbar: [],
+                page: false,
+                cols: [[
+                    { type: "numbers", title: "NO.", fixed: 'left' }
+                    , { field: "info1", title: "源字段", width: 140, templet: '#column1' }
+                    , { templet: "<span>>></span>", width: 40, align: "center" }
+                    , { field: "info2", title: "目标字段", width: 390, templet: '#column2' }
+                ]],
+                done: function (res, curr, count) {
+
+                }
+            });
+
+            table.on("toolbar(tableFilter)", function (obj) {
+                switch (obj.event) {
+                    case "importData":
+                        importData();
+                        break;
+                }
+            });
+
+            upload.render({
+                elem: '#btn_Upload',
+                field: 'file',
+                url: '@Url.Action("ExcelUplaod")',
+                auto: true,
+                exts: 'xlsx|xls|',
+                choose: function (obj) {
+                },
+                progress: function (n, elem, res, index) {
+                    var percent = n + '%' //获取进度百分比
+                    element.progress('demo', percent); //可配合 layui 进度条元素使用
+                    console.log(elem); //得到当前触发的元素 DOM 对象。可通过该元素定义的属性值匹配到对应的进度条。
+                    console.log(res); //得到 progress 响应信息
+                    console.log(index); //得到当前上传文件的索引，多文件上传时的进度条控制，如：
+                    element.progress('demo-' + index, n + '%'); //进度条
+                },
+                before: function () {
+                    this.data = {}
+                    $("#spanShow").html('');
+                    $("#columnList").attr("style", "display:none;");
+                    $("#importData").attr("style", "display:none;");
+                    $("#tabList").attr("style", "display:none;");
+                },
+                done: function (res) {
+                    if (res.code == 0) {
+                        $('#filename').val(res.filename);
+                        $('#table').html(res.msg);
+                        $('#column').val(res.fileinfo);
+                        $("#show").html(res.file_exa);
+
+                        $("#divExcel").attr("style", "text-align: center;margin-top: 10px;");
+
+                        $("#columnList").attr("style", "margin-left: 20px; margin-right: 20px; display: block;");
+                        $("#importData").attr("style", "display:block;");
+                        $("#tabList").attr("style", "margin-left: 20px; margin-right: 20px; display: block;");
+
+                        ThisTable.reload({
+                            where: { columns: res.fileinfo, "tbid": $('#tbid').val() }
+                        });
+                    }
+                    else {
+                        layer.msg(res.message, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                    }
+                },
+                error: function () {
+                    layer.alert('上传失败', {
+                        icon: 2
+                    });
+                }
+            });
+
+            $("#importData").click(function () {
+                importData();
+            });
+
+            function importData() {
+                var _list = [];
+                var trList = $('#tableId').next().find("tr")
+                for (var i = 0; i < trList.length; i++) {
+                    var tdArr = trList.eq(i).find("td");
+                    if (tdArr.eq(1).find('select') != null) {
+                        var _row = {};
+                        _row.info1 = tdArr.eq(1).find('select').val();
+                        _row.info2 = tdArr.eq(3).find('select').val();
+                        if (_row.info1 != undefined) {
+                            _list.push(_row);
+                        }
+                    }
+                }
+
+                var loading = layer.load('Loading...', {
+                    shade: [0.1, '#fff']
+                });
+
+                setTimeout(function () {
+                    var _class = $("#fwid").val().replace('bi_', '').replace('fw_', '');
+                    if ($('#isDebug').val() == 'debug') {
+                        exUtils.ajax("/_TB/ImportData", "post", { "list": _list, filename: $('#filename').val(), fwid: $("#fwid").val() }, true).done(function (response) {
+                            $("#spanShow").html(response.message);
+                            exLayer.greenTickMsg(response.message, function () {
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                    else {
+                        exUtils.ajax("/" + _class + "/ImportData", "post", { "list": _list, filename: $('#filename').val(), fwid: $("#fwid").val() }, true).done(function (response) {
+                            $("#spanShow").html(response.message);
+                            exLayer.greenTickMsg(response.message, function () {
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+
+                    layer.close(loading);
+                }, 2000);
+            }
+        });
+    </script>
+    <script type="text/html" id="toolbarTpl">
+        <div class="layui-input-inline">
+            <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" lay-event="importData" id="add"><i class="fa fa-plus"></i>导入数据</button>
+        </div>
+    </script>
+    <script type='text/html' id='column1'>
+        <div class='layui-input-inline' style='width:100px;'>
+            <select>
+                <option value="-1">====</option>
+                {{d.info1}}
+            </select>
+        </div>
+    </script>
+    <script type='text/html' id='column2'>
+        <div class='layui-input-inline' style='width:350px;'>
+            <select disabled="disabled">
+                {{d.info2}}
+            </select>
+        </div>
+    </script>
+
+}

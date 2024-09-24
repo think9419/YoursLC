@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Think9.Models</AssemblyName>
+    <RootNamespace>Think9.Models</RootNamespace>
+    <Platforms>AnyCPU;x86;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Think9.Dapper\Think9.Dapper.csproj" />
+  </ItemGroup>
+
+</Project>

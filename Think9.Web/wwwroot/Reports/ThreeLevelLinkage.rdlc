@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="dbXML">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>7b89ecea-4d59-4953-ab0e-ba4d9dbaa1ef</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+	<DataSet Name="dbGrid">
+		<Fields>
+			<Field Name="id"><DataField>id</DataField><rd:TypeName>System.Int64</rd:TypeName></Field>
+			<Field Name="num"><DataField>num</DataField><rd:TypeName>System.Int32</rd:TypeName></Field>
+			<Field Name="listid"><DataField>listid</DataField><rd:TypeName>System.Int64</rd:TypeName></Field>
+			<Field Name="tbid"><DataField>tbid</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v1"><DataField>v1</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v1_Exa"><DataField>v1_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c1"><DataField>c1</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v2"><DataField>v2</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v2_Exa"><DataField>v2_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c2"><DataField>c2</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v3"><DataField>v3</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v3_Exa"><DataField>v3_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c3"><DataField>c3</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v4"><DataField>v4</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v4_Exa"><DataField>v4_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c4"><DataField>c4</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v5"><DataField>v5</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v5_Exa"><DataField>v5_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c5"><DataField>c5</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v6"><DataField>v6</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v6_Exa"><DataField>v6_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c6"><DataField>c6</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v7"><DataField>v7</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v7_Exa"><DataField>v7_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c7"><DataField>c7</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v8"><DataField>v8</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v8_Exa"><DataField>v8_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c8"><DataField>c8</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v9"><DataField>v9</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v9_Exa"><DataField>v9_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c9"><DataField>c9</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v10"><DataField>v10</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v10_Exa"><DataField>v10_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c10"><DataField>c10</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v11"><DataField>v11</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v11_Exa"><DataField>v11_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c11"><DataField>c11</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v12"><DataField>v12</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v12_Exa"><DataField>v12_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c12"><DataField>c12</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v13"><DataField>v13</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v13_Exa"><DataField>v13_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c13"><DataField>c13</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v14"><DataField>v14</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v14_Exa"><DataField>v14_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c14"><DataField>c14</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v15"><DataField>v15</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v15_Exa"><DataField>v15_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c15"><DataField>c15</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v16"><DataField>v16</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v16_Exa"><DataField>v16_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c16"><DataField>c16</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v17"><DataField>v17</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v17_Exa"><DataField>v17_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c17"><DataField>c17</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v18"><DataField>v18</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v18_Exa"><DataField>v18_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c18"><DataField>c18</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v19"><DataField>v19</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v19_Exa"><DataField>v19_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c19"><DataField>c19</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v20"><DataField>v20</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v20_Exa"><DataField>v20_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c20"><DataField>c20</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v21"><DataField>v21</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v21_Exa"><DataField>v21_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c21"><DataField>c21</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v22"><DataField>v22</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v22_Exa"><DataField>v22_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c22"><DataField>c22</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v23"><DataField>v23</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v23_Exa"><DataField>v23_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c23"><DataField>c23</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v24"><DataField>v24</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v24_Exa"><DataField>v24_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c24"><DataField>c24</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v25"><DataField>v25</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v25_Exa"><DataField>v25_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c25"><DataField>c25</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v26"><DataField>v26</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v26_Exa"><DataField>v26_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c26"><DataField>c26</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v27"><DataField>v27</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v27_Exa"><DataField>v27_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c27"><DataField>c27</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v28"><DataField>v28</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v28_Exa"><DataField>v28_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c28"><DataField>c28</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v29"><DataField>v29</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v29_Exa"><DataField>v29_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c29"><DataField>c29</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v30"><DataField>v30</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v30_Exa"><DataField>v30_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="c30"><DataField>c30</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+		</Fields>
+		<Query><DataSourceName>dbXML</DataSourceName><CommandText>/* Local Query */</CommandText></Query>
+	</DataSet>
+    <DataSet Name="dbMain">
+      <Fields>
+        <Field Name="listid">
+          <DataField>listid</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+			<Field Name="inProvince"><DataField>inProvince</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inProvince_Exa"><DataField>inProvince_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inCityAndCounty"><DataField>inCityAndCounty</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inCityAndCounty_Exa"><DataField>inCityAndCounty_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inTownship"><DataField>inTownship</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inTownship_Exa"><DataField>inTownship_Exa</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inRemarks"><DataField>inRemarks</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+      </Fields>
+      <Query>
+        <DataSourceName>dbXML</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <ReportSections>
+   <ReportSection>
+    <Body>
+     <ReportItems>
+		<Textbox Name="txtinRemarks"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inRemarks.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>txtinRemarks</rd:DefaultName> <Left>13.66200cm</Left> <Top>1.91175cm</Top> <Height>0.75900cm</Height> <Width>7.13720cm</Width>  <Style> <Border> <Style>None</Style>  </Border> <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab1"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>省</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab1</rd:DefaultName> <Left>0.25300cm</Left> <Top>0.76470cm</Top> <Height>0.75900cm</Height> <Width>2.93135cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab2"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>市县</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab2</rd:DefaultName> <Left>10.62600cm</Left> <Top>0.76470cm</Top> <Height>0.75900cm</Height> <Width>2.93135cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab3"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>乡镇</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab3</rd:DefaultName> <Left>0.25300cm</Left> <Top>1.91175cm</Top> <Height>0.75900cm</Height> <Width>2.93135cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="lab4"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>备注</Value> <MarkupType>HTML</MarkupType> <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style> <TextAlign>Right</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>lab4</rd:DefaultName> <Left>10.62600cm</Left> <Top>1.91175cm</Top> <Height>0.75900cm</Height> <Width>2.93135cm</Width> <Style> <Border>  <Style>None</Style>  </Border>  <BackgroundColor>White</BackgroundColor> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="drinProvince"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inProvince.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style><TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>drinProvince</rd:DefaultName> <Left>3.28900cm</Left> <Top>0.76470cm</Top> <Height>0.75900cm</Height> <Width>7.13720cm</Width><Style> <Border> <Style>None</Style>  </Border>  <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="drinCityAndCounty"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inCityAndCounty.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style><TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>drinCityAndCounty</rd:DefaultName> <Left>13.66200cm</Left> <Top>0.76470cm</Top> <Height>0.75900cm</Height> <Width>7.13720cm</Width><Style> <Border> <Style>None</Style>  </Border>  <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Textbox Name="drinTownship"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun> <Value>=First(Fields!inTownship.Value,"dbMain")</Value> <MarkupType>HTML</MarkupType>  <Style> <FontFamily>微软雅黑 Light</FontFamily> <FontSize>10pt</FontSize><Color>Black</Color>  </Style> </TextRun> </TextRuns> <Style><TextAlign>Left</TextAlign></Style> </Paragraph> </Paragraphs> <rd:DefaultName>drinTownship</rd:DefaultName> <Left>3.28900cm</Left> <Top>1.91175cm</Top> <Height>0.75900cm</Height> <Width>7.13720cm</Width><Style> <Border> <Style>None</Style>  </Border>  <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox>
+		<Tablix Name="GridViewtb_Subtable07"> <TablixBody> <TablixColumns> <TablixColumn> <Width>0.9cm</Width> </TablixColumn>  <TablixColumn> <Width>3.8235cm</Width> </TablixColumn>  <TablixColumn> <Width>3.8235cm</Width> </TablixColumn>  <TablixColumn> <Width>3.8235cm</Width> </TablixColumn>  <TablixColumn> <Width>3.8235cm</Width> </TablixColumn>  <TablixColumn> <Width>6.3725cm</Width> </TablixColumn> </TablixColumns> <TablixRows> <TablixRow> <Height>0.99cm</Height> <TablixCells><TablixCell><CellContents> <Textbox Name="tb_Subtable07Textbox1"> <CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs> <Paragraph> <TextRuns><TextRun><Value>NO.</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun> </TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs> <rd:DefaultName>tb_Subtable07Textbox1</rd:DefaultName><Style> <Border><Color>LightGrey</Color> <Style>Solid</Style><Width>0.01cm</Width> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom></Style> </Textbox> </CellContents></TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07Top_v1"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>省1</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07Top_v1</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07Top_v2"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>省2</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07Top_v2</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07Top_v3"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>县市</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07Top_v3</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07Top_v4"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>乡镇</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07Top_v4</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07Top_v5"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>备注</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07Top_v5</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell> </TablixCells> </TablixRow> <TablixRow> <Height>0.99cm</Height> <TablixCells><TablixCell><CellContents><Textbox Name="tb_Subtable07TextboxNUM"> <CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph> <TextRuns> <TextRun><Value>=Fields!num.Value</Value><Style><FontFamily>微软雅黑 Light</FontFamily> </Style></TextRun> </TextRuns><Style><TextAlign>Center</TextAlign></Style></Paragraph></Paragraphs><rd:DefaultName>tb_Subtable07TextboxNUM</rd:DefaultName><Style><Border> <Color>LightGrey</Color><Style>Solid</Style><Width>0.01cm</Width></Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents></TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07v1"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>=Fields!v1.Value</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07v1</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07v2"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>=Fields!v2.Value</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07v2</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07v3"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>=Fields!v3.Value</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07v3</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07v4"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>=Fields!v4.Value</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07v4</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell>  <TablixCell> <CellContents> <Textbox Name="tb_Subtable07v5"> <CanGrow>true</CanGrow> <KeepTogether>true</KeepTogether> <Paragraphs> <Paragraph> <TextRuns> <TextRun>  <Value>=Fields!v5.Value</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style> </TextRun> </TextRuns> <Style> <TextAlign>Center</TextAlign> </Style> </Paragraph> </Paragraphs> <rd:DefaultName>tb_Subtable07v5</rd:DefaultName> <Style> <Border> <Color>LightGrey</Color> <Style>Solid</Style> <Width>0.01cm</Width> </Border> <VerticalAlign>Middle</VerticalAlign> <PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight> <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom> </Style> </Textbox> </CellContents> </TablixCell> </TablixCells> </TablixRow> </TablixRows> </TablixBody> <TablixColumnHierarchy> <TablixMembers><TablixMember />  <TablixMember />  <TablixMember />  <TablixMember />  <TablixMember />  <TablixMember /></TablixMembers> </TablixColumnHierarchy> <TablixRowHierarchy> <TablixMembers> <TablixMember> <KeepWithGroup>After</KeepWithGroup></TablixMember> <TablixMember><Group Name="详细信息tb_Subtable07" /></TablixMember></TablixMembers> </TablixRowHierarchy> <DataSetName>dbGrid</DataSetName> <Filters> <Filter><FilterExpression>=Fields!tbid.Value</FilterExpression><Operator>Equal</Operator><FilterValues><FilterValue>tb_Subtable07</FilterValue></FilterValues></Filter> </Filters> <Top>3.05880cm</Top> <Left>0.25300cm</Left> <Height>1.5cm</Height> <Width>21.6665cm</Width> <Style>  <Border>  <Style>None</Style>  </Border> </Style> </Tablix>
+
+     </ReportItems>
+    <Height>9.26042cm</Height>
+    <Style>
+      <Border />
+    </Style>
+  </Body>
+  <Width>21cm</Width>
+  <Page>
+    <PageHeight>29.7cm</PageHeight>
+    <PageWidth>21cm</PageWidth>
+    <LeftMargin>0.5cm</LeftMargin>
+    <RightMargin>0.5cm</RightMargin>
+    <TopMargin>1.5cm</TopMargin>
+    <BottomMargin>1.5cm</BottomMargin>
+    <ColumnSpacing>0.13cm</ColumnSpacing>
+    <Style />
+  </Page>
+    </ReportSection>
+  </ReportSections>
+  <rd:ReportID>f2ca8aba-eb1e-4797-b7db-fd7891cc99f6</rd:ReportID>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+</Report>

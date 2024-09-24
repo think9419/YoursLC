@@ -1,0 +1,55 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:16
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:16
+	/// </summary>
+	 [Table("tb_EventWritten")]
+	public class EventWrittenModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// ListID
+		/// </summary>
+		public long? inListID { get; set; }
+		/// <summary>
+		/// ListID 【附加】
+		/// </summary>
+		[Computed]
+		public long? inListID_Exa { get; set; }
+		/// <summary>
+		/// ID
+		/// </summary>
+		public long? inID { get; set; }
+		/// <summary>
+		/// ID 【附加】
+		/// </summary>
+		[Computed]
+		public long? inID_Exa { get; set; }
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		/// <summary>
+		/// 备注 【附加】
+		/// </summary>
+		[Computed]
+		public string inRemarks_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

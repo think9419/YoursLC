@@ -1,0 +1,133 @@
+﻿@model Think9.Models.RuleListEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display: none" id="_id" value="@ViewBag.RuleID">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required" style="width:30px;">名称</label>
+            <div class="layui-input-block layui-col-space3" style="margin-left:60px;">
+                <div class="layui-col-xs8 layui-col-sm4 layui-col-md4">
+                    <input type="text" name="RuleName" id="RuleName" placeholder="请输入名称" autocomplete="off" class="layui-input" lay-verify="required" value="@ViewBag.RuleName" maxlength='50'>
+                </div>
+                <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                    <button type="button" class="layui-btn" lay-submit lay-filter="edit">编辑名称</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        var $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/RuleAuto/GetList/" + $("#_id").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "AutoShow", title: "AutoShow", sort: true },
+                { title: "", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                $('th').hide();//表头隐藏的样式
+                if (layui.device().mobile) {
+                    $("#spanShow").html('点击『添加』按钮逐项添加');
+                }
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '<span style="color: #FE7300;">自动编号由固定字符、日期、序号等组成，点击『添加』按钮逐项添加</span>'
+            }
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.AutoOrder);
+                    break;
+            }
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/RuleList/UpNameByID", "post", { id: $("#_id").val(), name: $("#RuleName").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    $(window.parent.document).find('#search').click();//刷新
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function add() {
+            exLayer.openMiddle("自动编号 - 组成项", "/SysTable/RuleAuto/AddItem?rid=" + $("#_id").val(), '500px', '300px', layui.device().mobile);
+        }
+
+        function refresh() {
+            table.reload('tableId', {})
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/RuleAuto/Delete", "get", { id: id }, true).done(function (response) {
+                    ThisTable.reload({
+                    });
+                    exUtils.tableSuccessMsg(response.message);
+                    /* $(".layui-laypage-btn")[0].click();*/
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button class="layui-btn  layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>添加</button>
+    </div>
+    <div class="layui-inline">
+        <span class="layui-word-aux" id="spanShow" style="color: #FE7300;"><i class="fa fa-angle-double-left"></i>自动编号由固定字符、日期、序号等组成，点击『添加』按钮逐项添加</span>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del"><i class="fa fa-close"></i></a>
+</script>

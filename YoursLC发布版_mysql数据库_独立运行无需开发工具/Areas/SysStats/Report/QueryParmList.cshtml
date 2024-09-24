@@ -1,0 +1,112 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<input style="display:none" id="rpId" value="@ViewBag.RpId">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/ReportParmQuery/GetParmQueryList?rpId=" + $("#rpId").val(),
+            method: "post",
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "ParameteName", title: "参数", width: 250, sort: true },
+                { field: "ControlTypeName", title: "控件", width: 100, sort: true },
+                { field: "Type", title: "方式", width: 150, sort: true },
+                { field: "RuleName", title: "选项" },
+
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.ListId);
+                    break;
+                case "del":
+                    del(data.ListId);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.openMiddle("新建查询参数", "/SysStats/Report/AddQueryParm?rpId=" + $("#rpId").val(), '800px', '500px', layui.device().mobile);
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                where: { rpId: $("#rpId").val() }
+            });
+        }
+
+        function edit(id) {
+            exLayer.openMiddle("编辑查询参数", "/SysStats/Report/EditQueryParm?id=" + id + "&rpId=" + $("#rpId").val(), '500px', '450px', layui.device().mobile);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysStats/ReportParmQuery/DeleteParmQuery", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    ThisTable.reload({
+                        where: { rpId: $("#rpId").val() }
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+    });</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建查询参数</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="DataType">
+    {{# if(d.DataType == 'DateTime'){ }}
+    <span>日期</span> {{# } }}
+
+    {{# if(d.DataType == 'string'){ }}
+    <span>字符</span> {{# } }}
+
+    {{# if(d.DataType == 'decimal'){ }}
+    <span>小数</span> {{# } }}
+
+    {{# if(d.DataType == 'int'){ }}
+    <span>整数</span> {{# } }}
+</script>

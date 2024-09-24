@@ -1,0 +1,35 @@
+﻿@{
+    ViewBag.Title = "图片查看";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-input-block" align="center">
+            <div class="layui-upload-list" id="divimg">
+                <img id="F_Img" height="350" οnclick="window.open('@ViewBag.src2')" src='@ViewBag.src' />
+            </div>
+        </div>
+        <div class="layui-input-block" align="center">
+            <a id="down" href="@ViewBag.src2" target='_blank'> <i class="fa fa-search-plus">查看原图</i></a>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'upload'], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+
+            $(document).ready(function () {
+                $("#divimg").bind("click", function () {
+                })
+            });
+        });
+    </script>
+
+}

@@ -1,0 +1,97 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+@using Think9.Models;
+<form class="layui-form">
+    <input style="display:none" id="id" value="@ViewBag.ClassID">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">数据库类别</label>
+        <div class="layui-input-block">
+            <select id="DbType" name="DbType" lay-filter="selectDbType" lay-verify='required'>
+                @foreach (valueTextEntity item in ((IEnumerable
+                <valueTextEntity>
+                )ViewBag.TypeList))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">数据库名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="DbName" id="DbName" placeholder="请输入数据库名称 类别为MySQL、Oracle数据库时需与数据库名相同" autocomplete="off" class="layui-input" lay-verify="required" maxlength="50">
+            <span style="color: #FE7300;">⇑类别为MySQL、Oracle数据库时需与数据库名相同</span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">连接字符</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入连接字符" value="" name="DbCon" id="DbCon" class="layui-textarea" lay-verify="required"></textarea>
+            <span id="spanDbCon" style="color:darkgrey">格式：;</span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入备注" value="" name="Remarks" id="Remarks" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新建连接</button>
+            <button type="button" class="layui-btn" lay-filter="connection" id="connection">测试连接</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysBasic/ExternalDb/Add", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/ExternalDb/GetList" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $("#connection").click(function () {
+            if ($("#DbCon").val() == '') {
+                layer.msg('请输入连接字符');
+                return false;
+            }
+            exUtils.ajax("/SysBasic/ExternalDb/Connection", "post", { con: $("#DbCon").val(), type: $("#DbType").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+            });
+            return false;
+        });
+
+        form.on('select(selectDbType)', function (data) {
+            if (data.value == 'mysql') {
+                $("#spanDbCon").html("格式：server=serverName(如：127.0.0.1);port=3306;database=databaseName(如：yourslc);user=username(如：root);password=password(密码);");
+            }
+            if (data.value == 'sqlserver') {
+                $("#spanDbCon").html("格式：Server=serverName(如：127.0.0.1);Database=databaseName(如：yourslc);User Id=username(如：sa);Password=password(密码); Timeout=30;");
+            }
+            if (data.value == 'postgresql') {
+                $("#spanDbCon").html("格式：Host=serverName(如：127.0.0.1);Port=5432;Database=databaseName(如：yourslc);Username=username(如：postgres);Password=password(密码); Timeout=30;");
+            }
+            if (data.value == 'oracle') {
+                $("#spanDbCon").html("格式：Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP) (HOST=serverName(如：127.0.0.1) (PORT=1521)))(CONNECT_DATA=(SERVICE_NAME= orcl)));User Id=用户名(如：***); Password=密码(如：***);");
+            }
+        })
+    });
+</script>

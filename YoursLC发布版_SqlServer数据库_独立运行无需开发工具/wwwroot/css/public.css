@@ -1,0 +1,82 @@
+.layuimini-content-page {
+    background-color: #F2F2F2 !important;
+}
+
+.layuimini-container {
+    border: 1px solid #F2F2F2;
+    border-radius: 5px;
+    background-color: #F2F2F2
+}
+
+.layuimini-main {
+    margin: 10px 10px 10px 10px;
+    border: 5px solid #ffffff;
+    border-radius: 5px;
+    background-color: #ffffff
+}
+
+.layui-breadcrumb > * {
+    font-size: 13px;
+    !important;
+}
+
+/**必填红点 */
+.layui-form-label.required:after {
+    content: "*";
+    color: red;
+    position: absolute;
+    top: 10px;
+    right: 5px;
+}
+
+.layuimini-form > .layui-form-item > .required:after {
+    content: '*';
+    color: red;
+    position: absolute;
+    margin-left: 4px;
+    font-weight: bold;
+    line-height: 1.8em;
+    top: 6px;
+    right: 5px;
+}
+
+.layuimini-form > .layui-form-item > .layui-form-label {
+    width: 250px !important;
+}
+
+.layuimini-form > .layui-form-item > .layui-input-block {
+    margin-left: 120px !important;
+}
+
+.layui-form > .layui-form-item > .layui-input-block > tip {
+    display: inline-block;
+    margin-top: 10px;
+    line-height: 14px;
+    font-size: 14px;
+    color: #a29c9c;
+}
+
+.layui-form > .layui-form-item > .layui-input-inline > tip {
+    display: inline-block;
+    margin-top: 10px;
+    line-height: 14px;
+    font-size: 14px;
+    color: #a29c9c;
+}
+
+/**搜索框*/
+
+.layuimini-container .table-fieldset {
+    margin: 0;
+    border: 1px solid #e6e6e6;
+    padding: 10px 10px 10px 5px;
+    color: #6b6b6b;
+}
+
+/*通用*/
+.none-select {
+    -moz-user-select: none; /*火狐*/
+    -webkit-user-select: none; /*webkit浏览器*/
+    -ms-user-select: none; /*IE10*/
+    user-select: none;
+}

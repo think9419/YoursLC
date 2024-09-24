@@ -1,0 +1,367 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:35:17
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+using Think9.Models;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+
+namespace Think9.Services.CodeBuild
+{
+    /// <summary>
+    /// Service
+    /// </summary>
+    public partial class BasedOnPrimaryAndSubTables2Service : BaseService<BasedOnPrimaryAndSubTables2Model>
+    {
+        private string sql;
+        private string str;
+        private string itemStr;
+        private readonly string _split = Think9.Services.Base.BaseConfig.ComSplit;//多选项的字符分割
+        private ComService comService = new ComService();
+        private ExtraDbService extraDb = new ExtraDbService();//外部数据源
+		private ExtraDbEntity extraDbModel;//外部数据源
+
+        #region sql 自定义的统计指标解析为sql语句
+
+        #endregion sql 自定义的统计指标解析为sql语句
+
+        /// <summary>
+        /// 获取分页数据并处理Value与Text转化
+        /// </summary>
+        /// <param name="total">结果集总数</param>
+        /// <param name="controlList">查询条件</param>
+        /// <param name="pageInfo">页面信息，包括行数、排序等</param>
+        /// <param name="user">当前用户信息</param>
+        /// <returns></returns>
+        public List<dynamic> GetListForPage(ref long total, IEnumerable<ControlEntity> controlList, PageInfoEntity pageInfo, CurrentUserEntity user)
+        {
+            //获取分页数据
+            List<dynamic> list = GetList(ref total, controlList, pageInfo).ToList();
+            GetStatsIndex(list);//获取统计指标值
+            //获取下拉选择、多选、单选数据源
+            IEnumerable<valueTextEntity> selectList = GetSelectList("list", BasicHelp.GetParamObject(user));
+            TransformList(selectList, list, user);//处理Value与Text转化
+
+            return list;
+        }
+
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        /// <param name="total">结果集总数</param>
+        /// <param name="list">查询条件</param>
+        /// <param name="pageInfo">页面信息，包括行数、排序等</param>
+        /// <returns></returns>
+        private IEnumerable<dynamic> GetList(ref long total, IEnumerable<ControlEntity> list, PageInfoEntity pageInfo)
+        {
+			string order = " ";
+			string where = GetSearchWhere(list);
+			var model = GetParamSearch(list);
+			
+			pageInfo.returnFields = "tb_GoodsStorage.*, tb_InventoryDetails.* ";
+			string some = "  tb_GoodsStorage INNER JOIN tb_InventoryDetails ON tb_GoodsStorage.listid = tb_InventoryDetails.listid ";
+			return base.GetPageUnite(ref total, model, pageInfo, some + where, order);
+        }
+
+        /// <summary>
+        /// 获取数据
+        /// </summary>
+        /// <param name="list">查询条件</param>
+        /// <param name="user">当前用户信息</param>
+        /// <returns></returns>
+        private IEnumerable<dynamic> GetList(IEnumerable<ControlEntity> list, CurrentUserEntity user = null)
+        {
+			string where = GetSearchWhere(list);
+			string order = "  ";
+			var model = GetParamSearch(list);
+			return base.GetBySql("SELECT tb_GoodsStorage.*, tb_InventoryDetails.* FROM tb_GoodsStorage INNER JOIN tb_InventoryDetails ON tb_GoodsStorage.listid = tb_InventoryDetails.listid  " + where + order, model);
+        }
+
+        /// <summary>
+        /// 获取数据DataTable导出excel
+        /// </summary>
+        /// <param name="ControlList">查询条件</param>
+        /// <param name="user">当前用户信息</param>
+        /// <returns></returns>
+        private DataTable GetDataTableForExport(IEnumerable<ControlEntity> ControlList, CurrentUserEntity user = null)
+        {
+            List<dynamic> list = GetList(ControlList, user).ToList();
+            if (list == null || list.Count < 1)
+            {
+                list.Add(new BasedOnPrimaryAndSubTables2Model());//无数据时需加入一条空数据，否则报错
+            }
+            GetStatsIndex(list);//获取统计指标值
+            //获取下拉选择、多选、单选数据源
+            IEnumerable<valueTextEntity> selectList = GetSelectList("list", BasicHelp.GetParamObject(user));
+            TransformList(selectList, list, user);//处理Value与Text转化
+
+            return DataTableHelp.ListToDataTable<dynamic>(list);//转换DataTable
+        }
+
+        /// <summary>
+        /// 获取统计指标值
+        /// </summary>
+        /// <param name="list">数据列表</param>
+        /// <param name="user">当前用户</param>
+        private void GetStatsIndex(List<dynamic> list, CurrentUserEntity user = null)
+        {
+			//无统计指标
+        }
+
+        /// <summary>
+        /// 处理Value与Text转化
+        /// </summary>
+        /// <param name="SelectList">Value与Text数据列表</param>
+        /// <param name="list">数据列表</param>
+        /// <param name="user">当前用户</param>
+        private void TransformList(IEnumerable<valueTextEntity> SelectList, List<dynamic> list, CurrentUserEntity user = null)
+        {
+            foreach (BasedOnPrimaryAndSubTables2Model obj in list)
+            {
+
+				//仓库
+				foreach (valueTextEntity sel in SelectList.Where(x => x.ClassID == "inWarehouse"))
+				{
+					if (obj.inWarehouse == sel.Value)
+					{
+						obj.inWarehouse = sel.Text;
+						break;
+					}
+				}
+				//单位
+				foreach (valueTextEntity sel in SelectList.Where(x => x.ClassID == "v4"))
+				{
+					if (obj.v4 == sel.Value)
+					{
+						obj.v4 = sel.Text;
+						break;
+					}
+				}
+            }
+        }
+
+        /// <summary>
+        /// 获取rdlc报表的相关数据
+        /// </summary>
+        /// <param name="rpid">统计表编码</param>
+        /// <param name="rpname">统计表名称</param>
+        /// <param name="prm">条件参数对象</param>
+        /// <returns></returns>
+        public RdlcDeviceEntity GetRdlcDevice(string rpid, string rpname, IEnumerable<ControlEntity> controlList)
+        {
+            string err = "";
+            string directory = Directory.GetCurrentDirectory();
+            RdlcDeviceEntity device = new RdlcDeviceEntity();
+
+            device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\rp_BasedOnPrimaryAndSubTables2.rdlc");//rdlc模板文件
+            device.PathUserImg = Think9.Services.Base.BaseConfig.GetUserImgPath();//用户图片所在文件夹
+            device.ImgNoExist = Think9.Services.Base.BaseConfig.GetImgNoExistPath();//图片不存在时的替代
+            //device.MainDt = GetMainDataTable(rpid, rpname);//报表名称
+            device.GridDt = GetDataTableForExport(controlList);//列表数据
+
+            return device;
+        }
+
+		/// <summary>
+		/// 获取下拉选择、多选、单选数据源
+		/// 处理列表显示时value与text转化，动态数据源来源于为指标指定的数据规范
+		/// </summary>
+		/// <param name="from">add、edit或list，list表明从列表页面查询条件跳转而来</param>
+		/// <param name="param">条件参数</param>
+		/// <returns></returns>
+		public IEnumerable<valueTextEntity> GetSelectList(string from, object param)
+		{
+			DataTable dt = DataTableHelp.NewValueTextDt();
+
+			//仓库
+			sql = "SELECT inCoding AS id,inName AS name FROM tb_Warehouse ORDER BY state";
+			foreach (DataRow dr in comService.GetDataTable(sql, param).Rows)
+			{
+				DataRow row = dt.NewRow();
+				row["ClassID"] = "inWarehouse";
+				row["Value"] = dr["id"].ToString();
+				row["Text"] = dr["name"].ToString();
+				dt.Rows.Add(row);
+			}
+			//编码
+			sql = "SELECT inCoding AS id,inName AS name FROM tb_ProductManagement ORDER BY state";
+			foreach (DataRow dr in comService.GetDataTable(sql, param).Rows)
+			{
+				DataRow row = dt.NewRow();
+				row["ClassID"] = "v1";
+				row["Value"] = dr["id"].ToString();
+				row["Text"] = dr["name"].ToString();
+				dt.Rows.Add(row);
+			}
+			//单位
+			sql = "SELECT inCoding AS id,inName AS name FROM tb_JLDW ORDER BY state";
+			foreach (DataRow dr in comService.GetDataTable(sql, param).Rows)
+			{
+				DataRow row = dt.NewRow();
+				row["ClassID"] = "v4";
+				row["Value"] = dr["id"].ToString();
+				row["Text"] = dr["name"].ToString();
+				dt.Rows.Add(row);
+			}
+
+			return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+		}
+
+        /// <summary>
+        /// 获取查询字符串
+        /// </summary>
+        /// <param name="list">查询条件list</param>
+        /// <returns>返回查询字符串</returns>
+        private string GetSearchWhere(IEnumerable<ControlEntity> list)
+		{
+			string where = " WHERE (1 = 1)";
+			
+			//仓库
+			str = BasicHelp.GetValueFrmList(list, "inWarehouse").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_GoodsStorage.inWarehouse = @inWarehouse)"; 
+			}
+			
+			//金额合计
+			str = BasicHelp.GetValueFrmList(list, "inTotalAmount").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_GoodsStorage.inTotalAmount >= @inTotalAmount)"; 
+			}
+			str = BasicHelp.GetValueFrmList(list, "inTotalAmount_Exa").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_GoodsStorage.inTotalAmount <= @inTotalAmount_Exa)"; 
+			}
+			
+			//入库日期
+			str = BasicHelp.GetValueFrmList(list, "inStorageDate").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_GoodsStorage.inStorageDate >= @inStorageDate)"; 
+			}
+			str = BasicHelp.GetValueFrmList(list, "inStorageDate_Exa").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_GoodsStorage.inStorageDate <= @inStorageDate_Exa)"; 
+			}
+			
+			//名称
+			str = BasicHelp.GetValueFrmList(list, "v2").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_InventoryDetails.v2 LIKE  @v2)"; 
+			}
+			
+			//数量
+			str = BasicHelp.GetValueFrmList(list, "v6").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_InventoryDetails.v6 >= @v6)"; 
+			}
+			str = BasicHelp.GetValueFrmList(list, "v6_Exa").Trim();
+			if (!string.IsNullOrEmpty(str))
+			{
+				where += " AND (tb_InventoryDetails.v6 <= @v6_Exa)"; 
+			}
+			return where;
+		}
+
+        /// <summary>
+        /// 查询条件list转化为Model
+        /// </summary>
+        /// <param name="list">查询条件list</param>
+        /// <returns></returns>
+        private BasedOnPrimaryAndSubTables2Model GetParamSearch(IEnumerable<ControlEntity> list)
+		{
+			
+			string _inWarehouse = BasicHelp.GetValueFrmList(list, "inWarehouse").Trim();//仓库
+			string _inTotalAmount = BasicHelp.GetValueFrmList(list, "inTotalAmount").Trim();//金额合计
+			string _inTotalAmount_Exa = BasicHelp.GetValueFrmList(list, "inTotalAmount_Exa").Trim();//金额合计
+			string _inStorageDate = BasicHelp.GetValueFrmList(list, "inStorageDate").Trim();//入库日期
+			string _inStorageDate_Exa = BasicHelp.GetValueFrmList(list, "inStorageDate_Exa").Trim();//入库日期
+			string _v2 = BasicHelp.GetValueFrmList(list, "v2").Trim();//名称
+			string _v6 = BasicHelp.GetValueFrmList(list, "v6").Trim();//数量
+			string _v6_Exa = BasicHelp.GetValueFrmList(list, "v6_Exa").Trim();//数量
+			return new BasedOnPrimaryAndSubTables2Model{ inWarehouse = _inWarehouse, inTotalAmount = ExtConvert.ToDecimalOrNull(_inTotalAmount), inTotalAmount_Exa = ExtConvert.ToDecimalOrNull(_inTotalAmount_Exa), inStorageDate = ExtConvert.ToDateOrNull(_inStorageDate), inStorageDate_Exa = ExtConvert.ToDateOrNull(_inStorageDate_Exa), v2 = string.Format("%{0}%", _v2), v6 = ExtConvert.ToDecimalOrNull(_v6), v6_Exa = ExtConvert.ToDecimalOrNull(_v6_Exa) };
+		}
+
+        /// <summary>
+        /// 获取对象并向查询条件赋初始值
+        /// </summary>
+        /// <param name="request">request不为空时（通常为从其他页面打开）</param>
+        /// <returns></returns>
+        public BasedOnPrimaryAndSubTables2Model GetModel(Microsoft.AspNetCore.Http.HttpRequest request)
+        {
+            BasedOnPrimaryAndSubTables2Model model = new BasedOnPrimaryAndSubTables2Model();
+            if (request != null)
+            {
+				if (!string.IsNullOrEmpty(request.Query["inWarehouse"]))
+				{
+					model.inWarehouse = request.Query["inWarehouse"].ToString();//仓库
+				}
+				if (!string.IsNullOrEmpty(request.Query["inWarehouse_Exa"]))
+				{
+					model.inWarehouse_Exa = request.Query["inWarehouse_Exa"].ToString();//仓库
+				}
+				if (!string.IsNullOrEmpty(request.Query["inTotalAmount"]) && ValidatorHelper.IsNumberic(request.Query["inTotalAmount"].ToString()))
+				{
+					model.inTotalAmount = ExtConvert.ToDecimalOrNull(request.Query["inTotalAmount"].ToString());//金额合计
+				}
+				if (!string.IsNullOrEmpty(request.Query["inTotalAmount_Exa"]) && ValidatorHelper.IsNumberic(request.Query["inTotalAmount_Exa"].ToString()))
+				{
+					model.inTotalAmount_Exa = ExtConvert.ToDecimalOrNull(request.Query["inTotalAmount_Exa"].ToString());//金额合计
+				}
+				if (!string.IsNullOrEmpty(request.Query["inStorageDate"]) && ValidatorHelper.IsDateTime(request.Query["inStorageDate"].ToString()))
+				{
+					model.inStorageDate = ExtConvert.ToDateOrNull(request.Query["inStorageDate"].ToString());//入库日期
+				}
+				if (!string.IsNullOrEmpty(request.Query["inStorageDate_Exa"]) && ValidatorHelper.IsDateTime(request.Query["inStorageDate_Exa"].ToString()))
+				{
+					model.inStorageDate_Exa = ExtConvert.ToDateOrNull(request.Query["inStorageDate_Exa"].ToString());//入库日期
+				}
+				if (!string.IsNullOrEmpty(request.Query["v2"]))
+				{
+					model.v2 = request.Query["v2"].ToString();//名称
+				}
+				if (!string.IsNullOrEmpty(request.Query["v6"]) && ValidatorHelper.IsNumberic(request.Query["v6"].ToString()))
+				{
+					model.v6 = ExtConvert.ToDecimalOrNull(request.Query["v6"].ToString());//数量
+				}
+				if (!string.IsNullOrEmpty(request.Query["v6_Exa"]) && ValidatorHelper.IsNumberic(request.Query["v6_Exa"].ToString()))
+				{
+					model.v6_Exa = ExtConvert.ToDecimalOrNull(request.Query["v6_Exa"].ToString());//数量
+				}
+            }
+            return model;
+        }
+
+        /// <summary>
+        /// 获取数据
+        /// </summary>
+        /// <param name="rpid">统计表编码</param>
+        /// <param name="rpname">统计表名称</param>
+        /// <returns></returns>
+        private DataTable GetMainDataTable(string rpid, string rpname)
+        {
+            DataTable dt = DataTableHelp.NewReportMainTb();
+            DataRow row = dt.NewRow();
+            row["ReportID"] = rpid;
+            row["ReportName"] = rpname;
+            row["ReportParm"] = "";
+            row["Title"] = rpname;
+            dt.Rows.Add(row);
+
+            return dt;
+        }
+    }
+}

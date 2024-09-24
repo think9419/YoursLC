@@ -1,0 +1,109 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="_flag" value="ddv1">
+<input style="display:none" id="_type" value="@ViewBag.Type">
+<input style="display:none" id="pu_frm" value="@ViewBag.PuFrom">
+<input style="display:none" id="pu_tbid" value="@ViewBag.PuTbId">
+<input style="display:none" id="pu_indexid" value="@ViewBag.PuIndexId">
+<input style="display:none" id="pu_rowid" value="@ViewBag.PuId">
+<input style="display:none" id="pu_column" value="@ViewBag.PuV">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/RuleList/GetSysParameter2?type=" + $('#_type').val(),
+            method: "get",
+            page: false,
+
+            defaultToolbar: [],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "radio", fixed: 'left' }
+                , { field: "Value", hide: true }
+                , { field: "Text", title: "系统参数" }
+            ]],
+            done: function (res, curr, count) {
+                $('th').hide();//表头隐藏的样式
+                //console.log(res, curr, count);
+            }
+        });
+
+        //查询
+        form.on("submit(search)", function (data) {
+            $("#searchfield").hide();
+            var _list = [];
+            getControlSearch(_list);
+            console.log(_list);
+
+            ThisTable.reload({
+                where: { flag: $('#_flag').val(), "list": _list },
+                page: { curr: 1 }
+            });
+            return false;
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "OK":
+                    getSelect(obj);
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        //数据表格自带的监听radio事件
+        table.on('radio(tableFilter)', function (obj) {
+            layer.msg("已选择：" + obj.data.Value + " - 需点击确定按钮");
+            document.body.scrollTop = document.documentElement.scrollTop = 0;
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        //从控件读值
+        function getControlSearch(_list) {
+            var _row = { ClassID: $('#_flag').val(), Text: $('#dictid').val(), Value: 'dictid' };
+            _list.push(_row);
+        }
+
+        //确定选择
+        function getSelect(obj) {
+            var strv = "";
+            var checkStatus = table.checkStatus(obj.config.id); //获取选中行状态
+            if (checkStatus.data.length > 0) {
+                strv = checkStatus.data[0].Value;
+            }
+            $(window.parent.document).find('#DefaultV').val(strv);
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        }
+
+    })</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <button class="layui-btn  layui-btn-normal" lay-event="OK" id="OK">确定选择</button>
+</script>

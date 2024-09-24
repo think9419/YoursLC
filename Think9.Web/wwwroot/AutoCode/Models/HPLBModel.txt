@@ -1,0 +1,28 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:28:32
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:28:32
+	/// </summary>
+	 [Table("tb_HPLB")]
+	public class HPLBModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		#endregion Model
+		
+	}
+}

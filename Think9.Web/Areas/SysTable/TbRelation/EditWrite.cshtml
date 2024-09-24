@@ -1,0 +1,395 @@
+﻿@using Think9.Models;
+@model Think9.Models.RelationWriteEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="Guid" value="@ViewBag.Guid">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="tbname" value="@ViewBag.tbname">
+    <input style="display:none" id="id" value="@ViewBag.id">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">名 称</label>
+        <div class="layui-input-block">
+            <input type="text" name="RelationName" placeholder="必填 请输入名称" autocomplete="off" class="layui-input" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">回写类别</label>
+        <div class="layui-input-inline">
+            <input type="radio" name="RelationSort" value="3" checked="checked" title="修改">
+            <input type="radio" name="RelationSort" value="2" title="删除" disabled>
+        </div>
+        <div class="layui-input-inline">
+            <input type="hidden" name="NumberType" value="2">
+            <input type="checkbox" id="NumberType" name="NumberType" value="1" title="只运行一次(不勾选则满足条件的就运行)">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">适用范围</label>
+        <div class="layui-input-block">
+            <input style="display:none" name="FlowPrcs_Exa" id="FlowPrcs_Exa">
+            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FlowList))
+            {
+                <input type="checkbox" name="FlowPrcs" value="@item.Value" title="@item.Text" lay-filter="FlowPrcs" lay-skin="primary">
+            }
+        </div>
+    </div>
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">选择回写指标后再编辑或者输入回写表达式，最后点击添加回写指标按钮；可添加多个回写指标</legend>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">回写数据表</label>
+            <div class="layui-input-block">
+                <input type="text" name="WriteTbId" id="WriteTbId" style="display:none" value="@Model.WriteTbId">
+                <input type="text" name="WriteTbName" id="WriteTbName" autocomplete="off" class="layui-input" readonly="readonly">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">回写指标</label>
+            <div class="layui-input-block">
+                <select id="WriteField" name="WriteField">
+                    <option value="">==请选择 需先选择回写数据表==</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">回写表达式</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" id="Expression" name="Expression" placeholder='输入值或点击右下角编辑按钮，单个指标值格式为tableid.indexid.Value'></textarea>
+                <span style="position: absolute;bottom: 25px; right: 5px;">
+                    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs"><i class="fa fa-edit" id="selExpression"></i></a>
+                </span>
+                <span style="position: absolute;top: 0px; left: 0px;">
+                    <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="_tips"></i>
+                </span>
+                <tip><span style='color: blue;'>表达式中包含输入为空的数字默认等于0</span></tip>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: right;">
+            <span style="color: #FE7300;">
+                选择回写指标并设置回写表达式后点击『添加回写指标』按钮 可添加多个回写指标>>
+            </span>
+            <button type="button" class="layui-btn " id="addListFiled"><i class="fa fa-plus"></i>添加回写指标</button>
+        </div>
+        <div class="layui-form-item">
+            <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+        </div>
+    </fieldset>
+    <br />
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">筛选条件</legend>
+        <div class="layui-form-item">
+            <label class="layui-form-label">连 接</label>
+            <div class="layui-input-inline">
+                <select name="linkstr" id="linkstr">
+                    <option value=""></option>
+                    <option value=" AND "> 并且 ( AND )</option>
+                    <option value=" OR "> 或者 ( OR )</option>
+                </select>
+            </div>
+            <label class="layui-form-label">判 断</label>
+            <div class="layui-input-inline">
+                <select name="judge" id="judge">
+                    <option value="=">等于</option>
+                    <option value=">">大于</option>
+                    <option value=">=">大于等于</option>
+                    <option value="<">小于</option>
+                    <option value="<=">小于等于</option>
+                    <option value="<>">不等于</option>
+                    <option value="like">包含</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">字 段</label>
+            <div class="layui-input-block">
+                <select id="ConditionFiled" name="ConditionFiled">
+                    <option value="">==请选择 需先选择取值数据表==</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">值</label>
+            <div class="layui-input-inline">
+                <input type="text" name="valuekey" id="valuekey" placeholder="输入或选择" class="layui-input">
+                <span style="position: absolute;top: 0px; left: 0px;">
+                    <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="输入或选择，控件值表达式为tb_name.indexid.Value（区分大小写），其中tb_name为数据表名称，indexid指标编码，Value值不可少，代表录入表tb_name中的指标indexid值" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-inline">
+                <button type="button" class="layui-btn layui-btn-primary" id="selectvalue"><i class="fa fa-check"></i>选择</button>
+            </div>
+            <div class="layui-inline">
+                <button type="button" class="layui-btn" id="addvalue"><i class="fa fa-plus"></i>添加筛选条件</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+
+            <div class="layui-input-block" style="margin-left:5px;">
+                <textarea class="layui-textarea" id="WhereStr" name="WhereStr"></textarea>
+                <span style="position: absolute;top: 0px; left: 0px;">
+                    <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipsWhereStr"></i>
+                </span>
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">备 注</legend>
+        <div class="layui-input-block" style="margin-left:5px;">
+            <textarea class="layui-textarea" id="RelationBy" name="RelationBy"></textarea>
+        </div>
+    </fieldset>
+    <br />
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编辑数据回写</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "layer"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.val("formUser", {
+            "RelationName": "@Model.RelationName"
+            , "RelationSort": "@Model.RelationSort"
+            , "WriteTbName": "@Model.FromTbName"
+            , "WhereStr": "@Html.Raw(@Model.WhereStr)"
+            , "RelationSort": "@Model.RelationSort"
+            , "RelationBy": "@Model.RelationBy"
+        });
+
+        formValExa();
+
+        function formValExa() {
+
+            $('#tipsWhereStr').attr("lay-tips", GetTips($('#WhereStr').val()));
+
+            $('#FlowPrcs_Exa').val('@Model.FlowPrcs_Exa');
+            $('input[name=FlowPrcs]').each(function () {
+                if ($('#FlowPrcs_Exa').val().indexOf('#' + $(this).val() + '#') != -1) {
+                    $(this).prop('checked', true);
+                }
+            });
+
+            if (@Model.NumberType == "1") {
+                $('#NumberType').attr("checked", true);
+            }
+            else {
+                $("#NumberType").removeAttr("checked");
+            }
+        }
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbRelation/GetFiledWrite?guid=" + $("#Guid").val() + "&writetbid=" + $("#WriteTbId").val() + "&id=" + $("#id").val(),
+            page: false,
+            method: "POST",
+            cols: [[
+                { field: "Info1", title: "@ViewBag.tbname" + "-回写指标", templet: '<span><i class="layui-icon layui-icon-about" lay-tips={{d.Info2}} data-offset="4" ></i><span>{{d.Info1}}</span></span>' },
+                { title: "<span>=</span>", templet: '<span>=</span>', width: 40 },
+                { field: "Info3", title: "回写表达式", templet: '<span><i class="layui-icon layui-icon-about" lay-tips={{d.Info4}} data-offset="4" ></i><span>{{d.Info3}}</span></span>' },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        //适用范围 多选
+        form.on('checkbox(FlowPrcs)', function (data) {
+            var arr_FlowPrcs = [];
+            $('input[name=FlowPrcs]:checked').each(function () {
+                arr_FlowPrcs.push($(this).val());
+            });
+            var _FlowPrcs = "#";
+            for (const elem of arr_FlowPrcs) {
+                _FlowPrcs = _FlowPrcs + elem + "#";
+            }
+            if (_FlowPrcs == "#") {
+                _FlowPrcs = '';
+            }
+            $('#FlowPrcs_Exa').val(_FlowPrcs);
+            return false;
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.id);
+                    break;
+            }
+        });
+
+        GetFieldList($("#WriteTbId").val());
+
+        form.on('select(WriteTbId)', function (data) {
+            GetFieldList(data.value);
+        })
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbRelation/EditWrite", "post", { model: data.field, id: $("#id").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbRelation/GetListByType?type=31&tbid=" + $(window.parent.document).find("#tbid").val() });
+
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#selectvalue').on('click', function () {
+            exLayer.openMiddle('选择', '/SysTable/TbRelation/SelectValue?tbid=' + $("#tbid").val(), '500px', '450px', layui.device().mobile);
+        });
+
+        //回写表达式
+        $('#selExpression').on('click', function () {
+            exLayer.open("回写表达式", "/SysTable/TbRelation/PUFormula?tbid=" + $("#tbid").val() + "&some=" + $("#Expression").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $('#addListFiled').on('click', function () {
+            var _value = $("#WriteField").val();
+            var _value2 = $("#Expression").val();
+
+            if (_value == '' || _value == null) {
+                exLayer.yellowSighMsg("请输入回写指标");
+                return false;
+            }
+            if (_value2 == '') {
+                exLayer.yellowSighMsg("请输入表达式");
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/TbRelation/AddFiledWrite", "post", { guid: $("#Guid").val(), id: $("#id").val(), value: _value, value2: _value2 }, true).done(function (response) {
+                exUtils.tableSuccessMsg(response.message);
+                ThisTable.reload({
+                    url: "/SysTable/TbRelation/GetFiledWrite?guid=" + $("#Guid").val() + "&writetbid=" + $("#WriteTbId").val() + "&id=" + $("#id").val()
+                });
+                $("#Expression").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        $('#addvalue').on('click', function () {
+            var _old = $("#WhereStr").val();
+            var _new = _old + ' ' + $("#linkstr").val() + ' ' + $("#ConditionFiled").val() + ' ' + $("#judge").val() + ' ' + $("#valuekey").val();
+            $("#WhereStr").val(_new);
+            $("#valuekey").val('');
+            $('#tipsWhereStr').attr("lay-tips", GetTips($('#WhereStr').val()));
+        });
+
+        function GetFieldList(id) {
+            GetSelectValueFieldByTb(id);
+            GetConditionFieldListByTb(id);
+        }
+
+        function GetSelectValueFieldByTb(id) {
+            var controlid = "#WriteField";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbRelation/GetSelectValueFieldByTb", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();
+            });
+        }
+
+        function GetConditionFieldListByTb(id) {
+            var controlid = "#ConditionFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/TbRelation/GetConditionFieldList", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        function del(id) {
+            exUtils.ajax("/SysTable/TbRelation/DeleteWriteFiled", "get", { id: id, guid: $("#Guid").val() }, true).done(function (response) {
+                ThisTable.reload({
+                    url: "/SysTable/TbRelation/GetFiledWrite?guid=" + $("#Guid").val() + "&writetbid=" + $("#WriteTbId").val() + "&id=" + $("#id").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        $(document).on("mouseenter", "#_tips", function () {
+            var remind = GetTips($('#Expression').val());
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "#_tips", function () {
+            layer.closeAll("tips");
+        });
+
+        $(document).on("mouseenter", "#tipsWhereStr", function () {
+            var remind = GetTips($('#WhereStr').val());
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "#tipsWhereStr", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del"><i class="fa fa-close"></i></a>
+</script>

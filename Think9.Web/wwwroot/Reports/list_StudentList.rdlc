@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="dbXML">
+      <ConnectionProperties>
+        <DataProvider>System.Data.DataSet</DataProvider>
+        <ConnectString>/* Local Connection */</ConnectString>
+      </ConnectionProperties>
+      <rd:DataSourceID>3757f814-1324-40a1-887d-c0806cda7767</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="dbGrid">
+      <Fields>
+			<Field Name="inCoding"><DataField>inCoding</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inName"><DataField>inName</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inRemarks"><DataField>inRemarks</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+        <Field Name="listid">
+          <DataField>listid</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="RunName">
+          <DataField>RunName</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="CreateUser">
+          <DataField>CreateUser</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+		 <Field Name="Url">
+          <DataField>Url</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+         <Field Name="DetailLink">
+          <DataField>DetailLink</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>dbXML</DataSourceName>
+        <CommandText>/* Local Query */</CommandText>
+      </Query>
+    </DataSet>
+  </DataSets>
+<ReportSections>
+ <ReportSection>
+  <Body>
+    <ReportItems>
+      <Tablix Name="table1">
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn> <Width>5cm</Width> </TablixColumn>
+            <TablixColumn> <Width>2cm</Width> </TablixColumn>
+            <TablixColumn> <Width>4.50cm</Width> </TablixColumn>
+            <TablixColumn> <Width>4.50cm</Width> </TablixColumn>
+            <TablixColumn> <Width>4.50cm</Width> </TablixColumn>
+          </TablixColumns>
+          <TablixRows>
+            <TablixRow>
+              <Height>1cm</Height>
+                <TablixCells>
+                  <TablixCell> <CellContents> <Textbox Name="Textbox2"><CanGrow>true</CanGrow><UserSort><SortExpression>=Fields!RunName.Value</SortExpression></UserSort><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>名称{点击查看详细}</Value> <Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun></TextRuns> <Style><TextAlign>Center</TextAlign></Style></Paragraph> </Paragraphs><rd:DefaultName>Textbox2</rd:DefaultName><Style><Border> <Color>LightGrey</Color> <Style>Solid</Style> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style> </Textbox></CellContents></TablixCell>
+                  <TablixCell> <CellContents> <Textbox Name="Textbox3"><CanGrow>true</CanGrow><UserSort><SortExpression>=Fields!CreateUser.Value</SortExpression></UserSort><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>发起人</Value><Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun></TextRuns> <Style><TextAlign>Center</TextAlign></Style></Paragraph> </Paragraphs><rd:DefaultName>Textbox3</rd:DefaultName><Style><Border> <Color>LightGrey</Color> <Style>Solid</Style> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style> </Textbox></CellContents></TablixCell>
+                  <TablixCell> <CellContents> <Textbox Name="Text1"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>编码</Value><Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun></TextRuns> <Style><TextAlign>Center</TextAlign></Style></Paragraph> </Paragraphs><rd:DefaultName>Text1</rd:DefaultName><Style><Border> <Color>LightGrey</Color> <Style>Solid</Style> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style> </Textbox></CellContents></TablixCell>
+                  <TablixCell> <CellContents> <Textbox Name="Text2"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>名称</Value><Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun></TextRuns> <Style><TextAlign>Center</TextAlign></Style></Paragraph> </Paragraphs><rd:DefaultName>Text2</rd:DefaultName><Style><Border> <Color>LightGrey</Color> <Style>Solid</Style> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style> </Textbox></CellContents></TablixCell>
+                  <TablixCell> <CellContents> <Textbox Name="Text3"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>备注</Value><Style><FontFamily>微软雅黑 Light</FontFamily></Style></TextRun></TextRuns> <Style><TextAlign>Center</TextAlign></Style></Paragraph> </Paragraphs><rd:DefaultName>Text3</rd:DefaultName><Style><Border> <Color>LightGrey</Color> <Style>Solid</Style> </Border><VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style> </Textbox></CellContents></TablixCell>
+                </TablixCells>
+              </TablixRow>
+            <TablixRow>
+              <Height>0.45497in</Height>
+                <TablixCells>
+                   <TablixCell><CellContents><Textbox Name="RunName"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!RunName.Value</Value><Style><TextDecoration>Underline</TextDecoration><Color>Blue</Color></Style> </TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style> </Paragraph></Paragraphs><rd:DefaultName>RunName</rd:DefaultName><ActionInfo><Actions><Action><Hyperlink>=Fields!DetailLink.Value</Hyperlink></Action></Actions></ActionInfo><Style><Border><Color>LightGrey</Color><Style>Solid</Style> </Border> <VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents> </TablixCell>
+                    <TablixCell><CellContents><Textbox Name="CreateUser"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!CreateUser.Value</Value><Style /> </TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style> </Paragraph></Paragraphs><rd:DefaultName>CreateUser</rd:DefaultName><Style><Border><Color>LightGrey</Color><Style>Solid</Style> </Border> <VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents> </TablixCell>
+                  <TablixCell><CellContents><Textbox Name="col1"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!inCoding.Value</Value><Style /> </TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style> </Paragraph></Paragraphs><rd:DefaultName>col1</rd:DefaultName><Style><Border><Color>LightGrey</Color><Style>Solid</Style> </Border> <VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents> </TablixCell>
+                  <TablixCell><CellContents><Textbox Name="col2"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!inName.Value</Value><Style /> </TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style> </Paragraph></Paragraphs><rd:DefaultName>col2</rd:DefaultName><Style><Border><Color>LightGrey</Color><Style>Solid</Style> </Border> <VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents> </TablixCell>
+                  <TablixCell><CellContents><Textbox Name="col3"><CanGrow>true</CanGrow><KeepTogether>true</KeepTogether><Paragraphs><Paragraph><TextRuns><TextRun><Value>=Fields!inRemarks.Value</Value><Style /> </TextRun></TextRuns><Style><TextAlign>Center</TextAlign></Style> </Paragraph></Paragraphs><rd:DefaultName>col3</rd:DefaultName><Style><Border><Color>LightGrey</Color><Style>Solid</Style> </Border> <VerticalAlign>Middle</VerticalAlign><PaddingLeft>2pt</PaddingLeft><PaddingRight>2pt</PaddingRight><PaddingTop>2pt</PaddingTop><PaddingBottom>2pt</PaddingBottom></Style></Textbox></CellContents> </TablixCell>
+                </TablixCells>
+              </TablixRow>
+            </TablixRows>
+        </TablixBody>
+        <TablixColumnHierarchy>
+            <TablixMembers>
+              <TablixMember />
+              <TablixMember />
+              <TablixMember />
+              <TablixMember />
+              <TablixMember />
+            </TablixMembers>
+        </TablixColumnHierarchy>
+        <TablixRowHierarchy> <TablixMembers> <TablixMember><KeepWithGroup>After</KeepWithGroup> </TablixMember><TablixMember><Group Name="详细信息" /> </TablixMember> </TablixMembers> </TablixRowHierarchy>
+        <DataSetName>dbGrid</DataSetName>
+        <Top>0cm</Top>
+        <Height>0.8cm</Height>
+        <Width>65.00cm</Width>
+        <Style><Border><Style>None</Style></Border></Style>
+       </Tablix>
+     </ReportItems>
+     <Height>4.18479cm</Height>
+     <Style><Border /> </Style>
+  </Body>
+  <Width>67.00cm</Width>
+  <Page> <PageHeight>29.7cm</PageHeight><LeftMargin>0.5cm</LeftMargin><RightMargin>0.5cm</RightMargin><TopMargin>1.5cm</TopMargin><BottomMargin>1.5cm</BottomMargin><Style /> </Page>
+ </ReportSection>
+</ReportSections>
+  <Language>zh-CN</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportID>394de33b-7d3d-468f-9523-e5260d491b6d</rd:ReportID>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+ </Report>

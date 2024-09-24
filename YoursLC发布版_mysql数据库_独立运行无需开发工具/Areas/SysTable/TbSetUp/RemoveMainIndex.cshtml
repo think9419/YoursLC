@@ -1,0 +1,337 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Add"; Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" style="padding-top: 10px;">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <fieldset class="table-fieldset" id="searchfield" style="display:none">
+        <legend style="color:darkgrey">快速查询</legend>
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline"  style="width:150px">
+                    @Html.DropDownList("IndexSortID", (IEnumerable<SelectListItem>)ViewBag.IndexSortList, "==所有分类==", new Dictionary<string, object> { })
+                </div>
+                <div class="layui-inline"  style="width:150px">
+                    <select id="IndexDataType" name="IndexDataType" lay-filter="IndexDataType">
+                        @foreach (IndexDtaeTypeEntity item in ((List
+                        <IndexDtaeTypeEntity>)ViewBag.DtaeTypeList))
+                        {
+                            <option value="@item.TypeId">@item.TypeName</option>
+                        }
+                    </select>
+                </div>
+                <div class="layui-inline"  style="width:100px">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button>
+                    <button type="button" class="layui-btn layui-btn-primary" title="新建录入指标" id="add_index"><i class="layui-icon layui-icon-add-1"></i></button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <div class="layui-row">
+        <div class="layui-col-md5">
+            <table class="layui-hide" id="lefttable" lay-filter="tableFilter"></table>
+        </div>
+        <div style="text-align: center; vertical-align: middle; ">
+            <div class="layui-col-md2" style="padding-top: 100px; " id="divBut">
+                <button type="button" class="layui-btn" id="addindex">
+                    添加&nbsp;<i class=" fa fa-angle-double-right
+fa-angle-"></i>
+                </button><br /><br />
+                <button type="button" class="layui-btn layui-btn-danger" id="delindex"><i class="fa fa-angle-double-left"></i>&nbsp;移除</button>
+            </div>
+        </div>
+        <div class="layui-col-md5">
+            <table class="layui-hide" id="righttable" lay-filter="tableFilter"></table>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let $ = layui.$;
+
+        //指标查询
+        $("#search").click(function () {
+            var ishow = 'n';
+            LeftTable.reload({
+                where: {
+                    key: $("#key").val(),
+                    sort: $("#IndexSortID").val(),
+                    type: $("#IndexDataType").val(),
+                    tbid: $("#tbid").val(),
+                    show: ishow
+                }
+            });
+            return false;
+        });
+
+        //指标新增
+        $("#add_index").click(function () {
+            exLayer.openMiddle("新建录入指标", "/SysTable/IndexBasic/Add", '500px', '450px', layui.device().mobile);
+        });
+
+        //添加指标
+        $("#addindex").click(function () {
+            layui.cache = {};//缓存清理 20240827
+            var checkStatus = table.checkStatus('lefttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) { //o即为表格中一行的数据
+                ids.push(o.IndexId);
+            });
+            if (ids.length < 1) {
+                layer.msg('无选中项');
+                return false;
+            }
+            ids = ids.join(",");
+            layer.confirm('确定要添加指标吗？', function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/AddTbIndexByStr", "post", {
+                    tbid: $("#tbid").val(),
+                    si: ids
+                }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        RightTable.reload({
+                            where: {
+                                tbid: $("#tbid").val()
+                            }
+                        });
+
+                        $("input[type='checkbox'][name='layTableCheckbox']").prop('checked', false);
+                        form.render("checkbox");
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+            return false;
+        });
+
+        //移除指标
+        $("#delindex").click(function () {
+            var checkStatus = table.checkStatus('righttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) { //o即为表格中一行的数据
+                ids.push(o.IndexId);
+            });
+            if (ids.length < 1) {
+                layer.msg('无选中项');
+                return false;
+            }
+            ids = ids.join(",");
+            layer.confirm("<span style='color: red;'>此操作将数据表对应字段移除，该字段的数据会被删除，并且不可恢复，确定要移除指标吗？</span>", function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexByStr", "post", {
+                    tbid: $("#tbid").val(),
+                    si: ids
+                }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        RightTable.reload({
+                            where: {
+                                tbid: $("#tbid").val()
+                            }
+                        });
+                    });
+                    layui.cache = {};//缓存清理 20240827
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            });
+            return false;
+        });
+
+        let LeftTable = table.render({
+            elem: "#lefttable",
+            url: "/SysTable/IndexBasic/GetIndexListBySearch?key=" + $("#key").val() + "&sort=" + $("#IndexSortID").val() + "&type=" + $("#IndexDataType").val(),
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, 'filter'],
+            toolbar: "#toolbarTpl",
+            height: layui.device().mobile ? 220 : 312,
+            limits: [10, 50, 100, 200, 500],
+            limit: 10,
+            page: true,
+            method: "post",
+            cols: [
+                [{
+                    type: "checkbox", fixed: 'left'
+                },
+                {
+                    type: "numbers",
+                    title: "NO.", fixed: 'left'
+                },
+                {
+                    field: "IndexId",
+                    title: "编码",
+                    width: 150,
+                    sort: true
+                },
+                {
+                    field: "IndexName",
+                    title: "名称",
+                    width: 150,
+                    sort: true
+                },
+                {
+                    field: "DataTypeName",
+                    title: "类型",
+                    sort: true,
+                    templet: "#DataType",
+                    width: layui.device().mobile ? 200 : null
+                },
+                {
+                    field: "UpdateTime",
+                    title: "最后修改",
+                    sort: true,
+                    width:  150
+                }
+                ]
+            ],
+            done: function (res, curr, count) {
+            }
+        });
+
+        let RightTable = table.render({
+            elem: "#righttable",
+            url: "/SysTable/TbSetUp/GetTbIndexList?tbid=" + $("#tbid").val(),
+            defaultToolbar: [],
+            toolbar: "#toolbarTp2",
+            height: layui.device().mobile ? 220 : 312,
+            limits: [200],
+            limit: 200,
+            page: true,
+            method: "post",
+            cols: [
+                [{
+                    type: "checkbox", fixed: 'left'
+                },
+                {
+                    type: "numbers",
+                    title: "NO.", fixed: 'left'
+                },
+                {
+                    field: "IndexId",
+                    title: "编码",
+                    width: 150,
+                    sort: true
+                },
+                {
+                    field: "IndexName",
+                    title: "名称",
+                    width: 150,
+                    sort: true
+                },
+                {
+                    field: "DataTypeName",
+                    title: "类型",
+                    width: layui.device().mobile ? 200 : null
+                }
+                ]
+            ],
+            done: function (res, curr, count) {
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add_index":
+                    exLayer.openMiddle("新建录入指标", "/SysTable/IndexBasic/Add", '500px', '450px', layui.device().mobile);
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                var ishow = 'n';
+                LeftTable.reload({
+                    where: {
+                        key: $("#key").val(),
+                        sort: $("#IndexSortID").val(),
+                        type: $("#IndexDataType").val(),
+                        tbid: $("#tbid").val(),
+                        show: ishow
+                    }
+                });
+                return false;
+            }
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#divBut").attr("style", "text-align: center; ");
+                $("#addindex").html('从待选项中添加');
+                $("#delindex").html('从已选项中移除');
+            }
+        });
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="DataType">
+    {{# if(d.IndexDataType == '1000'){ }}
+    <span>日期</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2000'){ }}
+    <span>字符(不限定长度)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2010'){ }}
+    <span>字符(长度10以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2030'){ }}
+    <span>字符(长度30以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2100'){ }}
+    <span>字符(长度100以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2200'){ }}
+    <span>字符(长度200以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '2500'){ }}
+    <span>字符(长度500以内)</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3000'){ }}
+    <span>整数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3002'){ }}
+    <span>2位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3004'){ }}
+    <span>4位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3006'){ }}
+    <span>6位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3102'){ }}
+    <span>金额</span> {{# } }}
+
+    {{# if(d.IndexDataType == '5200'){ }}
+    <span>图片</span> {{# } }}
+
+    {{# if(d.IndexDataType == '4100'){ }}
+    <span>附件</span> {{# } }}
+</script>
+<script type="text/html" id="toolbarTpl">
+    <span>待选项</span>
+</script>
+<script type="text/html" id="toolbarTp2">
+    <span>已选项</span>
+</script>

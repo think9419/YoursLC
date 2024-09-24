@@ -1,0 +1,10 @@
+D:\AAA_Yourslc\Think9.ExtApi\bin\x86\Debug\netcoreapp3.1\Think9.ExtApi.deps.json
+D:\AAA_Yourslc\Think9.ExtApi\bin\x86\Debug\netcoreapp3.1\Think9.ExtApi.dll
+D:\AAA_Yourslc\Think9.ExtApi\bin\x86\Debug\netcoreapp3.1\Think9.ExtApi.pdb
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.csproj.AssemblyReference.cache
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.GeneratedMSBuildEditorConfig.editorconfig
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.AssemblyInfoInputs.cache
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.AssemblyInfo.cs
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.csproj.CoreCompileInputs.cache
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.dll
+D:\AAA_Yourslc\Think9.ExtApi\obj\x86\Debug\netcoreapp3.1\Think9.ExtApi.pdb

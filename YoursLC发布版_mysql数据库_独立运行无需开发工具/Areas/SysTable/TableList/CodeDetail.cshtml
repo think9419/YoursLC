@@ -1,0 +1,41 @@
+﻿<!doctype html>
+
+<title></title>
+<meta charset="utf-8" />
+
+<link rel="stylesheet" href="~/codemirror/theme/dracula.css" />
+<link rel="stylesheet" href="~/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="~/codemirror/addon/hint/show-hint.css">
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script type="module" src="~/codemirror/lib/codemirror.js"></script>
+
+<article>
+    <h2></h2>
+    <form class="layui-form layui-form-pane" action="">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12">
+                @ViewBag.Path
+            </div>
+        </div>
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12">
+                <textarea id="code" name="code">@ViewBag.Details</textarea>
+            </div>
+        </div>
+    </form>
+    <script type="module">
+        CodeMirror.commands.autocomplete = function (cm) {
+            cm.showHint({ hint: CodeMirror.hint.anyword });
+        }
+        var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+            lineNumbers: true,
+            mode: "text/x-csharp",
+            theme: "dracula",	//设置主题
+            lineWrapping: true,	//代码折叠
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            matchBrackets: true,	//括号匹配
+            extraKeys: { "Ctrl-Space": "autocomplete" }
+        });
+    </script>
+</article>

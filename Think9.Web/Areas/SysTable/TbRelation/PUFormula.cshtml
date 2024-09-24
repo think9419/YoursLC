@@ -1,0 +1,219 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<input style="display:none" id="formid" value="@ViewBag.formid">
+
+<form class="layui-form" action="" id="_formid">
+    <div class="layui-form-item">
+        <div class="layui-block">
+            <textarea class='layui-textarea' id='formula' name='formula' placeholder='校验式由指标值、SQL函数、四则运算符(加减乘除及括号)、数字组成'>@ViewBag.some</textarea>
+            <span style="position: absolute;top: 15px; left: 20px;">
+                <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="" data-offset="4" id="tipsFormula"></i>
+            </span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+        </div>
+        <div class="layui-inline">
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn01">加+</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn02">减-</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn03">乘*</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn04">除/</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn05">括号(</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn06">括号)</a>
+            &nbsp;&nbsp;&nbsp;
+            <sapn style="color:darkgrey">
+                当前用户<i class="fa fa fa-angle-double-right"></i>
+            </sapn>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn11">真实姓名</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn12">登录名</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn13">单位(部门)编码</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn14">单位(部门)名称</a>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="OK">确 定</button>
+        </div>
+    </div>
+</form>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "element"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        form.render();
+
+        $('#tipsFormula').attr("lay-tips", GetTips('@ViewBag.some'));
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+
+            url: "/SysTable/TbRelation/GetSelectIndexList?tbid=" + $("#FromTbId").val(),
+            method: "GET",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                , { field: "Value", title: "", hide: true }
+                , { field: "Text", title: "点击选择", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                $('th').hide();//表头隐藏的样式
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "select":
+                    addSelect(data.Value);
+                    break;
+            }
+        });
+
+        form.on('select(FromTbId)', function (data) {
+            ThisTable.reload({
+                url: "/SysTable/TbRelation/GetSelectIndexList?tbid=" + data.value
+            });
+            $("#FromTbId").val(data.value);
+        })
+
+        $('#btn01').on('click', function () {
+            addSelect(' 加 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn02').on('click', function () {
+            addSelect(' 减 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn03').on('click', function () {
+            addSelect(' 乘 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn04').on('click', function () {
+            addSelect(' 除 ');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn05').on('click', function () {
+            addSelect('(');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn06').on('click', function () {
+            addSelect(')');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+
+        $('#btn11').on('click', function () {
+            addSelect('@@currentUserName');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn12').on('click', function () {
+            addSelect('@@currentUserId');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn13').on('click', function () {
+            addSelect('@@currentDeptNo');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn14').on('click', function () {
+            addSelect('@@currentDeptName');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn15').on('click', function () {
+            addSelect('@@timeToday');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        $('#btn16').on('click', function () {
+            addSelect('@@systime');
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+        });
+        function addSelect(selectid) {
+            var some = $("#formula").val() + selectid;
+            $("#formula").val(some);
+            $('#tipsFormula').attr("lay-tips", GetTips($('#formula').val()));
+            document.body.scrollTop = document.documentElement.scrollTop = 0;
+        }
+
+        form.on("submit(OK)", function (data) {
+            var some = $("#formula").val();
+            $(window.parent.document).find("#Expression").val(some);
+            $(window.parent.document).find("#_tips").attr("lay-tips", GetTips(some));
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        });
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "#tipsFormula", function () {
+            var remind = GetTips($('#formula').val());
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "#tipsFormula", function () {
+            layer.closeAll("tips");
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <span> <a lay-event="select" id="select"> <span>{{d.Text}}</span></a></span>
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+            <span style="color: #FE7300;"><i class="fa fa-angle-double-down"></i>点击选择</span>
+    </div>
+    <div class="layui-inline">
+    </div>
+    <div class="layui-inline">
+        <select id="FromTbId" name="FromTbId" lay-filter="FromTbId">
+            <option value="">选择录入表</option>
+            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+            {
+                    <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </div>
+</script>

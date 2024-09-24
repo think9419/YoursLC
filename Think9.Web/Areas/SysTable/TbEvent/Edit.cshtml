@@ -1,0 +1,299 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbEventCustomizeEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="Id" value="@Model.Id">
+    <input style="display:none" id="tbid" value="@Model.TbId">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">事件类型</label>
+        <div class="layui-input-block">
+            <input type="text" name="EventId" id="EventId" autocomplete="off" class="layui-input" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="FullName" id="FullName" placeholder="请输入名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">执行类别</label>
+        <div id="IsRelationSort">
+            <div class="layui-input-inline">
+                <input type="radio" name="ExecuteType" value="1" title="执行sql" id="Sort_1" disabled>
+                <i class="layui-icon layui-icon-about" lay-tips="执行包含参数的sql语句，完成数据的新增、编辑、删除操作，其中@index表示取当前数据index字段的值" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+            <div class="layui-input-inline">
+                <input type="radio" name="ExecuteType" value="2" title="执行存储过程" id="Sort_2" disabled>
+                <i class="layui-icon layui-icon-about" lay-tips="执行已定义的存储过程，可为存储过程的参数传值" data-offset="4" style="margin-left: -20px;"></i>
+            </div>
+        </div>
+    </div>
+    <div id="div01">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">SQL语句</label>
+            <div class="layui-input-block">
+                <textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);height: 150px;padding: 10px;" class="layui-textarea" id="ExecuteSql" name="ExecuteSql" placeholder='自定义包含参数的SQL语句实现DELETE、INSERT、UPDATE操作，其中@index表示取当前数据index字段的值，点击下列按钮可设置操作'></textarea>
+                <span style="position: absolute;top: 0px; left: 0px;">
+                    <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipsSql"></i>
+                </span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-inline"><button type="button" class="layui-btn-primary layui-btn-sm" id="insert" style="color:#FE7300"><i class="fa fa-code"></i>Insert</button>&nbsp;<button type="button" class="layui-btn-primary layui-btn-sm" id="update" style="color:#FE7300"><i class="fa fa-code"></i>Update</button>&nbsp;<button type="button" class="layui-btn-primary layui-btn-sm" id="delete" style="color:#FE7300"><i class="fa fa-code"></i>Delete</button></div>
+        </div>
+    </div>
+    <div id="div02">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">存储过程</label>
+            <div class="layui-input-block">
+                <input type="text" name="ProcedureName" id="ProcedureName" placeholder="请输入要调用的存储过程名称" autocomplete="off" class="layui-input" maxlength="100">
+            </div>
+        </div>
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey">为存储过程参数传值</legend>
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select name="ParaType" id="ParaType">
+                        <option value="">请选择需传值的参数类型</option>
+                        <option value="string">string字符</option>
+                        <option value="int">int整数</option>
+                        <option value="decimal">decimal小数</option>
+                        <option value="DateTime">DateTime日期</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" name="ParaName" id="ParaName" placeholder="请输入需传值的参数名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" name="ParaValue" id="ParaValue" placeholder="请输入或选择参数值" autocomplete="off" class="layui-input">
+                    <span style="position: absolute;top: 0px; left: 0px;">
+                        <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="
+@@+指标编码表示从当前数据取该指标值" data-offset="4"></i>
+                    </span>
+                    <span style="position: absolute;bottom: 6px; right: 5px;">
+                        <a href="javascript:;">
+                            <i class="fa fa-check-square-o" id="selectValue"   lay-tips="
+选择指标值，从当前数据取值"></i>
+                        </a>
+                    </span>
+                </div>
+                <div class="layui-input-inline">
+                    <button type="button" class="layui-btn" id="addPara"><i class="fa fa-plus"></i>添加</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+        </fieldset>
+    </div>
+    <div class="layui-form-item"></div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="可执行多个，按照序号顺序执行" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" id="Remarks" name="Remarks" placeholder='请输入备注'></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "layer", "code"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        form.render(); //
+        formValExa();
+
+        form.val("formUser", {
+            "ExecuteSql": "@Html.Raw(@Model.ExecuteSql)",
+            "ProcedureName": "@Model.ProcedureName",
+            "OrderNo": "@Model.OrderNo",
+            "EventId": "@Model.EventId",
+            "FullName": "@Model.FullName",
+            "Remarks": "@Model.Remarks",
+            "ExecuteType": "@Model.ExecuteType",
+            "Id": "@Model.Id"
+        });
+        function formValExa() {
+            $("#div01").attr("style", "display:none;");
+            $("#div02").attr("style", "display:none;");
+            //执行存储过程
+            if (@Model.ExecuteType == '2') {
+                $("#div02").attr("style", "display:block;");
+            }
+            else {
+                $("#div01").attr("style", "display:block;");
+            }
+        }
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/SqlTemplet/GetParaList?frm=1&id=" + $("#Id").val(),
+            page: false,
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ParaType", title: "参数类型", width: 150 },
+                { field: "ParaName", title: "参数" },
+                { field: "ParaValue", title: "参数值" },
+                { title: "", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.Id);
+                    break;
+            }
+        });
+
+        //选择参数值
+        $('#selectValue').on('click', function () {
+            exLayer.openMiddle("", "/SysTable/SqlTemplet/SelectIndex?tbid=" + $("#tbid").val(), '600px', '400px', layui.device().mobile);
+        });
+
+        //添加参数值
+        $('#addPara').on('click', function () {
+            var _id = $("#Id").val();
+            var _name = $("#ParaName").val();
+            var _value = $("#ParaValue").val();
+            var _type = $("#ParaType").val();
+
+            if (_name == '') {
+                exLayer.yellowSighMsg("请输入参数名称");
+                return false;
+            }
+            if (_value == '') {
+                exLayer.yellowSighMsg("请选择或输入参数值");
+                return false;
+            }
+            if (_type == '') {
+                exLayer.yellowSighMsg("请选择参数类型");
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/SqlTemplet/AddPara", "post", { tbid: $("#tbid").val(), id: _id, name: _name, value: _value, type: _type }, true).done(function (response) {
+                exUtils.tableSuccessMsg(response.message);
+                $("#ParaName").val('');
+                $("#ParaValue").val('');
+                ThisTable.reload({
+                    url: "/SysTable/SqlTemplet/GetParaList?frm=1&id=" + $("#Id").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbEvent/Edit", "post", { model: data.field, id: $("#Id").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbEvent/GetList?tbid=" + $(window.parent.document).find('#tbid').val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function del(id) {
+            exUtils.ajax("/SysTable/SqlTemplet/DeletePara", "get", { id: id }, true).done(function (response) {
+                ThisTable.reload({
+                    url: "/SysTable/SqlTemplet/GetParaList?frm=1&id=" + $("#Id").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        $("#insert").click(function () {
+            exLayer.openMiddle("", "/SysTable/SqlTemplet/TempletInsert?tbid=" + $("#tbid").val(), '600px', '400px', layui.device().mobile);
+        });
+
+        $("#update").click(function () {
+            exLayer.openMiddle("", "/SysTable/SqlTemplet/TempletUpdate?tbid=" + $("#tbid").val(), '600px', '400px', layui.device().mobile);
+        });
+
+        $("#delete").click(function () {
+            exLayer.openMiddle("", "/SysTable/SqlTemplet/TempletDelete?tbid=" + $("#tbid").val(), '600px', '400px', layui.device().mobile);
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "#tipsSql", function () {
+            var remind = GetTips($('#ExecuteSql').val());
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "#tipsSql", function () {
+            layer.closeAll("tips");
+        });
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $(".layui-inline").attr('class', 'layui-input-inline');
+            }
+            $('#tipsSql').attr("lay-tips", GetTips($('#ExecuteSql').val()));
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del"><i class="fa fa-close"></i></a>
+</script>

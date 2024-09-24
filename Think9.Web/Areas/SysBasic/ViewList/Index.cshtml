@@ -1,0 +1,66 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+<blockquote class="layui-elem-quote layui-text">
+    『已定义视图』可作为单列选择、多列选择的数据源，可创建从『已定义视图』取数的『数据读取』，『统计指标』可从『以定义视图』取数...
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysBasic/ViewList/GetList",
+
+            cols: [[
+                { field: "Value", title: "名称", sort: true },
+                { field: "Text", title: "创建时间", sort: true }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+
+            }
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysBasic/ViewList/GetList"
+            });
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+
+</script>

@@ -1,0 +1,202 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<blockquote class="layui-elem-quote layui-text">
+    启动『发布模式』无需替换代码也能按照最新设置运行程序；启动『发布模式』链接路径由『表编码(去前缀)』自动修改为『_RP?rpid=表编码』，Views文件夹中cshtml文件中的『/表编码(去前缀)/』自动修改为『/_RP/』<br>
+    『启动调式模式』可使用调式代码功能；启动『调试模式』链接路径由『_RP?rpid=表编码』自动修改为『表编码(去前缀)』，Views文件夹中cshtml文件中的『/_RP/』自动修改为『/表编码(去前缀)/』<br>
+    未建立菜单或者链接路径录入错误不能正确切换
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    @Html.DropDownList("SortID", (IEnumerable<SelectListItem>)ViewBag.SortList, "==所有分类==", new Dictionary<string, object> { })
+                </div>
+                <div class="layui-inline">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search'><i class='layui-icon layui-icon-search'></i></button> <button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+        form.render();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/Report/GetReportListOnlyModel",
+            toolbar: "#toolbarTpl",
+            page: false,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ReportId", title: "编码", sort: true },
+                { field: "ReportName", title: "名称", sort: true },
+                { field: "Model", title: "模式", width: 120, templet: '#switchModel', unresize: true, sort: true }
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "searchShow":
+                    searchShow();
+                    break;
+                case "modelDebug"://
+                    modelDebug();
+                    break;
+                case "modelRelease"://
+                    modelRelease();
+                    break;
+                case "refresh":
+                    $("#searchfield").hide();
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportListOnlyModel?key=" + $("#key").val() + "&sortid=" + $("#SortID").val()
+                    });
+                    break;
+            }
+        });
+
+        //监听切换按钮
+        form.on('switch(stateModel)', function (data) {
+            var tbid = this.value;
+            var isRelease = "";
+            if (data.elem.checked) {
+                isRelease = "release";
+            }
+            exUtils.ajax("/SysStats/Report/ChangeModel?idsStr=" + tbid + "&isRelease=" + isRelease, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportListOnlyModel"
+                    });
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        form.on("submit(search)", function (data) {
+            $("#searchfield").hide();
+            ThisTable.reload({
+                url: "/SysStats/Report/GetReportListOnlyModel?key=" + $("#key").val() + "&sortid=" + $("#SortID").val()
+            });
+            return false;
+        });
+
+        function modelRelease() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+            }
+            if (idsStr) {
+                exUtils.ajax("/SysStats/Report/ChangeModel", "post", { idsStr: idsStr, isRelease: 'release' }, true).done(function (response) {
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportListOnlyModel"
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+
+        function modelDebug() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ReportId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+            }
+            if (idsStr) {
+                exUtils.ajax("/SysStats/Report/ChangeModel", "post", { idsStr: idsStr, isRelease: '' }, true).done(function (response) {
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetReportListOnlyModel"
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="modelRelease" id="modelRelease"><i class="layui-icon layui-icon-upload"></i>启动发布模式</button>
+        <button class="layui-btn layui-btn-warm layui-btn-sm" lay-event="modelDebug" id="modelDebug"><i class="fa fa-terminal"></i>启动调试模式</button>
+    </div>
+    <div class="layui-inline">
+        <span class="layui-word-aux"></span>
+    </div>
+</script>
+<script type="text/html" id="switchModel">
+    <div class='layui-input-inline'>
+        <span>{{d.Model}}</span>
+    </div>
+</script>

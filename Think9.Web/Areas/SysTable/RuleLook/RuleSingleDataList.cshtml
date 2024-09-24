@@ -1,0 +1,42 @@
+﻿@*YoursLc有源低代码 http://yourslc.top Create:admin 2022-09-23 19:26:35 弹出选择树-此文件放置于Views/Demo11/中*@
+
+@using Think9.Models;
+@{
+    ViewBag.Title = "单列选择数据预览 - 最多显示100条";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<input style="display:none" id="_id" value="@ViewBag.Id">
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/RuleLook/GetRuleSingleDataList?id=" + $('#_id').val(),
+            method: "POST",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' }
+                , { field: "info1", title: "Value" }
+                , { field: "info2", title: "Text" }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    $('th').hide();//表头隐藏的样式
+                    $('tr').css({ 'background-color': '#BCD2EE', 'color': 'RED' });//设置th颜色
+                    exLayer.redCryMsg("ERR");
+                }
+            }
+        });
+    });
+</script>

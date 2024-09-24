@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbRelation/GetList?tbid=" + $("#tbid").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            page: true,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { title: "类型", width: 150, templet: "#Type_Tp" },
+                { field: "RelationName", title: "名称" },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add1":
+                    add1();
+                    break;
+                case "add2":
+                    add2();
+                    break;
+                case "add3":
+                    add3();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.RelationId, data.RelationType);
+                    break;
+                case "del":
+                    del(data.RelationId);
+                    break;
+            }
+        });
+
+        function add1() {
+            exLayer.open("新建数据读取", "/SysTable/TbRelation/AddRead?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function add2() {
+            exUtils.ajax("/SysTable/TbRelation/BeforeAddTbRelation", "post", { tbid: $("#tbid").val() }, true).done(function (response) {
+                exLayer.open("新建子表数据初始化", "/SysTable/TbRelation/EditGridData?tbid=" + $("#tbid").val() + "&id=0", '100%', '100%', '0px', '0px', null, null);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function add3() {
+            exLayer.open("新建数据回写", "/SysTable/TbRelation/AddWrite?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(id, type) {
+            if (type == "11") {
+                exLayer.open("编辑数据读取", "/SysTable/TbRelation/EditRead?id=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+            if (type == "21") {
+                exLayer.open("编辑子表数据初始化", "/SysTable/TbRelation/EditGridData?id=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+            if (type == "31") {
+                exLayer.open("编辑数据回写", "/SysTable/TbRelation/EditWrite?id=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/TbRelation/Delete", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbRelation/GetList?tbid=" + $("#tbid").val()
+            });
+        }
+    });
+</script>
+
+<script type='text/html' id='Type_Tp'>
+    {{#  if(d.RelationType == '21'){ }}
+    <span>子表数据初始化</span>
+    {{#  } }}
+    {{#  if(d.RelationType == '11'){ }}
+    <span>数据读取</span>
+    {{#  } }}
+    {{#  if(d.RelationType == '31'){ }}
+    <span>数据回写</span>
+    {{#  } }}
+</script>
+
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add2" id="add2"><i class="fa fa-plus"></i>新建子表数据初始化</button>
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add1" id="add1"><i class="fa fa-plus"></i>新建数据读取</button>
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add3" id="add3"><i class="fa fa-plus"></i>新建数据回写</button>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+
+<script type='text/html' id='Tp02'>
+    {{#  if(d.isUse == "0"){ }}
+    <span>禁用</span>
+    {{#  }else{ }}
+    {{#  } }}
+</script>

@@ -1,0 +1,127 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="PrcsId" value="@ViewBag.Id">
+    <input style="display:none" id="fId" value="@ViewBag.FId">
+    <div class="layui-form-item">
+        <label class="layui-form-label" id="_select">选择</label>
+        <div class="layui-inline">
+            <select name="NextPrcsId" id="NextPrcsId" lay-filter="selectfilter">
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="NextOrder" id="NextOrder" placeholder="请输入序号" class="layui-input" lay-verify='required|integer'>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">添加至下一步骤</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" id="_case">转入条件</label>
+        <div class="layui-input-block">
+            <input style="display: none" name="NextPrcsInCase" id="NextPrcsInCase">
+            <textarea placeholder="转入条件...建设中..." value="" name="NextPrcsInCaseShow" id="NextPrcsInCaseShow" class="layui-textarea" readonly="readonly"></textarea>
+        </div>
+    </div>
+</form>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script src="~/js/lay-config.js?v=2.0.0" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysFlow/FlowPrcs/GetNextListById?id=" + $("#PrcsId").val() + "&fid=" + $("#fId").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO." },
+                { field: "NextPrcsName", title: "名称", width: 350 },
+                { field: "NextOrder", title: "序号", width: 100, align: "center" },
+                { field: "NextPrcsInCaseShow", title: "转入条件" },
+                { title: "操作", width: 80, align: "center", fixed: "right", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.Id);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.open("新建流程步骤", "/SysFlow/FlowPrcs/AddPrcs?id=" + $("#flowId").val() + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysFlow/FlowPrcs/GetNextListById?id=" + $("#PrcsId").val() + "&fid=" + $("#fId").val()
+            });
+        }
+
+        function del(id) {
+            exUtils.ajax("/SysFlow/FlowPrcs/DelNext?id=" + id, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        }
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysFlow/FlowPrcs/AddNext?id=" + $("#PrcsId").val(), "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#_select").text("");
+                $("#_case").text("");
+            }
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id="del">删除</a>
+</script>

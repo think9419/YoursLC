@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "UserPwd";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<head>
+    <meta charset="utf-8">
+    <title>修改密码</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+</head>
+<form class="layui-form changePwd">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="UserName" value="@ViewBag.UserName" disabled class="layui-input layui-disabled">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">旧密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="OldPassword" placeholder="请输入旧密码" lay-verify="required" class="layui-input pwd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="Password" placeholder="请输入新密码" lay-verify="required|pass" id="oldPwd" class="layui-input pwd">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="Repassword" placeholder="请确认密码" lay-verify="required|confirmPwd" class="layui-input pwd">
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align:center;">
+            <button type="button" class="layui-btn" lay-submit lay-filter="changePwd">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        //添加验证规则verify
+        form.verify({
+            pass: [
+                /^[\S]{6,16}$/
+                , '密码必须6到16位，且不能出现空格'
+            ],
+            confirmPwd: function (value, item) {
+                if ($("#oldPwd").val() != value) {
+                    return "两次输入密码不一致，请重新输入！";
+                }
+            }
+        });
+
+        //修改密码
+        form.on("submit(changePwd)", function (data) {
+            exUtils.ajax("/SysBasic/User/ModifyUserPwd", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    location.reload(); // 父页面刷新
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+        });
+    });
+</script>

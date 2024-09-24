@@ -1,0 +1,47 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:12
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:12
+	/// </summary>
+	 [Table("tb_ZeroDivisionException")]
+	public class ZeroDivisionExceptionModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 小数01
+		/// </summary>
+		public decimal? inXS01 { get; set; }
+		/// <summary>
+		/// 小数01 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS01_Exa { get; set; }
+		/// <summary>
+		/// 小数02
+		/// </summary>
+		public decimal? inXS02 { get; set; }
+		/// <summary>
+		/// 小数02 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS02_Exa { get; set; }
+		/// <summary>
+		/// 小数03
+		/// </summary>
+		public decimal? inXS03 { get; set; }
+		/// <summary>
+		/// 小数03 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS03_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

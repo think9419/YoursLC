@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>Think9.Base</id>
+    <version>1.0.0</version>
+    <authors>Think9.Base</authors>
+    <description>Package Description</description>
+    <dependencies>
+      <group targetFramework=".NETCoreApp3.1">
+        <dependency id="Think9.Repository" version="1.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="D:\A_Think9_NetCore_Y2021\Think9.Base\bin\x64\Release\netcoreapp3.1\win-x64\Think9.Base.dll" target="lib\netcoreapp3.1\Think9.Base.dll" />
+  </files>
+</package>

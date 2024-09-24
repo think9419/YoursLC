@@ -1,0 +1,72 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:00
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:00
+	/// </summary>
+	 [Table("tb_ReadSingleValue")]
+	public class ReadSingleValueModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 下拉选择
+		/// </summary>
+		public string inDropdownSelection { get; set; }
+		/// <summary>
+		/// 下拉选择 【附加】
+		/// </summary>
+		[Computed]
+		public string inDropdownSelection_Exa { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string inUnit { get; set; }
+		/// <summary>
+		/// 单位 【附加】
+		/// </summary>
+		[Computed]
+		public string inUnit_Exa { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? inUnitPrice { get; set; }
+		/// <summary>
+		/// 单价 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inUnitPrice_Exa { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		public string inSpecificationAndModel { get; set; }
+		/// <summary>
+		/// 类别
+		/// </summary>
+		public string inCategory { get; set; }
+		/// <summary>
+		/// 类别 【附加】
+		/// </summary>
+		[Computed]
+		public string inCategory_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

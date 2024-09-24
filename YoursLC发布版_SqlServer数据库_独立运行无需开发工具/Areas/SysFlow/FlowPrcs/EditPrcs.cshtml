@@ -1,0 +1,268 @@
+﻿@using Think9.Models;
+@model Think9.Models.FlowPrcsEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+<form class="layui-form" lay-filter="formUser">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属流程</label>
+        <div class="layui-input-block">
+            <input style="display:none" name="tbid" id="tbid" value="@ViewBag.tbid">
+            <input style="display: none" name="flowId" id="flowId" value="@ViewBag.flowId">
+            <input type="hidden" name="PrcsId" value="@Model.PrcsId">
+            <input type="text" name="FlowName" id="FlowName" class="layui-input" readonly="readonly" value="@ViewBag.name">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">步骤编码</label>
+        <div class="layui-input-inline">
+            <input type="text" name="PrcsNo" id="PrcsNo" placeholder="必填 " autocomplete="off" class="layui-input" readonly="readonly" maxlength="30">
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label required">步骤序号</label>
+            <div class="layui-input-block">
+                <input type="text" name="PrcsOrder" id="PrcsOrder" placeholder="必填 序号" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+            </div>
+        </div>
+        <div class="layui-input-inline">
+            <input type="hidden" name="isFirst" value="2">
+            <input type="checkbox" id="isFirst" name="isFirst" value="1" lay-filter="isFirst" title="新建步骤（即第1步）">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">步骤名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="PrcsName" id="PrcsName" placeholder="必填 步骤名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">可写字段</label>
+        <div class="layui-input-block">
+            <input style="display: none" name="PrcsIndex" id="PrcsIndex">
+            <textarea placeholder="可写字段" value="" name="PrcsIndex_Exa" id="PrcsIndex_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 6px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="PrcsIndex2">选择</i></a>
+                <a href="javascript:;"><i class="fa fa-check" id="allPrcsIndex">所有...</i></a>
+            </span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">保密字段</label>
+        <div class="layui-input-block">
+            <input style="display: none" name="HiddenIndex" id="HiddenIndex">
+            <textarea placeholder="保密字段是不可写字段，同时隐藏显示" value="" name="HiddenIndex_Exa" id="HiddenIndex_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 6px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="HiddenIndex2">选择</i></a>
+            </span>
+        </div>
+    </div>
+    <fieldset class="table-fieldset">
+        <legend style="color:darkgrey">授权范围由人员、单位及角色的合集确定，即满足人员、单位及角色其中一项便能办理</legend>
+        <div style="margin: 5px 5px 5px 5px">
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsUser" id="PrcsUser">
+                    <textarea placeholder="人员" value="" name="PrcsUser_Exa" id="PrcsUser_Exa" class="layui-textarea" readonly="readonly"></textarea>
+                    <span style="position: absolute;bottom: 6px; right: 5px;">
+                        <a href="javascript:;"><i class="fa fa-check-square-o" id="PrcsUser2">选择</i></a>
+                        <a href="javascript:;"><i class="fa fa-check" id="allPrcsUser">所有</i></a>
+                    </span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsDept" id="PrcsDept">
+                    <textarea placeholder="部门" value="" name="PrcsDept_Exa" id="PrcsDept_Exa" class="layui-textarea" readonly="readonly"></textarea>
+                    <span style="position: absolute;bottom: 6px; right: 5px;">
+                        <a href="javascript:;"><i class="fa fa-check-square-o" id="PrcsDept2">选择</i></a>
+                        <a href="javascript:;"> <i class="fa fa-check" id="allPrcsDept">所有</i></a>
+                    </span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <input style="display: none" name="PrcsPriv" id="PrcsPriv">
+                    <textarea placeholder="角色" value="" name="PrcsPriv_Exa" id="PrcsPriv_Exa" class="layui-textarea" readonly="readonly"></textarea>
+                    <span style="position: absolute;bottom: 6px; right: 5px;">
+                        <a href="javascript:;"><i class="fa fa-check-square-o" id="PrcsPriv2">选择</i></a>
+                        <a href="javascript:;"><i class="fa fa-check" id="allPrcsPriv">所有</i></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <div class="layui-form-item">
+        <label class="layui-form-label">回退选项</label>
+        <div class="layui-input-block">
+            <select name="AllowBack" id="AllowBack" lay-filter="AllowBack">
+                <option value='1'>不允许</option>
+                <option value='2'>允许回退上一步骤</option>
+                <option value='3'>允许回退之前步骤</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">附件权限</label>
+        <input style="display: none" name="BAttachment" id="BAttachment">
+        <div class="layui-input-block">
+            <input type="hidden" name="A1" value="2">
+            <input type="hidden" name="A2" value="2">
+            <input type="hidden" name="A3" value="2">
+            <input type="checkbox" id="A1" name="A1" value="1" lay-filter="A1" title="新建">
+            <input type="checkbox" id="A2" name="A2" value="1" lay-filter="A2" title="删除">
+            <input type="checkbox" id="A3" name="A3" value="1" lay-filter="A3" title="下载">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        getVal();
+        form.render(); //
+
+        //赋值
+        form.val("formUser", {
+            "PrcsNo": "@Model.PrcsNo",
+            "PrcsOrder": "@Model.PrcsOrder",
+            "PrcsName": "@Model.PrcsName",
+            "PrcsIndex": "@Model.PrcsIndex",
+            "PrcsIndex_Exa": "@Model.PrcsIndex_Exa",
+            "HiddenIndex": "@Model.HiddenIndex",
+            "HiddenIndex_Exa": "@Model.HiddenIndex_Exa",
+            "PrcsUser": "@Model.PrcsUser",
+            "PrcsUser_Exa": "@Model.PrcsUser_Exa",
+            "PrcsDept": "@Model.PrcsDept",
+            "PrcsDept_Exa": "@Model.PrcsDept_Exa",
+            "PrcsPriv": "@Model.PrcsPriv",
+            "AllowBack": "@Model.AllowBack",
+            "PrcsPriv_Exa": "@Model.PrcsPriv_Exa"
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysFlow/FlowPrcs/EditPrcs", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+                parent.layui.table.reload('tableId', { url: "/SysFlow/FlowPrcs/GetListByFId?id=" + $(window.parent.document).find("#flowId").val() });
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //所有可写字段
+        $('#allPrcsIndex').on('click', function () {
+            $('#PrcsIndex').val("#all#");
+            $('#PrcsIndex_Exa').val("所有");
+
+        });
+
+        $('#PrcsIndex2').on('click', function () {
+            exLayer.open("可写字段", "/Com/ComSelect/SelectIndexAndGridTb?fId=flowprcs01&tbid=" + $("#tbid").val() + "&sId=" + $("#PrcsIndex").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //保密字段
+        $('#HiddenIndex2').on('click', function () {
+            exLayer.open("保密字段", "/Com/ComSelect/SelectIndexAndGridTb?fId=flowprcs02&tbid=" + $("#tbid").val() + "&sId=" + $("#HiddenIndex").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //所有用户
+        $('#allPrcsUser').on('click', function () {
+            $('#PrcsUser').val("#all#");
+            $('#PrcsUser_Exa').val("所有用户");
+
+        });
+        //选择用户
+        $('#PrcsUser_Exa').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=flowprcs&sId=" + $("#PrcsUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        //选择用户
+        $('#PrcsUser2').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=flowprcs&sId=" + $("#PrcsUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //所有部门
+        $('#allPrcsDept').on('click', function () {
+            $('#PrcsDept').val("#all#");
+            $('#PrcsDept_Exa').val("所有部门");
+
+        });
+        //选择部门 PrcsDept2
+        $('#PrcsDept_Exa').on('click', function () {
+            exLayer.open("选择部门", "/Com/ComSelect/SelectDept?fId=flowprcs&sId=" + $("#PrcsDept").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $('#PrcsDept2').on('click', function () {
+            exLayer.open("选择部门", "/Com/ComSelect/SelectDept?fId=flowprcs&sId=" + $("#PrcsDept").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //所有角色
+        $('#allPrcsPriv').on('click', function () {
+            $('#PrcsPriv').val("#all#");
+            $('#PrcsPriv_Exa').val("所有角色");
+
+        });
+        //选择角色
+        $('#PrcsPriv_Exa').on('click', function () {
+            exLayer.open("选择角色", "/Com/ComSelect/SelectRole?fId=flowprcs&sId=" + $("#PrcsPriv").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        //选择角色
+        $('#PrcsPriv2').on('click', function () {
+            exLayer.open("选择角色", "/Com/ComSelect/SelectRole?fId=flowprcs&sId=" + $("#PrcsPriv").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        function getVal() {
+            if (@Model.A1 == "1") {
+                $('#A1').attr("checked", true);
+            }
+            else {
+                $("#A1").removeAttr("checked");
+            }
+
+            if (@Model.A2 == "1") {
+                $('#A2').attr("checked", true);
+            }
+            else {
+                $("#A2").removeAttr("checked");
+            }
+
+            if (@Model.A3 == "1") {
+                $('#A3').attr("checked", true);
+            }
+            else {
+                $("#A3").removeAttr("checked");
+            }
+
+            if (@Model.isFirst == "1") {
+                $('#isFirst').attr("checked", true);
+            }
+            else {
+                $("#isFirst").removeAttr("checked");
+            }
+        }
+
+        $(document).ready(function () {
+            form.render('select');
+        });
+    });
+</script>

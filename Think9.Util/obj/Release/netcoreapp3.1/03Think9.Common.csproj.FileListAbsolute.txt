@@ -1,0 +1,9 @@
+D:\A_Think9_NetCore_Y2021\Think9.Common\bin\Release\netcoreapp3.1\03Think9.Common.deps.json
+D:\A_Think9_NetCore_Y2021\Think9.Common\bin\Release\netcoreapp3.1\03Think9.Common.dll
+D:\A_Think9_NetCore_Y2021\Think9.Common\bin\Release\netcoreapp3.1\03Think9.Common.pdb
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.GeneratedMSBuildEditorConfig.editorconfig
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.AssemblyInfoInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.AssemblyInfo.cs
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.csproj.CoreCompileInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.dll
+D:\A_Think9_NetCore_Y2021\Think9.Common\obj\Release\netcoreapp3.1\03Think9.Common.pdb

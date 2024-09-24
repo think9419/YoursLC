@@ -1,0 +1,503 @@
+﻿@using Think9.Models;
+@model Think9.Models.IndexStatsEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标分类</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("IndexSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择指标分类==", new Dictionary<string, object> { })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">指标编码</label>
+        <div class="layui-input-block layui-col-space3">
+            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                <input type="text" name="IndexId" id="IndexId" placeholder="指标编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="30">
+            </div>
+            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                    <option value="">⇓自动生成编码</option>
+                    <option value="英文">英文</option>
+                    <option value="全拼">全拼</option>
+                    <option value="首拼">首拼</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">指标名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="IndexName" id="IndexName" placeholder="指标名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item" style="display:none">
+        <label class="layui-form-label">指标类型</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="Type" value="1">
+            <input type="checkbox" id="Type" name="Type" value="2" title="复合指标--待升级暂不可用" lay-filter="selectSort" disabled="disabled">
+        </div>
+    </div>
+    <div id="divSort1">
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md11">
+                    <label class="layui-form-label required">数据源</label>
+                    <div class="layui-input-block">
+                        <select id="DbID" name="DbID" lay-filter="selectDb">
+                            <option value="0">当前数据库</option>
+                            <optgroup label="⇓从外部数据库取值 - 需首先在数据源管理>>外部数据库中添加创建">
+                                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.DbList))
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                    <button type='button' class='layui-btn layui-btn-primary' id='refresh' lay-tips='刷新'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId">
+            <label class="layui-form-label required">取值数据表</label>
+            <div class="layui-input-block">
+                <select id="FromTbId" name="FromTbId" lay-filter="selectFromTbId">
+                    <option value="">==需首先选择 - 从已创建的录入表、视图取值==</option>
+                    <optgroup label="从已定义的录入表取值 未创建数据表的录入表不能取值">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                    <optgroup label="从已创建的视图读值">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.ViewList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId_Exa" style="display:none">
+            <label class="layui-form-label required">取值数据表</label>
+            <div class="layui-input-block">
+                <select id="FromTbId_Exa" name="FromTbId_Exa" lay-filter="selectFromTbId_Exa">
+                    <option value="">==需首先选择 - 从已创建的录入表、视图取值==</option>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">统计字段</label>
+            <div class="layui-input-block">
+                <input type="text" name="SelectField" id="SelectField" placeholder="统计字段 选择或者输入 数据库为PostgreSql或Oracle时字段前后需加入双引号" autocomplete="off" class="layui-input" lay-verify="required">
+                <span style="position: absolute;bottom: 25px; right: 5px;">
+                    <a href="javascript:;"><i class="fa fa-check-square-o" id="_SelectField">选择</i></a>
+                </span>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑数据库为PostgreSql或Oracle时字段前后需加入双引号
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">表达式</label>
+            <div class="layui-input-block">
+                <input type="text" name="FromStr" id="FromStr" placeholder="表达式" autocomplete="off" class="layui-input" value="SELECT {统计字段} FROM 数据源" readonly>
+            </div>
+        </div>
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey">筛选条件</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label">连 接</label>
+                <div class="layui-input-inline">
+                    <select name="linkstr" id="linkstr">
+                        <option value=""></option>
+                        <option value=" AND "> 并且 ( AND )</option>
+                        <option value=" OR "> 或者 ( OR )</option>
+                    </select>
+                </div>
+                <label class="layui-form-label">判 断</label>
+                <div class="layui-input-inline">
+                    <select name="judge" id="judge">
+                        <option value="=">等于</option>
+                        <option value=">">大于</option>
+                        <option value=">=">大于等于</option>
+                        <option value="<">小于</option>
+                        <option value="<=">小于等于</option>
+                        <option value="<>">不等于</option>
+                        <option value="like">包含</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">字 段</label>
+                <div class="layui-input-block">
+                    <select id="ConditionFiled" name="ConditionFiled">
+                        <option value="">==请选择 需先选择取值数据表==</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">值</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="valuekey" id="valuekey" placeholder="输入或选择" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <button type="button" class="layui-btn layui-btn-primary" id="selectvalue"><i class="fa fa-check"></i>选择</button>
+                </div>
+                <div class="layui-input-inline">
+                    <button type="button" class="layui-btn " id="addvalue"><i class="fa fa-plus"></i>添加筛选条件</button>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block" style="margin-left:5px;">
+                    <textarea class="layui-textarea" id="WhereStr" name="WhereStr" placeholder='SQL语句，如字段1=条件1 and 字段2=条件2 ，其中条件可包含条件参数，数据库为PostgreSql或Oracle时字段前后需加入双引号'></textarea>
+                    <span style="position: absolute;top: 0px; left: 0px;">
+                        <i class="fa fa-question-circle-o" style="color: #FE7300;" lay-tips="tips" data-offset="4" id="tipsWhereStr"></i>
+                    </span>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <div id="divSort2" style="display: none;">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">计算式</label>
+            <div class="layui-input-block">
+                <textarea name='FormulaStr' id='FormulaStr' class='layui-textarea' placeholder='计算式由非复合指标、四则运算符(加减乘除及括号)、数字组成'></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"></label>
+            <div class="layui-input-block">
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="_FormulaStr">选择</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn01">加+</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn02">减-</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn03">乘*</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn04">除/</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn05">括号(</a>
+                <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn06">括号)</a>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="layui-form-item">
+        <label class="layui-form-label">小数位数</label>
+        <div class="layui-input-block">
+            <select name="Digit" id="Digit">
+                <option value="0">0</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">计量单位</label>
+        <div class="layui-input-block">
+            <input type="text" name="Units" id="Units" placeholder="计量单位" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea name='IndexExplain' id='IndexExplain' class='layui-textarea' placeholder='备注'></textarea>
+        </div>
+    </div>
+    <br />
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新建统计指标</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        layui.code();
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        //指标类型？复合
+        form.on('checkbox(selectSort)', function (data) {
+            var check = document.getElementById('Type').checked;
+
+            $("#divSort1").attr("style", "display:none;");
+            $("#divSort2").attr("style", "display:none;");
+            if (check) {
+                $("#divSort2").attr("style", "display:block;");
+
+                $("#FromTbId").removeAttr("lay-verify");
+                $("#SelectField").removeAttr("lay-verify");
+                $("#FromStr").removeAttr("lay-verify");
+            }
+            else {
+                $("#divSort1").attr("style", "display:block;");
+            }
+        });
+
+        //复合指标选择非复合指标
+        $('#_FormulaStr').on('click', function () {
+            exLayer.open("选择", "/Com/ComSelect/SelectIndexStats?frm=formula&type=1", '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $('#btn01').on('click', function () {
+            addSelect(' 加 ');
+        });
+        $('#btn02').on('click', function () {
+            addSelect(' 减 ');
+        });
+        $('#btn03').on('click', function () {
+            addSelect(' 乘 ');
+        });
+        $('#btn04').on('click', function () {
+            addSelect(' 除 ');
+        });
+        $('#btn05').on('click', function () {
+            addSelect('(');
+        });
+        $('#btn06').on('click', function () {
+            addSelect(')');
+        });
+
+        $('#_SelectField').on('click', function () {
+            exLayer.open("选择", "/Com/ComSelect/SelectStatsField?frm=edit&tbid=" + $("#FromTbId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        function addSelect(selectid) {
+            var some = $("#FormulaStr").val() + selectid;
+            $("#FormulaStr").val(some);
+        }
+
+        function getExpression() {
+            var some = "SELECT " + $("#SelectField").val() + " FROM " + $("#FromTbId").val();
+            $("#FromStr").val(some);
+        }
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#IndexName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#IndexId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //刷新DbID
+        $('#refresh').on('click', function () {
+            var _dbid = $("#DbID").val();
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+            setTimeout(function () {
+                if (_dbid == '0') {
+
+                }
+                else {
+                    GetSelectValueFieldByDB(_dbid);
+                    //ControlEmpty();//清空控件
+                }
+                layer.close(loading);
+
+            }, 2000);
+        });
+
+        //数据源选择
+        form.on('select(selectDb)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                $("#divTbId").hide();
+                $("#divTbId_Exa").hide();
+
+                $('#FromTbId').removeAttr('lay-verify');
+                $('#FromTbId_Exa').removeAttr('lay-verify');
+
+                if (data.value == '0') {
+                    $("#divTbId").show();
+                    $('#FromTbId').attr('lay-verify', 'required');
+                }
+                else {
+                    $("#divTbId_Exa").show();
+                    $('#TbId_Exa').attr('lay-verify', 'required');
+                    $('#FromTbId_Exa').attr('lay-verify', 'required');
+                    GetSelectValueFieldByDB(data.value);
+                    GetConditionFieldListByTb(data.value);
+                    //ControlEmpty();//清空控件
+                }
+                layer.close(loading);
+            }, 2000);
+        })
+
+        //当前库选择数据表
+        form.on('select(selectFromTbId)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                GetConditionFieldListByTb(data.value);
+                layer.close(loading);
+            }, 2000);
+        })
+
+        //外部库选择数据表
+        form.on('select(selectFromTbId_Exa)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                GetConditionFieldListByTb(data.value);
+                layer.close(loading);
+            }, 2000);
+        })
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysStats/IndexStats/Add", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    $(window.parent.document).find('#search').click();
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#selectvalue').on('click', function () {
+            exLayer.openMiddle('选择', '/Com/ComSelect/SelectParm', '500px', '450px', layui.device().mobile);
+        });
+
+        //添加筛选条件
+        $('#addvalue').on('click', function () {
+            var _old = $("#WhereStr").val();
+            var _new = _old + ' ' + $("#linkstr").val() + ' ' + $("#ConditionFiled").val().replace("#table#", "") + ' ' + $("#judge").val() + ' ' + $("#valuekey").val();
+            $("#WhereStr").val(_new);
+            $("#valuekey").val('');
+            $('#tipsWhereStr').attr("lay-tips", GetTips($('#WhereStr').val()));
+        });
+
+        function GetSelectValueFieldByDB(id) {
+            var controlid = "#FromTbId_Exa";
+            $("" + controlid + "").empty(); //清空控件
+            $.ajax({
+                url: '/SysTable/RuleSingle/GetSelectValueFieldByDB',
+                type: 'GET',
+                data: { id: id },
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (i, item) {
+                        if (item.ClassID == 'err') {
+                            layer.msg(item.Text, { icon: 5, time: 20000, btn: ['关闭'] });
+                        }
+                        else {
+                            $("" + controlid + "").append(new Option(item.Text, item.Value));
+                        }
+                    });
+                    form.render();//不加下拉框可能不正确显示
+                },
+                error: function (xhr, textStatus, error) {
+                    console.log('请求失败', xhr.responseText);
+                    exLayer.redCrossMsg('请求失败');
+                }
+            });
+        }
+
+        function GetConditionFieldListByTb(id) {
+            var controlid = "#ConditionFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysStats/IndexStats/GetConditionFieldList", { id: id, dbId: $("#DbID").val() }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        //清空控件
+        function ControlEmpty() {
+            $("#FromTbId_Exa").empty();
+            $("#FromTbId_Exa").append(new Option("==请选择 需先选择取值数据表==", ""));
+            $("#ConditionFiled").empty();
+            $("#ConditionFiled").append(new Option("==请选择 需先选择取值数据表==", ""));
+        }
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysStats/Report/GetTbIndexTips",
+                type: "get",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

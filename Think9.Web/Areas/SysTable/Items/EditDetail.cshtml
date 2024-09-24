@@ -1,0 +1,58 @@
+﻿@model Think9.Models.ItemsDetailEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <input style="display: none" name="ItemCode" id="ItemCode" value="@ViewBag.ClassID">
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">子项编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="DetailCode" placeholder="子项编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="20" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">子项名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="DetailName" placeholder="子项名称" autocomplete="off" class="layui-input" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="5">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.val("formEdit", {
+            "DetailCode": "@Model.DetailCode",
+            "DetailName": "@Model.DetailName",
+            "OrderNo": "@Model.OrderNo"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/Items/EditDetail", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/Items/GetDetailList?classid=" + $(window.parent.document).find("#classid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

@@ -1,0 +1,108 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:35:17
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体参数类【统计表】  生成时间：2024-09-24 13:35:17
+	/// </summary>
+	public class BasedOnPrimaryAndSubTables2Model : BasicReportEntity
+	{
+		/// <summary>
+		/// 审核
+		/// </summary>
+		public string inAuditing { get; set; }
+		/// <summary>
+		/// 审核
+		/// </summary>
+		public string inAuditing_Exa { get; set; }
+		/// <summary>
+		/// 入库单号
+		/// </summary>
+		public string inWarehouseEntryNumber { get; set; }
+		/// <summary>
+		/// 仓库
+		/// </summary>
+		public string inWarehouse { get; set; }
+		/// <summary>
+		/// 仓库
+		/// </summary>
+		public string inWarehouse_Exa { get; set; }
+		/// <summary>
+		/// 金额合计
+		/// </summary>
+		public decimal? inTotalAmount { get; set; }
+		/// <summary>
+		/// 金额合计
+		/// </summary>
+		public decimal? inTotalAmount_Exa { get; set; }
+		/// <summary>
+		/// 经办人
+		/// </summary>
+		public string inOperator { get; set; }
+		/// <summary>
+		/// 入库日期
+		/// </summary>
+		public DateTime? inStorageDate { get; set; }
+		/// <summary>
+		/// 入库日期
+		/// </summary>
+		public DateTime? inStorageDate_Exa { get; set; }
+		/// <summary>
+		/// 采购编号
+		/// </summary>
+		public string inProcurementNumber { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string v1 { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string v2 { get; set; }
+		/// <summary>
+		/// 规格型号
+		/// </summary>
+		public string v3 { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string v4 { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string v4_Exa { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? v5 { get; set; }
+		/// <summary>
+		/// 单价
+		/// </summary>
+		public decimal? v5_Exa { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		public decimal? v6 { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		public decimal? v6_Exa { get; set; }
+		/// <summary>
+		/// 金额
+		/// </summary>
+		public decimal? v7 { get; set; }
+		/// <summary>
+		/// 金额
+		/// </summary>
+		public decimal? v7_Exa { get; set; }
+	}
+}

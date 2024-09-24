@@ -1,0 +1,38 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:37
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:37
+	/// </summary>
+	 [Table("tb_CharacterTooLong2")]
+	public class CharacterTooLong2Model : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 入库日期
+		/// </summary>
+		public DateTime? inStorageDate { get; set; }
+		/// <summary>
+		/// 入库日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inStorageDate_Exa { get; set; }
+		/// <summary>
+		/// 单位
+		/// </summary>
+		public string inUnit { get; set; }
+		/// <summary>
+		/// 单位 【附加】
+		/// </summary>
+		[Computed]
+		public string inUnit_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

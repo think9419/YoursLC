@@ -1,0 +1,802 @@
+﻿@model Think9.Models.TbBasicEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <blockquote class="layui-elem-quote layui-text">
+        可为List页面、Form页面添加『自定义按钮』，『自定义按钮』可实现『打开页面』及『后台处理』功能。
+        『后台处理』通过执行自定义包含参数的sql语句或调用已定义的存储过程，完成数据的新增、编辑、删除操作；『打开页面』，即打开录入表或统计表页面，如打开Show页面（显示页面，通过传递的参数--通常为业务主键，确定数据的listid从而显示数据），打开Add页面（新增数据页面，通过传递参数为控件赋值），打开Edit页面（编辑页面，通过传递的参数--通常为业务主键，确定数据listid从而显示数据...）<br />
+        『预定义按钮』是指List页面、Form页面、Detail页面中系统预定义的『新增按钮』、『批量删除按钮』、『保存按钮』、『转交按钮』等，可设置预定义按钮是否显示、操作权限等
+
+    </blockquote>
+    <span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+        <i class="fa fa-close" style="color: #FFAB00;"></i>
+    </span>
+    <div class="layui-tab layui-tab-brief" lay-filter="lay-filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">自定义按钮</li>
+            <li lay-id="2">预定义按钮</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item  layui-show">
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+            <div class="layui-tab-item">
+                <fieldset class="table-fieldset" id="field2">
+                    <legend style="color:darkgrey">List页面 - 预定义按钮设置</legend>
+                    <div style="margin: 10px 10px 10px 10px">
+                        <div class="layui-form-item" id="top01">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                是否显示
+                            </div>
+                            <div class="layui-input-inline">
+                                按钮标题
+                            </div>
+                            <div class="layui-input-inline">
+                                其他
+                            </div>
+                            <div class="layui-input-inline">
+                                权限设置
+                            </div>
+                            <div class="layui-input-inline">
+                                处理函数 - 发布模式调用_TB类;调试模式调用动态生成类
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">详细按钮</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListDetails" id="ButListDetails" lay-filter="ButListDetails" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListDetailsTxt" id="ButListDetailsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <select id="ButListDetailsExa" name="ButListDetailsExa" lay-filter="selectfilter">
+                                    <option value="select">打开弹出页面</option>
+                                    <option value="html">打开网页</option>
+                                    <option value="pdf">打开pdf</option>
+                                </select>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListDetails"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public ActionResult Detail(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">记录按钮</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListRecord" id="ButListRecord" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListRecordTxt" id="ButListRecordTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListRecord"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>{FlowRunList}|public ActionResult RecordList(...)</sapn>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">编辑按钮</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListEdit" id="ButListEdit" lay-skin="primary" title="显示" value="1" disabled="disabled">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListEditTxt" id="ButListEditTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListEdit"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public ActionResult BeforeEdit(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">删除按钮</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListDel" id="ButListDel" lay-skin="primary" title="显示" value="1" disabled="disabled">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListDelTxt" id="ButListDelTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListDel"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public JsonResult Delete(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">新增按钮</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListADD" id="ButListADD" lay-skin="primary" title="显示" value="1" disabled="disabled">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListADDTxt" id="ButListADDTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListADD"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public ActionResult BeforeAdd(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">批量删除</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListBatchDel" id="ButListBatchDel" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListBatchDelTxt" id="ButListBatchDelTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListBatchDel"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public JsonResult BatchDel(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">数据导入</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListImportExcel" id="ButListImportExcel" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListImportExcelTxt" id="ButListImportExcelTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListImportExcel"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>{ImportData}|public ActionResult ImportDataFromExcel(...)</sapn>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">合并导出</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListMergeExport" id="ButListMergeExport" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListMergeExportTxt" id="ButListMergeExportTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListMergeExport"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>public JsonResult MergeExport(...)</sapn>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">流程查看</label>
+                            <div class="layui-input-inline">
+                                <input type="checkbox" name="ButListPrcs" id="ButListPrcs" lay-skin="primary" title="显示" value="1">
+                            </div>
+                            <div class="layui-input-inline">
+                                <input type="text" name="ButListPrcsTxt" id="ButListPrcsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                            </div>
+                            <div class="layui-input-inline">
+                                <span>&nbsp;</span>
+                            </div>
+                            <div class="layui-input-inline">
+                                <button type="button" class="layui-btn layui-btn-normal" id="_ButListPrcs"><i class="fa fa-edit"></i></button>
+                            </div>
+                            <div class="layui-input-inline">
+                                <sapn>{FlowRunList}|public ActionResult RecordList(...)</sapn>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <br />
+                <fieldset class="table-fieldset" id="field">
+                    <legend style="color:darkgrey">Form页面 - 预定义按钮设置</legend>
+                    <div style="margin: 10px 10px 10px 10px">
+                        <div class="layui-form-item" id="top02">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                是否显示
+                            </div>
+                            <div class="layui-input-inline">
+                                按钮标题
+                            </div>
+                            <div class="layui-input-inline">
+                                提示字符
+                            </div>
+                            <div class="layui-input-inline">
+                                权限设置
+                            </div>
+                            <div class="layui-input-inline">
+                                处理函数 - 发布模式调用_TB类;调试模式调用动态生成类
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">打印按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButPrint" id="ButPrint" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButPrintTxt" id="ButPrintTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButPrintWarn" id="ButPrintWarn" placeholder="点击按钮后弹出提示字符" autocomplete="off" class="layui-input" maxlength="120" readonly>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="_ButPrint"><i class="fa fa-edit"></i></button>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <sapn>public ActionResult Print(...)</sapn>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">附件按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButAtt" id="ButAtt" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButAttTxt" id="ButAttTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButAttWarn" id="ButAttWarn" placeholder="点击按钮后弹出提示字符" autocomplete="off" class="layui-input" maxlength="120" readonly>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="_ButAtt"><i class="fa fa-edit"></i></button>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <sapn>{FileManage}|public IActionResult Attachment(...)</sapn>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">保存按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButEdit" id="ButEdit" lay-skin="primary" title="显示" value="1" disabled="disabled">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButEditTxt" id="ButEditTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButEditWarn" id="ButEditWarn" placeholder="点击按钮后弹出提示字符" autocomplete="off" class="layui-input" maxlength="120">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="_ButEdit"><i class="fa fa-edit"></i></button>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <sapn>public ActionResult SaveData(...)</sapn>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">转交按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButNext" id="ButNext" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButNextTxt" id="ButNextTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButNextWarn" id="ButNextWarn" placeholder="点击按钮后弹出提示字符" autocomplete="off" class="layui-input" maxlength="120">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="_ButNext"><i class="fa fa-edit"></i></button>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <sapn>public ActionResult NextStep(...)</sapn>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">结束|提交<br>按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButFinish" id="ButFinish" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButFinishTxt" id="ButFinishTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButFinishWarn" id="ButFinishWarn" placeholder="点击按钮后弹出提示字符" autocomplete="off" class="layui-input" maxlength="120">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" class="layui-btn layui-btn-normal" id="_ButFinish"><i class="fa fa-edit"></i></button>
+                                </div>
+                                <div class="layui-input-inline">
+                                    <sapn>public ActionResult Finish(...)</sapn>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <br />
+                <fieldset class="table-fieldset" id="field3">
+                    <legend style="color:darkgrey">Detail页面 - 预定义按钮设置</legend>
+                    <div style="margin: 10px 10px 10px 10px">
+                        <div class="layui-form-item" id="top03">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                是否显示
+                            </div>
+                            <div class="layui-input-inline">
+                                按钮标题
+                            </div>
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-inline">
+                                是否显示
+                            </div>
+                            <div class="layui-input-inline">
+                                按钮标题
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">查看PDF</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButPDFDetails" id="ButPDFDetails" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButPDFDetailsTxt" id="ButPDFDetailsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                                </div>
+                                <label class="layui-form-label">查看Excel</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButExcelDetails" id="ButExcelDetails" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButExcelDetailsTxt" id="ButExcelDetailsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">查看DOC</label>
+                                <div class="layui-input-inline">
+                                    <input type="hidden" name="ButDOCDetails" value="0">
+                                    <input type="checkbox" name="ButDOCDetails" id="ButDOCDetails" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButDOCDetailsTxt" id="ButDOCDetailsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                                </div>
+                                <label class="layui-form-label">附件按钮</label>
+                                <div class="layui-input-inline">
+                                    <input type="checkbox" name="ButAttDetails" id="ButAttDetails" lay-skin="primary" title="显示" value="1">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <input type="text" name="ButAttDetailsTxt" id="ButAttDetailsTxt" placeholder="按钮标题" autocomplete="off" class="layui-input" style="width:100px" maxlength="10" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="layui-form-item" style="padding-top:10px;">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input style="display: none" name="TbId" id="TbId" value="@Model.TbId">
+
+</form>
+
+<script>
+    layui.use(["table", 'form', "element", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+        form.render();
+
+        formValExa();
+
+        //Tab选项
+        element.on('tab(tabTag_Filter)', function (data) {
+        });
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        form.val("formEdit", {
+            //Form页面
+            "ButAttTxt": "@Model.ButAttTxt"
+            , "ButPrintTxt": "@Model.ButPrintTxt"
+            , "ButEditTxt": "@Model.ButEditTxt"
+            , "ButNextTxt": "@Model.ButNextTxt"
+            , "ButFinishTxt": "@Model.ButFinishTxt"
+            , "ButAttWarn": "@Model.ButAttWarn"
+            , "ButPrintWarn": "@Model.ButPrintWarn"
+            , "ButEditWarn": "@Model.ButEditWarn"
+            , "ButNextWarn": "@Model.ButNextWarn"
+            , "ButFinishWarn": "@Model.ButFinishWarn"
+
+            //List页面
+            , "ButListDetailsExa": "@Model.ButListDetailsExa"
+            , "ButListDetailsTxt": "@Model.ButListDetailsTxt"
+            , "ButListRecordTxt": "@Model.ButListRecordTxt"
+            , "ButListEditTxt": "@Model.ButListEditTxt"
+            , "ButListDelTxt": "@Model.ButListDelTxt"
+            , "ButListADDTxt": "@Model.ButListADDTxt"
+            , "ButListImportExcelTxt": "数据导入"
+            , "ButListBatchDelTxt": "批量删除"
+            , "ButListMergeExportTxt": "合并导出"
+            , "ButListPrcsTxt": "显示流程步骤"
+
+            //Details页面
+            , "ButPDFDetailsTxt": "@Model.ButPDFDetailsTxt"
+            , "ButExcelDetailsTxt": "@Model.ButExcelDetailsTxt"
+            , "ButDOCDetailsTxt": "@Model.ButDOCDetailsTxt"
+            , "ButAttDetailsTxt": "@Model.ButAttDetailsTxt"
+
+        });
+
+        function formValExa() {
+            if (@Model.ButPrint == "1") {
+                $('#ButPrint').attr("checked", true);
+            }
+            else {
+                $("#ButPrint").removeAttr("checked");
+            }
+
+            if (@Model.ButAtt == "1") {
+                $('#ButAtt').attr("checked", true);
+            }
+            else {
+                $("#ButAtt").removeAttr("checked");
+            }
+
+            if (@Model.ButNext == "1") {
+                $('#ButNext').attr("checked", true);
+            }
+            else {
+                $("#ButNext").removeAttr("checked");
+            }
+
+            if (@Model.ButFinish == "1") {
+                $('#ButFinish').attr("checked", true);
+            }
+            else {
+                $("#ButFinish").removeAttr("checked");
+            }
+
+            $('#ButEdit').attr("checked", true);
+
+            $('#ButListEdit').attr("checked", true);
+            $('#ButListDel').attr("checked", true);
+            $('#ButListADD').attr("checked", true);
+
+            if (@Model.ButListDetails == "1") {
+                $('#ButListDetails').attr("checked", true);
+            }
+            else {
+                $("#ButListDetails").removeAttr("checked");
+            }
+
+            if (@Model.ButListRecord == "1") {
+                $('#ButListRecord').attr("checked", true);
+            }
+            else {
+                $("#ButListRecord").removeAttr("checked");
+            }
+
+            if (@Model.ButPDFDetails == "1") {
+                $('#ButPDFDetails').attr("checked", true);
+            }
+            else {
+                $("#ButPDFDetails").removeAttr("checked");
+            }
+
+            if (@Model.ButExcelDetails == "1") {
+                $('#ButExcelDetails').attr("checked", true);
+            }
+            else {
+                $("#ButExcelDetails").removeAttr("checked");
+            }
+
+            if (@Model.ButDOCDetails == "1") {
+                $('#ButDOCDetails').attr("checked", true);
+            }
+            else {
+                $("#ButDOCDetails").removeAttr("checked");
+            }
+
+            if (@Model.ButAttDetails == "1") {
+                $('#ButAttDetails').attr("checked", true);
+            }
+            else {
+                $("#ButAttDetails").removeAttr("checked");
+            }
+
+            if (@Model.ButListImportExcel == "1") {
+                $('#ButListImportExcel').attr("checked", true);
+            }
+            else {
+                $("#ButListImportExcel").removeAttr("checked");
+            }
+
+            if (@Model.ButListBatchDel == "1") {
+                $('#ButListBatchDel').attr("checked", true);
+            }
+            else {
+                $("#ButListBatchDel").removeAttr("checked");
+            }
+
+            if (@Model.ButListMergeExport == "1") {
+                $('#ButListMergeExport').attr("checked", true);
+            }
+            else {
+                $("#ButListMergeExport").removeAttr("checked");
+            }
+
+            var _fwid = "@Model.FlowId";
+            if (_fwid.startsWith('bi_')) {
+                $("#ButListPrcs").removeAttr("checked");
+                $('#ButListPrcs').attr('disabled', 'disabled');
+            }
+            else {
+                if (@Model.ButListPrcs == "1") {
+                    $('#ButListPrcs').attr("checked", true);
+                }
+                else {
+                    $("#ButListPrcs").removeAttr("checked");
+                }
+            }
+        }
+
+        form.on("submit(edit)", function (data) {
+            var _list = [];
+            getControl(_list);
+
+            exUtils.ajax("/SysTable/TbBasic/EditTbBut", "post", { entity: data.field, tbid: $("#TbId").val(), "list": _list }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //从控件读值
+        function getControl(_list) {
+            _list.push({ Text: 'print', Value: $('#ButPrint').prop('checked') });
+            _list.push({ Text: 'att', Value: $('#ButAtt').prop('checked') });
+            _list.push({ Text: 'next', Value: $('#ButNext').prop('checked') });
+            _list.push({ Text: 'finish', Value: $('#ButFinish').prop('checked') });
+            _list.push({ Text: 'listdetails', Value: $('#ButListDetails').prop('checked'), Exa: $('#ButListDetailsExa').val() });
+            _list.push({ Text: 'listrecord', Value: $('#ButListRecord').prop('checked') });
+            _list.push({ Text: 'pdfdetails', Value: $('#ButPDFDetails').prop('checked') });
+            _list.push({ Text: 'exceldetails', Value: $('#ButExcelDetails').prop('checked') });
+            _list.push({ Text: 'docdetails', Value: $('#ButDOCDetails').prop('checked') });
+            _list.push({ Text: 'attdetails', Value: $('#ButAttDetails').prop('checked') });
+
+            _list.push({ Text: 'listimportexcel', Value: $('#ButListImportExcel').prop('checked') });
+            _list.push({ Text: 'listbatchdel', Value: $('#ButListBatchDel').prop('checked') });
+            _list.push({ Text: 'listmergeexport', Value: $('#ButListMergeExport').prop('checked') });
+            _list.push({ Text: 'listprcs', Value: $('#ButListPrcs').prop('checked') });
+        }
+
+        function openMiddle(title, btnid, pageType) {
+            exLayer.openMiddle(title + " - 按钮权限", "/SysTable/TbBasic/TbButDisable?tbid=" + $("#TbId").val() + "&btnid=" + btnid + "&pageType=" + pageType, '600px', '400px', layui.device().mobile);
+        }
+        //记录
+        $('#_ButListRecord').on('click', function () {
+            openMiddle('record', 'record', 'list');
+        });
+        //查看详细
+        $('#_ButListDetails').on('click', function () {
+            openMiddle('detail', 'detail', 'list');
+        });
+        //编辑
+        $('#_ButListEdit').on('click', function () {
+            openMiddle('edit', 'edit', 'list');
+        });
+        //删除
+        $('#_ButListDel').on('click', function () {
+            openMiddle('del', 'del', 'list');
+        });
+        //新增数据
+        $('#_ButListADD').on('click', function () {
+            openMiddle('add', 'add', 'list');
+        });
+        //批量删除
+        $('#_ButListBatchDel').on('click', function () {
+            openMiddle('batchDel', 'batchDel', 'list');
+        });
+        //导入数据
+        $('#_ButListImportExcel').on('click', function () {
+            openMiddle('importExcel', 'importExcel', 'list');
+        });
+        //合并导出
+        $('#_ButListMergeExport').on('click', function () {
+            openMiddle('mergeExport', 'mergeExport', 'list');
+        });
+        //流程查看
+        $('#_ButListPrcs').on('click', function () {
+            openMiddle('listprcs', 'listprcs', 'list');
+        });
+
+        //
+        $('#_ButPrint').on('click', function () {
+            openMiddle('print', 'print', 'form');
+        });
+        //
+        $('#_ButAtt').on('click', function () {
+            openMiddle('att', 'att', 'form');
+        });
+        //
+        $('#_ButEdit').on('click', function () {
+            openMiddle('edit', 'edit', 'form');
+        });
+        //
+        $('#_ButNext').on('click', function () {
+            openMiddle('next', 'next', 'form');
+        });
+        //
+        $('#_ButFinish').on('click', function () {
+            openMiddle('finish', 'finish', 'form');
+        });
+
+        //TbButCustomize
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbButCustomize/GetList?tbid=" + $("#TbId").val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "PageType", title: "所在页面", width: 140, sort: true },
+                { field: "GridId", title: "录入表ID", width: 200, sort: true, templet: "#T_tbId" },
+                { field: "IsBatch", title: "执行类别", width: 180, sort: true, templet: "#T_IsLink" },
+                { field: "IsBatch", title: "单|批处理", width: 150, sort: true, templet: "#T_ISBatch" },
+                { field: "BtnId", title: "按钮ID", width: 200, sort: true },
+                { field: "BtnText", title: "按钮文本", sort: true },
+                { title: "权限", width: 60, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTp2" },
+                { title: "记录", width: 60, templet: "#operation_Record" },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]]
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.Id);
+                    break;
+                case "del":
+                    del(data.Id);
+                    break;
+                case "authority":
+                    exLayer.openMiddle(data.BtnText + " - 按钮权限", "/SysTable/TbBasic/TbButDisable?tbid=" + $("#TbId").val() + "&btnid=" + data.BtnId + "&pageType=" + data.PageType, '600px', '400px', layui.device().mobile);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.open("新建自定义按钮", "/SysTable/TbButCustomize/Add?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(id, type) {
+            exLayer.open("编辑自定义按钮", "/SysTable/TbButCustomize/Edit?id=" + id + "&tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/TbButCustomize/DeleteBut", "get", { id: id, tbid: $("#TbId").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    refresh();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbButCustomize/GetList?tbid=" + $("#TbId").val()
+            });
+        }
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#top01").attr("style", "display:none");
+                $("#top02").attr("style", "display:none");
+                $("#top03").attr("style", "display:none");
+            }
+        });
+    })
+</script>
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建自定义按钮</button>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTp2">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="authority" id="authority"><i class="fa fa-edit"></i></a>
+</script>
+<!-- 行工具栏模板 -->
+<script type='text/html' id='T_tbId'>
+    {{#  if(d.GridId == ''){ }}
+    <span>{{d.TbId}}</span>
+    {{#  }else{ }}
+    <span>{{d.GridId}}</span>
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type='text/html' id='T_ISBatch'>
+    {{#  if(d.IsBatch == '1'){ }}
+    <span>单处理</span>
+    {{#  }else{ }}
+    <span>批处理</span>
+    {{#  } }}
+</script>
+<script type='text/html' id='T_IsLink'>
+    {{#  if(d.IsLink == '1'){ }}
+    <span>打开页面</span>
+    {{#  }else{ }}
+    <span>后台处理</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="operation_Record">
+    <a href="/SysTable/TableList/EventRecord?id={{d.Id}}&isSys=n" target="_blank" id="print" class="layui-btn layui-btn-primary layui-btn-xs">
+        <i class='fa fa-file-text-o'></i>
+    </a>
+</script>

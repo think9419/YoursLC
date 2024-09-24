@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<blockquote class="layui-elem-quote layui-text">
+    『数据回写』是在指定的条件下（适用范围）按照设定的规则对满足条件的录入表数据进行编辑修改，『数据回写』更改后需『重新生成』才能生效
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        setADD();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbRelation/GetListByType?tbid=" + $("#tbid").val() + "&type=31",
+            limits: [10, 50, 100],
+            limit: 10,
+            page: true,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "RelationName", title: "名称" },
+                { field: "isUse", title: "启用", width: 90, templet: '#switchIsUse', unresize: true, sort: true, hide: true },
+                { title: "记录", width: 60, templet: "#operation_Record" },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add3":
+                    add3();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.RelationId, data.RelationType);
+                    break;
+                case "del":
+                    del(data.RelationId);
+                    break;
+            }
+        });
+
+        //监听启用按钮
+        form.on('switch(stateIsUse)', function (data) {
+            var id = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbRelation/UpIsUse?id=" + id + "&isState=" + isState, "get", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function add3() {
+            exLayer.open("新建数据回写", "/SysTable/TbRelation/AddWrite?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(id, type) {
+            if (type == "31") {
+                exLayer.open("编辑数据回写", "/SysTable/TbRelation/EditWrite?id=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/TbRelation/Delete", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbRelation/GetListByType?tbid=" + $("#tbid").val() + "&type=31"
+            });
+        }
+
+        function setADD() {
+            $("#add03").attr("href", "/SysTable/TbRelation/AddWrite?tbid=" + $("#tbid").val());
+        }
+    });
+</script>
+
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add3" id="add3"><i class="fa fa-plus"></i>新建数据回写</button>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Record">
+    <a href="/SysTable/TableList/ListWriteRecord?id={{d.RelationId}}" target="_blank" id="print" class="layui-btn layui-btn-primary layui-btn-xs">
+        <i class='fa fa-file-text-o'></i>
+    </a>
+</script>
+
+<script type='text/html' id='Tp02'>
+    {{#  if(d.isUse == "0"){ }}
+    <span>禁用</span>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<!-- 启用 -->
+<script type="text/html" id="switchIsUse">
+    <span title="启用"><input type="checkbox" name="isUse" value="{{d.RelationId}}" lay-skin="switch" lay-text="启用|禁用" lay-filter="stateIsUse" {{ d.isUse == 1 ? 'checked' : '' }}></span>
+</script>

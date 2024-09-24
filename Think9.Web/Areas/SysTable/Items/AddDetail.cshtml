@@ -1,0 +1,68 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="ItemCode" id="ItemCode" value="@ViewBag.ClassID">
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">子项编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="DetailCode" id="DetailCode" placeholder="子项编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label   required">子项名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="DetailName" id="DetailName" placeholder="子项名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="80">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="5">
+        </div>
+    </div>
+    <div class="layui-form-item" style="padding-top:10px;">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新建子项</button>
+            <input type="checkbox" id="continue" title="连续新建">
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[A-Za-z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysTable/Items/AddDetail", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    if ($("#continue").is(':checked')) {
+                        $("#DetailCode").val("");
+                        $("#DetailName").val("");
+                        var _OrderNo = Number($("#OrderNo").val()) + 1;
+                        $("#OrderNo").val(_OrderNo);
+                    }
+                    else {
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                    parent.layui.table.reload('tableId', { url: "/SysTable/Items/GetDetailList?classid=" + $(window.parent.document).find("#classid").val() });
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

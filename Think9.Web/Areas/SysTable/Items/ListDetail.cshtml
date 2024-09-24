@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="classid" id="classid" value="@ViewBag.ClassID">
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+        var classid = $("#classid").val();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/Items/GetDetailList?classid=" + $("#classid").val(),
+            limit: 10,
+            page: true,
+            method: "post",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "DetailCode", title: "编码", sort: true, width: 120, align: "center" },
+                { field: "DetailName", title: "名称", sort: true, align: "center", width: layui.device().mobile ? 200 : null },
+                { field: "OrderNo", title: "序号", sort: true, width: 80, align: "center", hide: layui.device().mobile ? true : false },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.DetailCode);
+                    break;
+                case "del":
+                    del(classid, data.DetailCode);
+                    break;
+            }
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                where: { classid: $("#classid").val() }
+            });
+        }
+
+        function add() {
+            if (layui.device().mobile) {
+                exLayer.open("新建子项", "/SysTable/Items/AddDetail?classid=" + $("#classid").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                exLayer.openMiddle("新建子项", "/SysTable/Items/AddDetail?classid=" + $("#classid").val(), '450px', '350px', layui.device().mobile);
+            }
+        }
+
+        function edit(id) {
+            if (layui.device().mobile) {
+                exLayer.open("编辑子项", "/SysTable/Items/EditDetail?classid=" + $("#classid").val() + "&id=" + id, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                exLayer.openMiddle("编辑子项", "/SysTable/Items/EditDetail?classid=" + $("#classid").val() + "&id=" + id, '450px', '350px', layui.device().mobile);
+            }
+        }
+
+        function del(classid, id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/Items/DelDetail", "get", { classid: $("#classid").val(), id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建子项</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>

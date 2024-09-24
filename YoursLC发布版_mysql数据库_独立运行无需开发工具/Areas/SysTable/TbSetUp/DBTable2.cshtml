@@ -1,0 +1,47 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetTableFieldsList?tbid=" + $("#tbid").val(),
+            defaultToolbar: [],
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ColumnName", title: "字段名", width: 190, sort: true },
+                { field: "DataType", title: "类 型", width: 120, sort: true },
+                { field: "IndexName", title: "备 注", sort: true, width: layui.device().mobile ? 250 : null }
+            ]],
+            done: function (res, curr, count) {
+                if (count == 0) {
+                }
+            },
+            text: {
+                none: '请点击『创建数据表』按钮'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+            }
+        });
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+</script>

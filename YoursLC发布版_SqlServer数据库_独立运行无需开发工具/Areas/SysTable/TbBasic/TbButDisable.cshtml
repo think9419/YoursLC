@@ -1,0 +1,355 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" action="">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="btnid" value="@ViewBag.btnid">
+    <input style="display:none" id="pageType" value="@ViewBag.pageType">
+    <blockquote class="layui-elem-quote  layui-text">
+        由人员、单位及角色的合集确定，即『禁用』其中之一，便不能使用该按钮
+    </blockquote>
+    <span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+        <i class="fa fa-close" style="color: #FFAB00;"></i>
+    </span>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId3' id='ObjId3' autocomplete='off' class='layui-input' placeholder='选择禁用用户'>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add3" lay-filter="add3" lay-submit>添加</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId' id='ObjId' autocomplete='off' class='layui-input' placeholder='选择禁用组织机构'>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add" lay-filter="add" lay-submit>添加</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId2' id='ObjId2' autocomplete='off' class='layui-input' placeholder='选择禁用角色'>
+        </div>
+
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add2" lay-filter="add2" lay-submit>添加</button>
+        </div>
+    </div>
+</form>
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "tableSelect", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let $ = layui.$;
+
+        form.render();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ObjTable = tableSelect.render({
+            elem: '#ObjId',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=1',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ObjTable2 = tableSelect.render({
+            elem: '#ObjId2',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=2',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ObjTable3 = tableSelect.render({
+            elem: '#ObjId3',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=3',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable = tableSelect.render({
+            elem: '#IndexId',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable2 = tableSelect.render({
+            elem: '#IndexId2',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable3 = tableSelect.render({
+            elem: '#IndexId3',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbBasic/GetTbButDisableList?tbid=" + $('#tbid').val() + "&btnid=" + $('#btnid').val() + "&pageType=" + $('#pageType').val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "BtnId", title: "按钮编码", sort: true },
+                { field: "ObjType", title: "对象类别", sort: true, width: 100, templet: "#ObjType" },
+                { field: "ObjId", title: "对象编码", sort: true }
+
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        form.on("submit(add)", function () {
+            if ($("#ObjId").val().trim() == '') {
+                layer.msg('请选择组织机构');
+                return false;
+            }
+            exUtils.ajax("/SysTable/TbBasic/AddTbButDisable", "post", { tbid: $("#tbid").val(), idsStr: $("#ObjId").val(), btnid: $("#btnid").val(), pageType: $("#pageType").val(), objType: 1 }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on("submit(add2)", function () {
+            if ($("#ObjId2").val().trim() == '') {
+                layer.msg('请选择角色');
+                return false;
+            }
+            exUtils.ajax("/SysTable/TbBasic/AddTbButDisable", "post", { tbid: $("#tbid").val(), idsStr: $("#ObjId2").val(), btnid: $("#btnid").val(), pageType: $("#pageType").val(), objType: 2 }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId2").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on("submit(add3)", function () {
+            if ($("#ObjId3").val().trim() == '') {
+                layer.msg('请选择用户');
+                return false;
+            }
+            exUtils.ajax("/SysTable/TbBasic/AddTbButDisable", "post", { tbid: $("#tbid").val(), idsStr: $("#ObjId3").val(), btnid: $("#btnid").val(), pageType: $("#pageType").val(), objType: 3 }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId3").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbBasic/GetTbButDisableList?tbid=" + $('#tbid').val() + "&btnid=" + $('#btnid').val() + "&pageType=" + $('#pageType').val()
+            });
+        }
+
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].id + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysTable/TbBasic/DelTbButDisable", "get", { tbid: $("#tbid").val(), idsStr: idsStr }, true).done(function (response) {
+                        refresh();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-btn-container">
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i></button>
+    </div>
+</script>
+<script type='text/html' id='ObjType'>
+    {{#  if(d.ObjType == '1'){ }}
+    组织机构
+    {{#  } }}
+    {{#  if(d.ObjType == '2'){ }}
+    角色
+    {{#  } }}
+    {{#  if(d.ObjType == '3'){ }}
+    用户
+    {{#  } }}
+</script>

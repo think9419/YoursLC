@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TableList/GetGridTbList?tbid=" + $("#tbid").val(),
+            toolbar: "#toolbarTpl",
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            method: "get",
+            cols: [[
+                { field: "TbId", title: "编码", sort: true },
+                { field: "TbName", title: "名称", sort: true },
+                { title: "设置", width: 410, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysTable/TableList/GetGridTbList?tbid=" + $("#tbid").val()
+                    });
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "look":
+                    look(data.TbId, data.TbName);
+                    break;
+                case "btn11":
+                    exLayer.open(data.TbName + "", "/SysTable/TbBasic/EditGrid?tbid=" + data.TbId, '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "btn12":
+                    exLayer.open(data.TbName + " - 录入指标管理", "/SysTable/TbSetUp/ColumnList?tbid=" + data.TbId + "&isMobile=" + layui.device().mobile, '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "btn_11":
+                    exLayer.open(data.TbName + " - 数据读取管理", "/SysTable/TbRelation/ListRead?tbid=" + data.TbId, '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "btn_31":
+                    exLayer.open(data.TbName + " - 数据回写管理", "/SysTable/TbRelation/ListWrite?tbid=" + data.TbId, '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "btn32":
+                    exLayer.open(data.TbName + " - 录入校验管理", "/SysTable/TbValueCheck/List?tbid=" + data.TbId, '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "btn_21":
+                    exLayer.open(data.TbName + " - 数据读写管理", "/SysTable/TbRelation/ListGridData?tbid=" + data.TbId, '100%', '100%', '0px', '0px', null, null);
+                    break;
+            }
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn11" lay-tips="录入表基本属性">属性</a>
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn12" lay-tips="录入表指标管理">指标{{ d.indexCount }}</a>
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn_11" lay-tips="录入表数据读取">读取{{ d.TbRelationCount11 }}</a>
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn_31" lay-tips="录入表数据回写">回写{{ d.TbRelationCount31 }}</a>
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn32" lay-tips="自定义录入校验">校验{{ d.ValueCheckCount }}</a>
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="btn_21" lay-tips="子表数据初始化">初始化{{ d.TbRelationCount21 }}</a>
+</script>

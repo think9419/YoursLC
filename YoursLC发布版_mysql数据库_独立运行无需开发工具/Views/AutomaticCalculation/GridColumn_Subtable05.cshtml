@@ -1,0 +1,193 @@
+﻿@*子表05 子表纵列显示 移动端点击编辑或者新增子表数据将打开此页面*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:29:00 添加或编辑-此文件放置于Views/AutomaticCalculation /中*@
+
+@using Think9.Models;
+@*@model Think9.Models.Subtable05Model;*@
+@{ ViewBag.Title = "Add";
+	Layout = "~/Areas/Shared/_LayuiMobileForm.cshtml"; }
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+<input style="display:none" id="_isDebug" value="debug">@*debug为调试；release为发布*@
+<input style="display:none" id="_grid" value="tb_Subtable05">@*子表编码*@
+<input style="display:none" id="_DisabledStr" value="@ViewBag.DisabledStr">@*禁用控件字符*@
+<input style="display:none" id="_listid" value="@ViewBag.ListId">
+<input style="display:none" id="_id" value="@ViewBag.Id">
+<input style="display:none" id="_plit" value="@ViewBag.Split">@*多选框字符分割*@
+<input style="display:none" id="_type" value="@ViewBag.Type">@*add或edit*@
+<input style="display:none" id="_flag" value="@ViewBag.Flag">@*标志字符编辑数据时需要*@
+<input style="display:none" id="_userid" value="@ViewBag.UserId">@*用户id*@
+<input style="display:none" id="_fwid" value="@ViewBag.FId">@*当前流程编码*@
+<input style="display:none" id="prc_no" value="@ViewBag.PrcNo">@*当前流程步骤编码*@
+@*弹出选择时页面间传递数据*@
+<input style="display:none" id="pu_value">@*弹出选择时使用-弹出页面选择的值*@
+<input style="display:none" id="pu_tbid">@*弹出选择时使用-触发弹出页面的表id，_main或子表编码*@
+<input style="display:none" id="pu_indexid">@*弹出选择时使用-触发弹出页面的指标编码*@
+<div class="layui-form">
+	<div class="layui-form layui-row layui-col-space10">
+		<div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+			<label class="layui-form-label">列1</label>
+			<div class="layui-input-block">
+				<input type='text' name='v1' id='v1' autocomplete='off' class='layui-input'   maxlength='15'    lay-verify='number'   placeholder='列1'>
+			</div>
+		</div>
+		<div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+			<label class="layui-form-label">列222</label>
+			<div class="layui-input-block">
+				<input type='text' name='v2' id='v2' autocomplete='off' class='layui-input'   maxlength='15'    lay-verify='number'   placeholder='列222'>
+			</div>
+		</div>
+	 </div>
+	<div class="layui-form layui-row layui-col-space10">
+		<div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+			<label class="layui-form-label">列3</label>
+			<div class="layui-input-block">
+				<input type='text' name='v3' id='v3' autocomplete='off' class='layui-input layui-disabled'   maxlength='15'   disabled='disabled'   lay-verify='number'   placeholder='列1*列2'>
+			</div>
+		</div>
+	 </div>
+</div>
+<br />
+ <div class="layui-form-item"  style="text-align: center;">
+	<div class="layui-btn-container">
+       <button type="button" class="layui-btn" lay-submit lay-filter="edit" id="edit">保 存</button>
+	   <button type="button" class="layui-btn layui-btn-primary" id="close">取 消</button>
+	 </div>
+  </div>
+</form>
+<script>
+	layui.config({
+		base: '/Self_JS/'  /*自定义的js--wwwroot\Self_JS\AutomaticCalculation.js*/
+	});
+	layui.use(["form", "exLayer", "element", "exUtils", "table", "tableSelect", "AutomaticCalculation"], function () {
+		let form = layui.form;
+		let layer = layui.layer;
+		let table = layui.table;
+		let exLayer = layui.exLayer;
+		let exUtils = layui.exUtils;
+		let element = layui.element;
+		let tableSelect = layui.tableSelect;
+		let myJS = layui.AutomaticCalculation;
+		let $ = layui.$;
+
+		form.render();//更新全部表单数据
+		formValExa();//控件赋值-复选框和图片
+
+		//Tab选项
+		element.on('tab(element_Filter)', function (data) {
+        });
+		//赋值--不包括多选框和图片
+		form.val("formUser", {
+			"v1": "@Model.v1"
+			,"v2": "@Model.v2"
+			,"v3": "@Model.v3"
+		});
+		//自定义控件赋值，用于多选框和图片的显示
+		function formValExa() {
+
+
+		}
+
+
+
+
+       //toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "_event":
+                    break;
+            }
+        });
+		//弹出页面关闭后为控件赋值并执行数据读取
+		$("#pu_value").click(function () {
+		    //弹出页面关闭时以下组件已被赋值
+			var _tbid = $('#pu_tbid').val();//表id，主表为_main，子表纵列为_gridColumn
+			var _indexid = $('#pu_indexid').val();//指标编码，触发弹出选择的控件id
+			var _rowid = $('#pu_rowid').val();//子表数据主键
+			var _value = $('#pu_value').val();//弹出页面选择的值
+			var _column = $('#pu_column').val();//第几列--子表弹出时有用
+			//弹出页面关闭后，选择的Value为触发弹出页面的input赋值，wwwroot\Self_JS\AutomaticCalculation.js中定义
+			myJS.getValueFromPopUp(_tbid, _indexid, _rowid, _column, _value);
+			//执行数据读取，每个弹出选择都调用，如果没有设置数据读取后台返回空，前端也不会执行控件赋值
+			readValue(_tbid, _indexid, _rowid, _value);
+		});
+		//数据读取 发布模式调用_TB/AfterControlSelect，调试模式调用AutomaticCalculation/AfterControlSelect
+		//后端返回lists，再调用 myJS.setValueByList(lists)完成为控件赋值
+		function readValue(_tbid, _indexid, _rowid, _value) {
+			var _gridList = myJS.getControlListFrmGridColumn($('#_grid').val());
+			//从父页面读取主表所有控件ID和Value，wwwroot\Self_JS\AutomaticCalculation.js中定义
+            var _controlsList = myJS.getControlValueListFrmParent();
+
+			exUtils.ajax("/_TB/AfterControlSelect", "post", { controlslist: _controlsList, "gridlist": _gridList, id: _rowid, tbid: _tbid, indexid: _indexid, value: _value, fwid: $('#_fwid').val(), listid: $('#_listid').val() }, true).done(function (response) {
+				var lists = response.list;
+				var _listid = response.extra;
+                var _grid = response.extra2;
+				if (_listid != "") {
+                    $('#_listid').val(_listid);
+                }
+                if (lists != null) {
+				   //使用后台返回的lists，为控件赋值，wwwroot\Self_JS\AutomaticCalculation.js中定义
+                    myJS.setValueByList(lists, _tbid, _rowid);
+				}
+				if (_grid != "") {
+                    tableRender(_grid);//子表数据刷新
+				}
+				form.render();// 更新表单数据，一定要加
+			}).fail(function (error) {
+				console.log(error);
+			});
+
+			return false;
+		};
+		//新增或编辑
+	   form.on("submit(edit)", function (data) {
+	        if ($('#_listid').val() == '0') {
+                layer.msg('数据保存时，请勿强制刷新或关闭页面，否则会出现错误');
+            }
+			//从父页面读取主表所有控件ID和Value，wwwroot\Self_JS\AutomaticCalculation.js中定义
+			var _controlsList = myJS.getControlValueListFrmParent();
+	        var _gridList = myJS.getControlListFrmGridColumn($('#_grid').val());
+            exUtils.ajax("/_TB/SaveSingleGrid", "post",{ 'gridlist': _gridList, listid: $('#_listid').val(), prcno: $('#prc_no').val(), type: $('#_type').val(), flag: $('#_flag').val(), grid: $('#_grid').val(), fwid: $('#_fwid').val(), controlsList: _controlsList  }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+					    parent.layer.close(parent.layer.getFrameIndex(window.name));
+						var _listid = response.extra;
+					    if (_listid != "") {
+						   $(window.parent.document).find("#_listid").val(_listid);//将listid传递到主页面，很重要
+					    }
+						parent.layui.table.reload('tb_Subtable05', { url: "/_TB/GetGridList?tbid=tb_Subtable05&listid=" + $(window.parent.document).find("#_listid").val() + "&fwid=" + $(window.parent.document).find("#_fwid").val() + "&from=" + $(window.parent.document).find("#_type").val() + "&mobile=" + $(window.parent.document).find("#_isMobile").val() });//刷新子表
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+		//关闭
+		$('#close').on('click', function () {
+			parent.layer.close(parent.layer.getFrameIndex(window.name));
+		});
+		//消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+		$(document).ready(function () {
+			if ($("#_type").val() == 'add') {
+				$("#edit").text("新增");
+			}
+			else {
+				$("#edit").text("编辑");
+			}
+		    myJS.disableGridColumnFormControl($('#_grid').val(), $('#_DisabledStr').val());//设置控件状态
+			form.render('select');//要加上，否则下拉选择disabled设置无效
+        });
+	});
+</script>

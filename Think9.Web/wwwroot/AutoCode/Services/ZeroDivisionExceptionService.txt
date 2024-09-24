@@ -1,0 +1,1101 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:29:12
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+using System;
+using System.Data;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Think9.Models;
+using System.IO;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+using System.Linq;
+using Newtonsoft.Json.Linq;
+
+namespace Think9.Services.CodeBuild
+{
+	/// <summary>
+	/// 主表Service
+	/// </summary>
+	public partial class ZeroDivisionExceptionService : BaseService<ZeroDivisionExceptionModel>
+	{
+		private ComService comService = new ComService();
+		public int lockUpTime = 0;//锁定期限，发布模式会修改该值，所以public
+
+		private readonly static string _maintbid = "tb_ZeroDivisionException";//主表编码
+		private readonly static string _flowid = "bi_ZeroDivisionException";//流程编码 bi_基础信息 fw_一般录入表
+		private readonly static string _tbname = "除零异常";//录入表名称
+		private readonly string _split = Think9.Services.Base.BaseConfig.ComSplit;//多选项的字符分割
+		private ExtraDbService extraDb = new ExtraDbService();//外部数据源
+		private ExtraDbEntity extraDbModel;//外部数据源
+		private string sql;
+		private string str;
+
+		#region 检测及校验
+        /// <summary>
+        /// 添加前校验
+        /// </summary>
+        /// <param name="mPrcs">当前流程步骤</param>
+        /// <param name="user">当前用户</param>
+        /// <returns>错误信息</returns>
+        public string CheckedBeforeAdd(CurrentPrcsEntity mPrcs, CurrentUserEntity user)
+        {
+            return CheckCom.CheckedBeforeAdd(_flowid, mPrcs, user);
+        }
+
+        /// <summary>
+		/// 编辑前校验
+		/// </summary>
+		/// <param name="listid">数据id</param>
+        /// <param name="mPrcs">当前流程步骤</param>
+        /// <param name="user">当前用户</param>
+		/// <returns>错误信息</returns>
+        public string CheckedBeforeEdit(string listid, CurrentPrcsEntity mPrcs, CurrentUserEntity user)
+        {
+            return CheckCom.CheckedBeforeEdit(_flowid, listid, mPrcs, user, lockUpTime);
+        }
+
+        /// <summary>
+		/// 删除前校验
+		/// </summary>
+		/// <param name="listid">数据id</param>
+        /// <param name="mPrcs">当前流程步骤</param>
+        /// <param name="user">当前用户</param>
+		/// <returns>错误信息</returns>
+        public string CheckedBeforeDel(string listid, CurrentPrcsEntity mPrcs, CurrentUserEntity user)
+        {
+            return CheckCom.CheckedBeforeDel(_flowid, listid, mPrcs, user, lockUpTime);
+        }
+
+		/// <summary>
+        /// 数据校验-自定义校验
+        /// </summary>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <param name="dtMain">主表数据</param>
+        /// <param name="gridlist">指标数据列表</param>
+        /// <returns>错误信息</returns>
+        public string DataValidation(string prcno, DataTable dtMain, IEnumerable<GridListEntity> gridlist = null)
+        {
+            prcno = string.IsNullOrEmpty(prcno) ? "_edit" : prcno;
+            return CheckCom.GetCustomValidate(_flowid, prcno, dtMain, gridlist);
+        }
+        #endregion 检测及校验
+
+		#region 增删改
+        /// <summary>
+        /// 添加主表数据,listid=0时被调用
+        /// </summary>
+        /// <param name="err">错误信息</param>
+        /// <param name="user">当前用户</param>
+        /// <param name="model">主表model</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <returns>数据id</returns>
+        public long AddData(ref string err, CurrentUserEntity user, ZeroDivisionExceptionModel model, string prcno)
+        {
+            long listid = 0;
+            DataTable dtMain = DataTableHelp.ModelToDataTable<ZeroDivisionExceptionModel>(model);//model转换DataTable
+            //进行主键和唯一键检测，主键和唯一键可在录入表指标属性中设置
+            DebugApp.Trace = "CheckCom.CheckMainTbValueBKAndUnique(...)";//定位-方便发布模式测试
+            err = CheckCom.CheckMainTbValueBKAndUnique(listid, _maintbid, model, dtMain);
+            if (string.IsNullOrEmpty(err))
+            {
+                //进行主表自定义校验，自定义校验可在录入表管理/录入校验中设置
+                DebugApp.Trace = "DataValidation(...)";
+                err = DataValidation(prcno, dtMain);
+                if (string.IsNullOrEmpty(err))
+                {
+					
+					DebugApp.Trace = "ZeroDivisionExceptionService.GetCalculationValue(...)";
+					GetCalculationValue(ref model, listid);//计算式
+					DebugApp.Trace = "ZeroDivisionExceptionService.InsertReturnID(...)";
+					listid = InsertReturnID(GetModelDefault(user, model, null));
+					
+					err = listid > 0 ? "" : "添加失败";
+					if (string.IsNullOrEmpty(err))
+					{
+						Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#新增数据#");
+					}
+                }
+            }
+            return listid;
+        }
+
+        /// <summary>
+        /// 编辑主子表数据listid不为0时被调用，可处理多个子表
+        /// </summary>
+		/// <param name="user">当前用户</param>
+        /// <param name="model">主表数据</param>
+        /// <param name="gridlist">子表数据列表</param>
+        /// <param name="listid">主表数据id</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <param name="isFinish">是否完成，确定调用不同处理函数</param>
+        /// <returns>错误信息</returns>
+        public string EditData(CurrentUserEntity user, ZeroDivisionExceptionModel model, IEnumerable<GridListEntity> gridlist, long listid, string prcno, string isFinish = "")
+        {
+            string err = "";
+            string updateFields;//可修改字段
+
+            if (string.IsNullOrEmpty(err))
+            {
+                model.ListId = listid;
+                DataTable dtMain = DataTableHelp.ModelToDataTable<ZeroDivisionExceptionModel>(model);
+                //主键和唯一检测，可在录入表指标属性中设置
+                DebugApp.Trace = "CheckCom.CheckMainTbValueBKAndUnique(...)";//定位-方便发布模式测试
+                err = CheckCom.CheckMainTbValueBKAndUnique(listid, _maintbid, model, dtMain);
+                if (string.IsNullOrEmpty(err))
+                {
+                    //自定义校验，可在录入表管理录入校验中设置
+                    DebugApp.Trace = "DataValidation(...)";
+                    err = DataValidation(prcno, dtMain, gridlist);
+                    if (string.IsNullOrEmpty(err))
+                    {
+		
+
+                        DebugApp.Trace = "ZeroDivisionExceptionService.GetUpdateFields(...)";
+                        updateFields = GetUpdateFields(prcno, user);//可修改字段
+                        if(!string.IsNullOrEmpty(updateFields))
+                        {
+							GetCalculationValue(ref model, listid);//计算式
+                            //编辑主表
+                            DebugApp.Trace = "ZeroDivisionExceptionService.UpdateByWhere(...)";
+                            err = UpdateByWhere("WHERE listid=" + listid + "", updateFields, model) > 0 ? "" : "编辑失败";
+							Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#编辑数据#");
+                        }
+                    }
+                }
+            }
+            return err;
+        }
+
+		/// <summary>
+		/// 数据删除，可处理软删除
+		/// </summary>
+		/// <param name="user">当前用户</param>
+		/// <param name="listid">主表数据id</param>
+		/// <returns>错误信息</returns>
+		public string DelByListId(CurrentUserEntity user, string listid)
+		{
+			string err = "";
+			var model = base.GetByWhereFirst("WHERE listid = " + listid + "");
+			if (model == null)
+				return "当前数据不存在";
+			
+			List<string> resultList = AfterDelete(ref err, listid, user, model);
+			Record.AddResultList("system", listid.ToString(), _flowid, resultList, "#自定义事件AfterDelete#");
+			if(!string.IsNullOrEmpty(err))
+			{
+				return err;
+			}
+			AttachmentService.DelImg(long.Parse(listid), _flowid);//删除图片
+			AttachmentService.DelAttachment(long.Parse(listid), _flowid);//删除附件
+			
+			//删除主表及相关数据
+			AutoNo.DelAutoNo(listid, _flowid);//删除自动编号
+			Record.Delete(listid, _flowid);//删除记录
+			if (_flowid.StartsWith("fw_"))//删除flowrunlist、flowrunprcslist表关联数据
+			{
+				comService.ExecuteSql("DELETE FROM flowrunlist WHERE ListId = " + listid + "");
+				comService.ExecuteSql("DELETE FROM flowrunprcslist WHERE ListId = " + listid + "");
+			}
+			return base.DeleteByWhere("WHERE ListId = " + listid + "") ? "" : "删除失败";//删除主表数据
+		}
+
+		/// <summary>
+		/// 主表插入一条空数据,listid=0时子表添加数据前会被调用
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="user">当前用户</param>
+		/// <returns>返回listid，基础信息表自增长，一般录入表对应flowrunlist中的listid</returns>
+		public long InsertEmptyReturnID(ref string err, CurrentUserEntity user)
+		{
+			long listid = InsertReturnID(GetModelDefault(user, null, null));
+			Record.Add(user == null ? "!NullEx" : user.Account, listid.ToString(), _flowid, "#主表新增空数据##N{1}#");
+			return listid;
+		}
+		#endregion 增删改
+
+		#region 自定义按钮事件处理
+        /// <summary>
+        /// List页面自定义按钮事件处理,执行sql或调用存储过程
+        /// </summary>
+        /// <param name="err">错误信息</param>
+        /// <param name="idsStr">listid逗号间隔</param>
+		/// <param name="frm">从哪个页面打开的</param>
+        /// <param name="btnId">按钮id</param>
+        /// <param name="user">当前用户</param>
+        /// <returns></returns>
+        public List<string> ListButEvent(ref string err, string idsStr, string frm, string btnId, CurrentUserEntity user)
+        {
+			return null;//未定义--可通过录入表管理/自定义按钮进行设置
+        }
+        #endregion 自定义按钮事件处理
+
+		#region Before处理
+		/// <summary>
+		/// 添加前数据处理，处理自动编号及子表数据初始化..
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="mPrcs">当前流程步骤，基础信息表为空</param>
+		/// <param name="user">当前用户</param>
+		/// <returns>基础信息表自增长，一般录入表对应flowrunlist中的listid</returns>
+		public long BeforeAdd(ref string err, CurrentPrcsEntity mPrcs, CurrentUserEntity user)
+		{
+			long listid = 0;
+            if (comService.GetTotal("tbindex", "WHERE TbId='" + _maintbid + "' AND RuleType='2' AND RuleId <> '' ") > 0)//有指标设置了自动编号
+            {
+                listid = InsertEmptyReturnID(ref err, user);//主表先插入一条空数据
+                if (string.IsNullOrEmpty(err))
+                {
+                    err = AutoNo.SetAutoNumber(listid, _flowid, user);
+                }
+				//不是多余的，如果设置了子表数据初始化，有错误不返回的话会继续执行
+                if (!string.IsNullOrEmpty(err))
+                {
+                    return listid;
+                }
+            }
+
+
+			return listid;
+		}
+
+		/// <summary>
+		/// 编辑前数据处理，默认标志接手办理
+		/// </summary>
+		/// <param name="listid">主表主键</param>
+		/// <param name="mPrcs">当前流程步骤，基础信息表为空</param>
+		/// <param name="user">当前用户信息</param>
+		/// <returns></returns>
+		public string BeforeEdit(string listid, CurrentPrcsEntity mPrcs, CurrentUserEntity user)
+		{
+			string err = "";
+			if (_flowid.StartsWith("fw_"))
+			{
+				err = FlowCom.TakeOverPrcs(user, mPrcs);//标志接手办理
+			}
+			//可自定义
+			return err;
+		}
+
+		/// <summary>
+		/// 删除前数据处理，默认什么也不做
+		/// </summary>
+		/// <param name="listid">主表主键</param>
+		/// <param name="mPrcs">当前流程步骤，基础信息表为空</param>
+		/// <returns></returns>
+		public string BeforeDelete(string listid, CurrentPrcsEntity mPrcs)
+		{
+			return "";//可自定义
+		}
+		#endregion Before处理
+
+		#region After事件处理 可在录入表管理/自定义事件中设置，未设置则返回null
+		/// <summary>
+        /// After处理
+        /// </summary>
+		/// <param name="type">add或edit</param>
+		/// <param name="listid">数据id</param>
+        /// <param name="user">当前用户</param>
+		/// <param name="model">主表数据</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <returns>返回异常信息</returns>
+		public string AfterEditEvent(string type, string listid, CurrentUserEntity user, ZeroDivisionExceptionModel model, string prcno)
+        {
+            string err = "";
+            List<string> resultList = type == "add" ? AfterAdd(ref err, listid, user, model) : AfterEdit(ref err, listid, prcno, user, model);//自定义事件
+            string _type = type == "add" ? "自定义事件AfterAdd" : "自定义事件AfterEdit";
+            Record.AddResultList("system", listid, _flowid, resultList, _type);
+            if (!string.IsNullOrEmpty(err))
+            {
+                return "自定义事件出现错误："+ err;
+            }
+
+            resultList = WriteBackData(ref err, listid, _flowid.StartsWith("bi_") ? "edit" : prcno, user, model);//数据回写
+            Record.AddResultList("system", listid, _flowid, resultList, "#数据回写#");
+            if (!string.IsNullOrEmpty(err))
+            {
+                return "数据回写出现错误：" + err;
+            }
+            return err;
+        }
+
+		/// <summary>
+        /// After处理
+        /// </summary>
+		/// <param name="type">add或finish</param>
+		/// <param name="listid">数据id</param>
+        /// <param name="user">当前用户</param>
+		/// <param name="model">主表数据</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+        /// <returns>返回异常信息</returns>
+        public string AfterFinishEvent(string type, string listid, CurrentUserEntity user, ZeroDivisionExceptionModel model, string prcno)
+        {
+            string err = "";
+            List<string> resultList = type == "add" ? AfterAdd(ref err, listid, user, model) : AfterFinish(ref err, listid, prcno, user, model);//自定义事件 提交|结束后数据处理
+            string _type = type == "add" ? "自定义事件AfterAdd" : "自定义事件AfterFinish";
+            Record.AddResultList("system", listid, _flowid, resultList, _type);
+            if (!string.IsNullOrEmpty(err))
+            {
+                return "自定义事件出现错误：" + err;
+            }
+
+            str = _flowid.StartsWith("bi_") ? "#数据提交##锁定数据#" : "#结束流程##锁定数据#";
+            Record.Add("system", listid, _flowid, str);
+            resultList = WriteBackData(ref err, listid, "_finish", user, model);//数据回写
+            Record.AddResultList("system", listid, _flowid, resultList, "#数据回写#");
+            if (!string.IsNullOrEmpty(err))
+            {
+                return "数据回写出现错误：" + err;
+            }
+            return err;
+        }
+
+		/// <summary>
+        /// 添加后数据处理--【批量】，导入数据时被调用
+        /// </summary>
+        /// <param name="err">错误信息</param>
+        /// <param name="idsStr">listid逗号间隔</param>
+        /// <param name="user">当前用户</param>
+        /// <returns>待记录的结果集</returns>
+        public List<string> BatchAfterAdd(ref string err, string idsStr, CurrentUserEntity user)
+        {
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+        }
+
+		/// <summary>
+        /// 添加后数据处理，录入表管理/自定义事件中可设置
+        /// </summary>
+        /// <param name="err">错误信息</param>
+        /// <param name="listid">主表主键</param>
+        /// <param name="user">当前用户</param>
+        /// <param name="model">当前数据对象</param>
+        /// <returns>待记录的结果集</returns>
+		private List<string> AfterAdd(ref string err, string listid, CurrentUserEntity user, ZeroDivisionExceptionModel model = null)
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 编辑后数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="prcno">当前流程步骤编码，结束为_finish</param>
+		/// <param name="user">当前用户</param>
+		/// <param name="model">当前数据model</param>
+		/// <returns>待记录的结果集</returns>
+		private List<string> AfterEdit(ref string err, string listid, string prcno, CurrentUserEntity user, ZeroDivisionExceptionModel model = null)
+		{
+			LockedService.LockedAfterEdit(_flowid, listid, lockUpTime);
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 提交|结束后数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="prcno">当前流程步骤编码，结束为_finish</param>
+		/// <param name="user">当前用户</param>
+		/// <param name="model">当前数据model</param>
+		/// <returns>待记录的结果集</returns>
+		private List<string> AfterFinish(ref string err, string listid, string prcno, CurrentUserEntity user, ZeroDivisionExceptionModel model = null)
+		{
+			FlowCom.FinishFlowPrcs(listid, _flowid, prcno, user);//结束并锁定数据
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+		/// 删除后数据处理，录入表管理/自定义事件中可设置,执行sql或调用存储过程
+		/// </summary>
+		/// <param name="err">错误信息</param>
+		/// <param name="listid">主表主键</param>
+		/// <param name="model">当前数据model</param>
+		/// <returns>待记录的结果集</returns>
+		private List<string> AfterDelete(ref string err, string listid, CurrentUserEntity user, ZeroDivisionExceptionModel model = null)
+		{
+			return null;//未定义--通过录入表管理/自定义事件可自定义
+		}
+
+		/// <summary>
+        /// 数据回写，通过录入表管理/数据回写可自定义
+        /// </summary>
+		/// <param name="err">错误信息</param>
+        /// <param name="listid">主表主键</param>
+        /// <param name="prcno">当前流程步骤编码</param>
+		/// <param name="user">当前用户</param>
+        /// <param name="model">当前数据model</param>
+		/// <returns>待记录的结果集</returns>
+		private List<string> WriteBackData(ref string err, string listid, string prcno, CurrentUserEntity user, ZeroDivisionExceptionModel model)
+        {
+			return null;//未定义，数据回写在录入表管理/数据回写中设置
+        }
+
+		/// <summary>
+		///返回可修改字段,自由流程排除了隐藏指标,固定流程排除了隐藏指标及不可写字段
+		/// </summary>
+		/// <param name="prcno">当前流程步骤编码</param>
+		/// <returns></returns>
+		public static string GetUpdateFields(string prcno, CurrentUserEntity user)
+		{
+			//自由流程或无流程首先排除隐藏指标
+			string updateFields = "inXS01,inXS02,inXS03";
+			//根据当前用户排除只读|保密字段，其中只读|保密字段可设置
+			return PageCom.GetUpdateFieldsStr(user, _maintbid, updateFields);
+		}
+		#endregion After事件处理 可在录入表管理/自定义事件中设置，未设置则返回null
+
+		#region 查询
+		/// <summary>
+		/// 数据查询列表
+		/// </summary>
+		/// <param name="total">结果集总数</param>
+		/// <param name="model">主表数据model</param>
+		/// <param name="pageInfo">页面信息，包括行数、排序等</param>
+		/// <param name="user">当前用户信息</param>
+		/// <param name="search">选项卡带出的查询字符</param>
+		/// <param name="isAll">为all则显示所有</param>
+		/// <returns>数据集</returns>
+		public List<dynamic> GetListForPage(ref long total, ZeroDivisionExceptionModel model, PageInfoEntity pageInfo, CurrentUserEntity user, string search, string isAll)
+		{
+		    pageInfo.field = "ORDER BY listid DESC";//默认按添加次序倒序
+            if (!string.IsNullOrEmpty(model.OrderStr))
+            {
+                pageInfo.field = model.OrderStr;
+            }
+			object param = BasicHelp.GetParamObject(user);
+			ZeroDivisionExceptionModel entity = new ZeroDivisionExceptionModel();
+			if (string.IsNullOrEmpty(isAll))
+			{
+				entity = model;
+			}
+			//主表查询返回数据列表，备注：查询条件可在录入表指标属性中设置
+			List<dynamic> list = GetList(ref total, search,  entity, pageInfo, user).ToList();
+			IEnumerable<valueTextEntity> selectList = GetSelectList("list", param);//下拉选择、多选、单选动态数据源
+			TransformExa(selectList, list, user);//处理Value与Text转化及其他
+
+			return list;
+		}
+
+		/// <summary>
+		/// list转化为DataTable(rdlc报表接收DataTable数据)，同时处理图片及Value与Text转化
+		/// </summary>
+		/// <param name="search">选项卡带出的查询字符</param>
+		/// <param name="model">当前页面数据，作为查询条件</param>
+		/// <param name="user">当前用户</param>
+		/// <param name="hostUrl">主页链接地址，excel数据点击链接可查看详细</param>
+		/// <returns>数据集</returns>
+		public DataTable GetListForExport(string search, ZeroDivisionExceptionModel model, CurrentUserEntity user, string hostUrl)
+		{
+			//主表查询返回数据列表，备注：查询条件可在录入表指标属性中设置
+			List<dynamic> list = GetList(search, model, user).ToList();
+			if (list == null || list.Count < 1)
+			{
+				list.Add(new ZeroDivisionExceptionModel());//无数据时需加入一条空数据，否则报错
+			}
+			//获取下拉选择、多选、单选数据源
+			IEnumerable<valueTextEntity> selectList = GetSelectList("list", BasicHelp.GetParamObject(user));
+			TransformExa(selectList, list, user, hostUrl);//处理Value与Text转化及其他
+			TransformImg(list, hostUrl);//处理图片
+			TransformFile(list, hostUrl);//处理附件
+
+			DataTable dt= DataTableHelp.ListToDataTable<dynamic>(list);//转换DataTable
+			GetSumRow(search, model, user, dt);//添加合计行
+			return dt;
+		}
+
+		/// <summary>
+		/// 获取下拉选择、多选、单选数据源，只处理主表组件
+		/// 处理列表显示时value与text转化，动态数据源来源于为指标指定的数据规范
+		/// </summary>
+		/// <param name="from">add、edit或list，list表明从列表页面查询条件跳转而来</param>
+		/// <param name="param">条件参数</param>
+		/// <returns>数据集</returns>
+		public IEnumerable<valueTextEntity> GetSelectList(string from, object param)
+		{
+			DataTable dt = DataTableHelp.NewValueTextDt();
+
+
+			return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+		}
+
+		/// <summary>
+		/// 获取分页数据 主表查询调用，返回列表，查询条件可在录入表指标属性中设置
+		/// </summary>
+		/// <param name="total">结果集总数</param>
+		/// <param name="search">筛选条件</param>
+		/// <param name="model">主表数据model</param>
+		/// <param name="pageInfo">页面信息，包括行数、排序等</param>
+		/// <param name="user">当前用户信息</param>
+		/// <returns>数据集</returns>
+		private IEnumerable<dynamic> GetList(ref long total, string search, ZeroDivisionExceptionModel model, PageInfoEntity pageInfo, CurrentUserEntity user)
+		{
+			string where = this.GetWhere(search, model, user);
+
+			return base.GetPageByFilter(ref total, model, pageInfo, where);
+
+		}
+
+		/// <summary>
+		/// 主表查询调用，返回列表，查询条件可在录入表指标属性中设置
+		/// </summary>
+		/// <param name="search">筛选条件</param>
+		/// <param name="model">主表数据model</param>
+		/// <param name="user">当前用户信息</param>
+		/// <returns>数据集</returns>
+		private IEnumerable<dynamic> GetList(string search, ZeroDivisionExceptionModel model, CurrentUserEntity user)
+		{
+			string where = this.GetWhere(search, model, user);
+
+			return base.GetByWhere(where, model, null, "ORDER BY listid DESC");
+
+		}
+
+		/// <summary>
+		/// 获取查询条件
+		/// </summary>
+		/// <param name="search">筛选条件</param>
+		/// <param name="model">当前页面数据，作为查询条件</param>
+		/// <param name="user">当前用户</param>
+		/// <returns>查询字符</returns>
+		private string GetWhere(string search, ZeroDivisionExceptionModel model, CurrentUserEntity user)
+		{
+			string where = BasicHelp.GetWhereByUserAndFlowId(user, _flowid);
+			if (!string.IsNullOrWhiteSpace(search))
+			{
+				if(search.ToLower().Trim().StartsWith("and "))
+				{
+                    where += " " + search.Trim();
+                }
+				else
+				{
+					where += " AND " + search.Trim();
+                }
+			}
+			//小数01
+			if(model.inXS01 != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS01 >= @inXS01)"; 
+			}
+			if(model.inXS01_Exa  != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS01 <= @inXS01_Exa)"; 
+			}
+			//小数02
+			if(model.inXS02 != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS02 >= @inXS02)"; 
+			}
+			if(model.inXS02_Exa  != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS02 <= @inXS02_Exa)"; 
+			}
+			//小数03
+			if(model.inXS03 != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS03 >= @inXS03)"; 
+			}
+			if(model.inXS03_Exa  != null)
+			{
+				where += " AND (tb_ZeroDivisionException.inXS03 <= @inXS03_Exa)"; 
+			}
+			return where;
+		}
+
+		/// <summary>
+		/// 处理下拉选择等组件Value与Text的转化，同时将禁用按钮字符（按钮权限控制）及加密后的listid（外链可作为参数）传入
+		/// </summary>
+		/// <param name="SelectList">Value与Text数据集</param>
+		/// <param name="list">数据集list</param>
+		/// <param name="user">当前用户</param>
+		/// <param name="hostUrl">主页链接地址，excel数据点击链接可查看详细</param>
+		private void TransformExa(IEnumerable<valueTextEntity> selectList, List<dynamic> list, CurrentUserEntity user, string hostUrl = "")
+		{
+			if (list == null)
+			{
+				return;
+			}
+			//禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置
+			str = GetDisableButStr("list", user);
+			//string updateFields = GetUpdateFields("",  user);//可编辑字段
+			string hiddens = PageCom.GetHiddenIndexStr(user, _maintbid, "y");//保密字段
+			//处理列表数据select、checkbox、radio等Value与Text转化
+			foreach (ZeroDivisionExceptionModel obj in list)
+			{
+				obj.DisableButStr = str; //传入禁用按钮字符,前端控制按钮状态
+			    obj.ListId_Exa = ListIdService.ChangeListId(obj.ListId).ToString();//ListId加密,外链时传递该值
+				obj.DetailLink = string.IsNullOrEmpty(hostUrl) ? "" : hostUrl + "/Com/RDLCReport/ExportHtml?fwid=" + _flowid + "&listid=" + obj.ListId_Exa;//详细，导出后excel自带外链
+                TransformHiddenIndex(user, obj, hiddens);//保密字段处理
+
+			}
+		}
+
+		/// <summary>
+		/// 图片列处理
+		/// </summary>
+		/// <param name="list">数据集list</param>
+		/// <param name="hostUrl">主页链接地址，excel数据点击链接可查看详细</param>
+		private void TransformImg(List<dynamic> list, string hostUrl)
+		{
+			return;
+		}
+
+		/// <summary>
+		/// 附件列处理
+		/// </summary>
+		/// <param name="list">数据集list</param>
+		/// <param name="hostUrl">主页链接地址，excel数据点击链接可下载</param>
+		private void TransformFile(List<dynamic> list, string hostUrl)
+		{
+			return;
+		}
+
+		/// <summary>
+        /// 保密字段列处理，固定流程通过流程步骤设置保密字段，基础信息表或自由流程可直接设置保密字段
+        /// </summary>
+        /// <param name="user">当前用户</param>
+        /// <param name="obj">当前对象</param>
+		/// <param name="hidden">保密字段</param>
+        private void TransformHiddenIndex(CurrentUserEntity user, ZeroDivisionExceptionModel obj, string hidden = "")
+        {
+		    if(string.IsNullOrEmpty(hidden))
+              return;
+			if (hidden.Contains(";inXS01;"))
+			{
+				obj.inXS01 = null;//小数01
+			}
+			if (hidden.Contains(";inXS02;"))
+			{
+				obj.inXS02 = null;//小数02
+			}
+			if (hidden.Contains(";inXS03;"))
+			{
+				obj.inXS03 = null;//小数03
+			}
+        }
+
+		/// <summary>
+		/// 列表合计，录入表指标设置为统计求和（需数值类型）就会求解
+		/// </summary>
+		/// <param name="search">筛选条件</param>
+		/// <param name="model">当前数据</param>
+		/// <param name="user">当前用户</param>
+		/// <param name="dt">数据集</param>
+		private void GetSumRow(string search, ZeroDivisionExceptionModel model, CurrentUserEntity user, DataTable dt)
+		{
+			return;
+		}
+		#endregion 查询
+
+		#region 弹出选择页面处理
+		/// <summary>
+		/// 弹出选择页面的查询条件有下拉选择时，为其绑定动态数据源，动态数据源来源于为指标指定的数据规范
+		/// </summary>
+		/// <param name="tbid">录入表id</param>
+		/// <param name="indexid">触发弹出选择页面的指标编码</param>
+		/// <param name="from">edit或list</param>
+		/// <param name="param">条件参数</param>
+		/// <returns>数据集</returns>
+		public IEnumerable<valueTextEntity> GetSelectListForQuery(string tbid, string indexid, string from, object param)
+		{
+			DataTable dt = DataTableHelp.NewValueTextDt();
+			//主表组件触发弹出选择页面
+			if (tbid == "_main")
+			{
+
+			}
+			else//子表组件触发弹出选择页面
+			{
+
+			}
+
+			return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+		}
+
+		/// <summary>
+		/// 弹出选择页面的显示列是下拉或者单选时，为其绑定动态数据源，动态数据源来源于为指标指定的数据规范
+		/// </summary>
+		/// <param name="tbid">录入表id</param>
+		/// <param name="indexid">触发弹出选择页面的指标编码</param>
+		/// <param name="from">edit或list</param>
+		/// <param name="param">条件参数</param>
+		/// <returns>数据集</returns>
+		private IEnumerable<valueTextEntity> GetSelectList(string indexid, string from, object param)
+		{
+			DataTable dt = DataTableHelp.NewValueTextDt();
+
+
+
+			return DataTableHelp.ToEnumerable<valueTextEntity>(dt);//DataTable转换为IEnumerable
+		}
+
+		/// <summary>
+        /// 处理下拉选择等组件Value与Text的转化
+        /// </summary>
+        /// <param name="SelectList">Value与Text数据集</param>
+        /// <param name="list">数据集list</param>
+        /// <param name="user">当前用户</param>
+        /// <param name="hostUrl">主页链接地址，excel数据点击链接可查看详细</param>
+        private void TransformExa(List<dynamic> list, string indexid, string from, CurrentUserEntity user)
+        {
+            string tbid = "";
+            if (list == null)
+            {
+                return;
+            }
+            IEnumerable<valueTextEntity> selectList = GetSelectList(indexid, from, BasicHelp.GetParamObject(user));
+        }
+
+		/// <summary>
+		/// 统一处理弹出选择页面获取数据列表
+		/// </summary>
+		/// <param name="total">结果集总数</param>
+		/// <param name="pageInfo">页面信息，包括行数、排序等</param>
+		/// <param name="type">为1表示当前页打开(非弹窗)，以keyword为关键词搜索</param>
+		/// <param name="keyword">搜索关键词</param>
+		/// <param name="indexid">主表触发时为指标编码，子表触发时为子表编码+指标编码</param>
+		/// <param name="from">list或edit 为list时（即查询时）会解除条件参数中包含的系统指标，如用户登录名等</param>
+		/// <param name="list">封装查询条件为list</param>
+		/// <param name="user">当前用户</param>
+		/// <returns>数据集</returns>
+		public List<dynamic> GetPopUpListForPage(ref long total, PageInfoEntity pageInfo, string type, string keyword, string indexid, string from, IEnumerable<valueTextEntity> list, CurrentUserEntity user = null)
+		{
+			string tbname;
+			string some;
+			string where;
+			string order;
+			PopUpTableListService tblist = new PopUpTableListService();
+			IEnumerable<valueTextEntity> selectList = GetSelectList(indexid, from, BasicHelp.GetParamObject(user));
+			List<dynamic> _list = null;
+
+
+			return _list;
+		}
+		#endregion 弹出选择页面处理
+
+		/// <summary>
+        /// 根据当前用户返回已禁用页面按钮的字符，用于按钮的权限控制
+        /// </summary>
+        /// <param name="pageType">页面类别，list或form</param>
+        /// <param name="user">当前用户</param>
+        /// <returns>禁用按钮字符</returns>
+        public string GetDisableButStr(string pageType, CurrentUserEntity user)
+        {
+            return AuthorityService.GetDisableButStr(_maintbid, pageType, user);
+        }
+
+		/// <summary>
+		/// 获取rdlc报表的相关数据,查看详细时被调用
+		/// </summary>
+		/// <param name="listid">数据主键</param>
+		/// <param name="hostUrl">主页链接地址，为查看图片使用</param>
+		/// <param name="rdlcTemple">rdlc模板文件</param>
+		/// <param name="mainDt">主表数据</param>
+		/// <param name="gridDt">子表数据</param>
+		/// <returns></returns>
+		public static RdlcDeviceEntity GetRdlcDevice(string listid, string hostUrl, CurrentUserEntity user = null, string rdlcTemple = null, DataTable mainDt = null, DataTable gridDt = null)
+		{
+			string err = "";
+			string directory = Directory.GetCurrentDirectory();
+			RdlcDeviceEntity device = PdfService.GetPdfDevice(_maintbid);
+			device.ListId = listid;
+			device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\ZeroDivisionException.rdlc");//rdlc模板文件
+			if (!string.IsNullOrEmpty(rdlcTemple))
+			{
+				rdlcTemple = rdlcTemple.EndsWith(".rdlc") ? rdlcTemple : rdlcTemple + ".rdlc";
+				device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\" + rdlcTemple + "");//rdlc模板文件
+			}
+			if (mainDt != null)
+			{
+				device.MainDt = mainDt;//主表数据
+			}
+			else
+			{
+				device.MainDt = PageCom.GetMainTbDt(ref err, _flowid, listid, hostUrl, device.PathUserImg, device.ImgNoExist, user);//主表数据
+			}
+			if (gridDt != null)
+			{
+				device.GridDt = gridDt;//子表数据
+			}
+			else
+			{
+				device.GridDt = PageCom.GetGridTbDt(ref err, _flowid, listid, hostUrl, device.PathUserImg, device.ImgNoExist, user);//子表数据
+			}
+
+			if (!string.IsNullOrEmpty(err))
+			{
+				device.Err = err;
+			}
+			return device;
+		}
+
+		/// <summary>
+		/// 获取rdlc报表相关数据,数据导出时被调用
+		/// </summary>
+		/// <param name="gridDt">列表数据</param>
+		/// <param name="rdlcTemple">指定的rdlc模板，不指定则使用默认</param>
+		/// <returns></returns>
+		public static RdlcDeviceEntity GetRdlcDevice(DataTable gridDt, string hostUrl, string rdlcTemple = null)
+		{
+			string directory = Directory.GetCurrentDirectory();
+            RdlcDeviceEntity device = PdfService.GetPdfDevice();
+			device.GridDt = gridDt;//列表数据
+			device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\list_ZeroDivisionException.rdlc");//rdlc默认模板
+			if (!string.IsNullOrEmpty(rdlcTemple))
+			{
+				rdlcTemple = rdlcTemple.EndsWith(".rdlc") ? rdlcTemple : rdlcTemple + ".rdlc";
+				device.PathRdlc = Path.Combine(directory, "wwwroot\\Reports\\" + rdlcTemple + "");//指定的rdlc模板
+			}
+			return device;
+		}
+
+
+		/// <summary>
+		/// 主表计算式 根据设置的录入表指标计算式生成
+		/// </summary>
+		/// <param name="listid">主表数据id</param>
+		/// <param name="model">主表对象</param>
+		public void GetCalculationValue(ref ZeroDivisionExceptionModel model, long listid)
+		{
+			model.inXS03 = model.inXS01 / model.inXS02;
+		}
+
+		#region GetObject 部分函数发布模式下会被调用
+		public ZeroDivisionExceptionModel JsonToModel(string json)
+		{
+			ZeroDivisionExceptionModel model = new ZeroDivisionExceptionModel();
+			if (!string.IsNullOrEmpty(json))
+			{
+			   model = (ZeroDivisionExceptionModel)JsonConvert.DeserializeObject<ZeroDivisionExceptionModel>(json);
+			}
+			return model;
+		}
+
+		public ZeroDivisionExceptionModel ListToModel(IEnumerable<ControlEntity> list)
+		{
+			ZeroDivisionExceptionModel model = new ZeroDivisionExceptionModel();
+			str = BasicHelp.GetValueFrmList(list, "listid");
+			model.ListId = string.IsNullOrEmpty(str) ? 0 : long.Parse(str);
+			str = BasicHelp.GetValueFrmList(list, "inXS01");//小数01
+			if (ValidatorHelper.IsNumberic(str))
+			{
+				model.inXS01 = ExtConvert.ToDecimalOrNull(str);
+			}
+			str = BasicHelp.GetValueFrmList(list, "inXS02");//小数02
+			if (ValidatorHelper.IsNumberic(str))
+			{
+				model.inXS02 = ExtConvert.ToDecimalOrNull(str);
+			}
+			str = BasicHelp.GetValueFrmList(list, "inXS03");//小数03
+			if (ValidatorHelper.IsNumberic(str))
+			{
+				model.inXS03 = ExtConvert.ToDecimalOrNull(str);
+			}
+			return model;
+		}
+
+		/// <summary>
+        /// 获取对象并向指标赋初始值，request不为空时（通常为从其他页面打开），将参数赋值给model
+        /// </summary>
+        /// <param name="type">add或edit</param>
+        /// <param name="listid">主键id</param>
+        /// <param name="user">当前用户</param>
+        /// <param name="request">request不为空时（通常为从其他页面打开）</param>
+        /// <returns></returns>
+		public ZeroDivisionExceptionModel GetModel(string type, long listid, CurrentUserEntity user, Microsoft.AspNetCore.Http.HttpRequest request = null)
+		{
+			ZeroDivisionExceptionModel model = new ZeroDivisionExceptionModel();
+			if (type == "add")
+			{
+				model.ListId = listid;
+				if (listid != 0)
+				{
+					model = GetByWhereFirst("WHERE listid=" + listid + "");
+				}
+				//赋初始值--系统指标或默认值（默认值优先级高于系统指标）
+				model.inXS01 = decimal.Parse(Think9.Services.Base.Random.GetRandomDEC10());//默认值10-99随机小数
+				model.inXS02 = (decimal)0;//默认值默认值
+                //request不为空时（通常为从其他页面打开），将参数赋值给model
+                GetModel(model, request);
+			}
+			else
+			{
+				model = GetByWhereFirst("WHERE listid=" + listid + "");
+			}
+			return model;
+		}
+
+		private void GetModel(ZeroDivisionExceptionModel model, Microsoft.AspNetCore.Http.HttpRequest request)
+		{
+			if(request != null)
+			{
+				if (!string.IsNullOrEmpty(request.Query["inXS02"]) && ValidatorHelper.IsNumberic(request.Query["inXS02"].ToString()))
+				{
+					model.inXS02 = ExtConvert.ToDecimalOrNull(request.Query["inXS02"].ToString());
+				}
+			}
+		}
+
+		/// <summary>
+        /// 获取对象并向指标赋初始值
+        /// </summary>
+        /// <param name="type">add或edit</param>
+        /// <param name="listid">主键id</param>
+        /// <returns></returns>
+		public ZeroDivisionExceptionModel GetModel(string type, long listid)
+		{
+			ZeroDivisionExceptionModel model = new ZeroDivisionExceptionModel();
+			if (type == "add")
+			{
+				model.ListId = listid;
+				if (listid != 0)
+				{
+					model = GetByWhereFirst("WHERE listid=" + listid + "");
+				}
+			}
+			else
+			{
+				model = GetByWhereFirst("WHERE listid=" + listid + "");
+			}
+			return model;
+		}
+
+		/// <summary>
+        /// 获取对象同时处理复选框和图片指标
+        /// </summary>
+        /// <param name="json">json字符</param>
+        /// <returns></returns>
+		public ZeroDivisionExceptionModel GetModel(string json)
+		{
+			ZeroDivisionExceptionModel model = new ZeroDivisionExceptionModel();
+			if (!string.IsNullOrEmpty(json))
+			{
+			   model = (ZeroDivisionExceptionModel)JsonConvert.DeserializeObject<ZeroDivisionExceptionModel>(json);
+			   //如果主表有复选框或图片进行处理
+
+			}
+			return model;
+		}
+
+		public void GetModel(string listid, CurrentUserEntity user, ref ZeroDivisionExceptionModel model)
+		{
+			if (model == null)
+			{
+				if (!string.IsNullOrEmpty(listid))
+				{
+					model = base.GetByWhereFirst("WHERE listid=" + listid + "");
+				}
+                if (model == null)
+                {
+                    model = new ZeroDivisionExceptionModel { ListId = long.Parse(listid) };//空值会报错
+                }
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(listid))
+				{
+					model.ListId = long.Parse(listid);
+				}
+			}
+
+			if(string.IsNullOrEmpty(model.createUser))
+            {
+				MainTBEntity entity = MainTBService.GetMainTBEntity(listid, _flowid);
+				model.isLock = entity.isLock;
+				model.createTime = entity.createTime;
+				model.createUser = entity.createUser;
+				model.createDept = entity.createDept;
+				model.createDeptStr = entity.createDeptStr;
+				model.runName = entity.runName;
+				model.attachmentId = entity.attachmentId;
+			}
+
+			model.currentUserId = user == null ? "!NullEx" : user.Account;
+			model.currentUserName = user == null ? "!NullEx" : user.RealName;
+            model.currentDeptNo = user == null ? "!NullEx" : user.DeptNo;
+            model.currentDeptName = user == null ? "!NullEx" : user.DeptName;
+            model.currentRoleNo = user == null ? "!NullEx" : user.RoleNo;
+            model.currentRoleName = user == null ? "!NullEx" : user.RoleName;
+            model.timeToday = DateTime.Today;
+            model.timeNow = DateTime.Now;
+		}
+
+		public ZeroDivisionExceptionModel GetModel(string listid, CurrentUserEntity user)
+        {
+            var model = base.GetByWhereFirst("WHERE listid=" + listid + "");
+            if (model == null)
+                return null;
+
+            model.createUser = user == null ? "!NullEx" : user.Account;
+            model.createDept = user == null ? "!NullEx" : user.DeptNo;
+            model.createDeptStr = user == null ? "!NullEx" : user.DeptNoStr;
+            model.isLock = "0";
+			model.currentUserId = user == null ? "!NullEx" : user.Account;
+			model.currentUserName = user == null ? "!NullEx" : user.RealName;
+            model.currentDeptNo = user == null ? "!NullEx" : user.DeptNo;
+            model.currentDeptName = user == null ? "!NullEx" : user.DeptName;
+            model.currentRoleNo = user == null ? "!NullEx" : user.RoleNo;
+            model.currentRoleName = user == null ? "!NullEx" : user.RoleName;
+            model.timeToday = DateTime.Today;
+            model.timeNow = DateTime.Now;
+
+            return model;
+        }
+
+		/// <summary>
+        /// model赋初始值，同时为隐藏指标赋默认值
+        /// </summary>
+        /// <param name="user">当前用户</param>
+        /// <param name="model">model</param>
+        /// <param name="listid">listid</param>
+        /// <returns></returns>
+		public ZeroDivisionExceptionModel GetModelDefault(CurrentUserEntity user, ZeroDivisionExceptionModel model, long? listid = null)
+		{
+		    model = model == null ? new ZeroDivisionExceptionModel() : model;
+            if (listid != null)
+            {
+                model.ListId = (long)listid;
+            }
+			model.createTime = DateTime.Now.ToString();
+			model.state = 1;//1有效0无效-1已删除
+			model.isLock = "0";
+			model.createUser = user == null ? "!NullEx" : user.Account;
+			model.createDept = user == null ? "!NullEx" : user.DeptNo;
+			model.createDeptStr = user == null ? "!NullEx" : user.DeptNoStr;
+			model.runName = BaseUtil.GetRunName(user == null ? "!NullEx" : user.Account, _flowid, _tbname);//得到名称
+
+			return model;
+		}
+
+		public DataTable ModelToDataTable(ZeroDivisionExceptionModel model)
+		{
+			return DataTableHelp.ModelToDataTable <ZeroDivisionExceptionModel> (model);
+		}
+
+        public IEnumerable<dynamic> GetDetailForMobile(string listid, CurrentUserEntity user)
+        {
+            List<dynamic> list = base.GetListByWhere("WHERE listid=@listid", new { listid = listid }).ToList();
+            //获取下拉选择、多选、单选数据源
+            IEnumerable<valueTextEntity> selectList = GetSelectList("list", BasicHelp.GetParamObject(user));
+            TransformExa(selectList, list, user);//处理Value与Text转化
+
+            return list;
+        }
+
+		public long InsertModel(ZeroDivisionExceptionModel model, DataTable dtMain, CurrentUserEntity user, string flowid, string tbname)
+		{
+			model.createTime = DateTime.Now.ToString();
+			model.state = 1;
+			model.isLock = "0";
+			model.createUser = user == null ? "!NullEx" : user.Account;
+			model.createDept = user == null ? "!NullEx" : user.DeptNo;
+			model.createDeptStr = user == null ? "!NullEx" : user.DeptNoStr;
+			model.runName = BaseUtil.GetRunName(model.createUser, flowid, tbname, dtMain);
+			
+			return base.InsertReturnID(model);
+		}
+		#endregion GetObject 部分函数发布模式下会被调用
+	}
+}

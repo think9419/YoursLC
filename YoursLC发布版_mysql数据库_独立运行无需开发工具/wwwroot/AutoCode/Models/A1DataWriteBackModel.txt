@@ -1,0 +1,54 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:44
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:44
+	/// </summary>
+	 [Table("tb_A1DataWriteBack")]
+	public class A1DataWriteBackModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 编码
+		/// </summary>
+		public string inCoding { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string inName { get; set; }
+		/// <summary>
+		/// 数量
+		/// </summary>
+		public decimal? inQuantity { get; set; }
+		/// <summary>
+		/// 数量 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inQuantity_Exa { get; set; }
+		/// <summary>
+		/// 上报日期
+		/// </summary>
+		public DateTime? inReportDate { get; set; }
+		/// <summary>
+		/// 上报日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inReportDate_Exa { get; set; }
+		/// <summary>
+		/// 填报人
+		/// </summary>
+		public string inApplicant { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

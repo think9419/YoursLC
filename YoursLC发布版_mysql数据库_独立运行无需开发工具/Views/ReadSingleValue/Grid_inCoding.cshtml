@@ -1,0 +1,247 @@
+﻿@*弹出选择页面*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:29:02 弹出选择从自定义录入表取值-此文件放置于Views/ReadSingleValue /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Index";
+	Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+
+<input style="display:none" id="_fromfw" value="bi_ProductManagement">@*取值数据表的流程id,查看详细时需要,为空则不会触发*@
+<input style="display:none" id="_flag" value="inCoding">@*父页面的指标id*@
+<input style="display:none" id="pu_frm" value="@ViewBag.PuFrom">@*list或者add*@
+<input style="display:none" id="pu_tbid" value="@ViewBag.PuTbId">@*表id*@
+<input style="display:none" id="pu_indexid" value="@ViewBag.PuIndexId">@*指标编码*@
+<input style="display:none" id="pu_rowid" value="@ViewBag.PuId">@*子表弹出时使用 对应tableid 哪一行*@
+<input style="display:none" id="pu_column" value="@ViewBag.PuV">@*子表弹出时使用 第几列*@
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+	<legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询 -<span id="sp_searchmode"></span><span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+	<div style="margin: 5px 5px 5px 5px">
+		<form class="layui-form layui-form-pane" action="">
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">类别</label>
+					<div class="layui-input-block">
+						<select id="inCategory" name="inCategory"  lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inCategory"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">名称</label>
+					<div class="layui-input-block">
+						<input type='text' name="inName" id="inName" autocomplete='off' class='layui-input'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">规格型号</label>
+					<div class="layui-input-block">
+						<input type='text' name="inSpecificationAndModel" id="inSpecificationAndModel" autocomplete='off' class='layui-input'>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-sm3">
+					<label class="layui-form-label">单位</label>
+					<div class="layui-input-block">
+						<select id="inUnit" name="inUnit"  lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inUnit"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+			 </div>
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button> <button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+				</div>
+			 </div>
+		</form>
+	</div>
+</fieldset>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+	layui.config({
+		base: '/Self_JS/' /*自定义的js文件 wwwroot/Self_JS文件夹中*/
+	});
+	layui.use(["table", "form", "exLayer", "exUtils", "ReadSingleValue"], function () {
+		let table = layui.table;
+		let form = layui.form;
+		let exLayer = layui.exLayer;
+		let exUtils = layui.exUtils;
+		let myJS = layui.ReadSingleValue;
+		let $ = layui.$;
+
+		form.render(); //更新全部表单数据
+
+		//渲染表格，url数据接口参数；cols设置显示字段...
+		let ThisTable = table.render({
+			elem: "#tableId",
+			url: "/_TB/GetPopUpPageList?indexid=" + $('#_flag').val() + "&from=" + $('#pu_frm').val() + "&fwid=" + $(window.parent.document).find('#_fwid').val(),
+			limits: [10, 50, 100],
+			limit: 10,
+			method:"POST",
+			page: true,
+			defaultToolbar: layui.device().mobile ? [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-icon-search' }, 'filter'] : [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, 'filter'],
+			toolbar: "#toolbarTpl",
+			cols: [[
+			{ type: "radio", fixed: 'left' }
+
+			   ,{ type: "numbers", title: "NO.", fixed: 'left' }
+			   ,{ field: "Value", hide: true  }
+			   ,{ title: "详细", width: 60,  templet: "#operation_Tpl" }
+				,{ field: "info1", title: "编码", width: layui.device().mobile ? 120 : null }
+				,{ field: "info2", title: "名称", width: layui.device().mobile ? 120 : null }
+				,{ field: "info3", title: "单位", width: layui.device().mobile ? 120 : null }
+				,{ field: "info4", title: "单价", width: layui.device().mobile ? 120 : null }
+				,{ field: "info5", title: "规格型号", width: layui.device().mobile ? 120 : null }
+				,{ field: "info6", title: "类别", width: layui.device().mobile ? 120 : null }
+			]],
+			done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+			}
+		});
+
+		 //查询
+		form.on("submit(search)", function (data) {
+			if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+			var _list = [];
+			getControlSearch(_list);
+
+			ThisTable.reload({
+				where: { flag: $('#_flag').val(), "list": _list, fwid: $(window.parent.document).find('#_fwid').val() },
+				page: { curr: 1 }
+			});
+			return false;
+		});
+		//toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "OK"://确定选择
+                    getPopUpSelect(obj);
+                    break;
+                case "searchShow":
+                    myJS.searchShow();
+                    break;
+            }
+        });
+		//数据表格自带的监听radio事件
+        table.on('radio(tableFilter)', function (obj) {
+		    layer.msg("已选择：" + obj.data.Value + " - 需点击确定按钮");
+            document.body.scrollTop = document.documentElement.scrollTop = 0;
+        });
+		//子表行双击事件
+		table.on('rowDouble(tableFilter)', function (obj) {
+
+		});
+		//确定选择后被调用，1为父页面控件赋值；2调用父页面事件，完成控件赋值及数据读取
+		function getPopUpSelect(obj) {
+			var strv = '';
+			var checkStatus = table.checkStatus(obj.config.id);
+			if (checkStatus.data.length > 0) {
+				strv = checkStatus.data[0].Value;
+			}
+
+            //调用后台处理函数 默认什么也不做--可自定义
+            exUtils.ajax('/_TB/AfterPopUpSelect', 'post', {
+                tbid: $('#pu_tbid').val(), indexid: $('#pu_indexid').val(), id: $('#pu_rowid').val(), value: strv, v: $('#pu_column').val()
+            }, true).done(function (response) {
+            }).fail(function (error) {
+                console.log(error);
+            });
+
+            beforeClose(strv);//页面关闭前为父页面控件赋值
+
+			$(window.parent.document).find('#pu_value').click();//调用父页面事件，完成控件赋值及数据读取
+
+			parent.layer.close(parent.layer.getFrameIndex(window.name));
+		}
+
+        //页面关闭前为父页面控件赋值
+		function beforeClose(strv) {
+			//为父页面控件赋值
+			$(window.parent.document).find('#pu_value').val(strv);//选择的值
+			$(window.parent.document).find('#pu_tbid').val($('#pu_tbid').val());//表id
+			$(window.parent.document).find('#pu_indexid').val($('#pu_indexid').val());//指标编码
+			$(window.parent.document).find('#pu_rowid').val($('#pu_rowid').val());//对应table中id可确定行
+			$(window.parent.document).find('#pu_column').val($('#pu_column').val());//第几列
+		}
+
+		//从控件读值，将查询条件push传给后端
+		function getControlSearch(_list) {
+			//类别
+			_list.push({ ClassID: $('#_flag').val(), Text:$('#inCategory').val(), Value:'inCategory'});
+			//名称
+			_list.push({ ClassID: $('#_flag').val(), Text:$('#inName').val(), Value:'inName'});
+			//规格型号
+			_list.push({ ClassID: $('#_flag').val(), Text:$('#inSpecificationAndModel').val(), Value:'inSpecificationAndModel'});
+			//单位
+			_list.push({ ClassID: $('#_flag').val(), Text:$('#inUnit').val(), Value:'inUnit'});
+		}
+
+        //图片预览
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var tips = $(this).data("offset") || 4;
+            var remind = $(this).attr("lay-tips");
+            if (remind != '') {
+                var last4 = remind.substring(remind.length - 4).toLowerCase();
+				var last5 = remind.substring(remind.length - 5).toLowerCase();
+                if (last4 == '.jpg' || last4 == '.png' || last4 == '.gif' || last4 == '.bmp' || last5 == '.jpeg') {
+                    var src = '/UserImg/' + remind;
+                    var imgHtml = "<img src='" + src + "' style='width: 60px;height:60px'/>";
+                    layer.tips(imgHtml, this, {
+                        time: -1,
+                        tips: [tips, $(this).data("color") || '#ffffff'],
+                        area: ['auto', 'auto'],
+                    });
+                }
+                else {
+                    layer.tips(remind, this, {
+                        time: -1,
+                        tips: [tips, $(this).data("color") || '#88858e'],
+                        area: ['auto', 'auto'],
+                    });
+                }
+            }
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+	    //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+       $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+	});
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+	<button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="OK" id="OK">确定选择</button>
+	<span class="layui-word-aux"><i class="fa fa-angle-double-left"></i>选择后，需点击【确定】按钮</span>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+    <a href="/Com/RDLCReport/ExportHtml?listid={{d.Id}}&isOriginal=y&fwid=bi_ProductManagement" target="_blank" id="print" class="layui-btn layui-btn-primary layui-btn-xs">
+        <i class='fa fa-file-text-o'></i>
+    </a>
+</script>
+
+<!-- 图片显示 -->
+<script>
+    function PopUpImg(id) {
+        showImg(id);
+    }
+</script>

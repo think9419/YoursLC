@@ -1,0 +1,64 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:32
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:32
+	/// </summary>
+	 [Table("tb_CustomVerification")]
+	public class CustomVerificationModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 字符01
+		/// </summary>
+		public string inZF01 { get; set; }
+		/// <summary>
+		/// 字符02
+		/// </summary>
+		public string inZF02 { get; set; }
+		/// <summary>
+		/// 日期01
+		/// </summary>
+		public DateTime? inRQ01 { get; set; }
+		/// <summary>
+		/// 日期01 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inRQ01_Exa { get; set; }
+		/// <summary>
+		/// 日期02
+		/// </summary>
+		public DateTime? inRQ02 { get; set; }
+		/// <summary>
+		/// 日期02 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inRQ02_Exa { get; set; }
+		/// <summary>
+		/// 小数01
+		/// </summary>
+		public decimal? inXS01 { get; set; }
+		/// <summary>
+		/// 小数01 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS01_Exa { get; set; }
+		/// <summary>
+		/// 小数02
+		/// </summary>
+		public decimal? inXS02 { get; set; }
+		/// <summary>
+		/// 小数02 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS02_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

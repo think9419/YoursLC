@@ -1,0 +1,90 @@
+﻿@{
+    ViewBag.Title = "已上传附件";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<input style="display:none" id="listid" value="@ViewBag.ListId">
+<input style="display:none" id="fwid" value="@ViewBag.FwId">
+<input style="display:none" id="attachmentId" value="@ViewBag.attachmentId">
+<input style="display:none" id="userid" value="@ViewBag.UserId">
+<div class="layui-container">
+    <div class="layui-row">
+        <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(["table", 'form', 'layer', 'upload', 'exLayer', 'exUtils', "element"], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+            let table = layui.table;
+            let exLayer = layui.exLayer;
+            let exUtils = layui.exUtils;
+            let element = layui.element;
+
+            let ThisTable = table.render({
+                elem: "#tableId",
+                url: "/Com/FileManage/GetAttList?attid=" + $('#attachmentId').val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                method: "POST",
+                page: true,
+                toolbar: "#toolbarTpl",
+                defaultToolbar: ['exports', 'filter'],
+                cols: [[
+                    { type: "numbers", title: "NO.", fixed: 'left' },
+                    { field: "FullName", title: "文件名称", sort: true },
+                    { field: "TotalSize", title: "文件大小", width: 120, sort: true },
+                    { field: "DocType", title: "类型", width: 120, sort: true },
+                    { field: "createTime", title: "上传时间", width: 150 },
+                    { field: "UserId", title: "上传人", width: 150, sort: true },
+                    { title: "下载", width: 70, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+                ]],
+                done: function (res, curr, count) {
+                }
+            });
+
+            table.on("tool(tableFilter)", function (obj) {
+                let data = obj.data;
+                switch (obj.event) {
+                    case "download":
+                        download(data.FullName);
+                        break;
+                }
+            });
+
+            table.on("toolbar(tableFilter)", function (obj) {
+                switch (obj.event) {
+                    case "refresh":
+                        ThisTable.reload({
+                            url: "/Com/FileManage/GetAttList?attid=" + $('#attachmentId').val(),
+                            page: { curr: 1 }
+                        });
+                        break;
+                }
+            });
+
+            upload.render({
+                elem: '#id'
+                , url: '/api/upload/'
+
+            });
+
+            function download(filename) {
+                window.open('/Com/FileManage/Download?attid=' + $('#attachmentId').val() + "&filename=" + filename + "&uid=" + $('#userid').val() + "&fwid=" + $('#fwid').val() + "&listid=" + $('#listid').val(), "_blank");
+            }
+        });
+    </script>
+
+    <script type='text/html' id='operation_Tpl'>
+        {{#  if(d.A2 == '1'){ }}
+        <a href="javascript:;" class='layui-btn layui-btn-normal layui-btn-xs' title='下载数据' lay-event='download' id='download'><i class='fa fa-download'></i></a>
+        {{#  }else{ }}
+        <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled' id='download'><i class='fa fa-download'></i></a>
+        {{#  } }}
+    </script>
+}

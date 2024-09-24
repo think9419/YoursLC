@@ -1,0 +1,101 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "按照流程属性来说，分为基本信息表和一般录入表两类，其中基本信息表无流程属性，数据表主键list自增长；一般录入表有流程属性，listid和flowrunlist表相关联，非自增长。同时定义了事件，修改备注等于编码",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 3,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_1",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "date",
+                        "name": "inDate",
+                        "label": "日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    }
+]

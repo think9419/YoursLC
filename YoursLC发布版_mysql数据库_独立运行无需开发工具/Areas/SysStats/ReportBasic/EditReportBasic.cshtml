@@ -1,0 +1,118 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportBasicEntity;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="FromTbId" value="@Model.TbId">
+    <br>
+    <div class="layui-form-item" style="display:none">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-block">
+            <button type='button' class="layui-btn layui-btn-primary layui-btn-sm" id="IndexColList"><i class='fa fa-edit'></i>显示列</button>
+            <button type='button' class="layui-btn layui-btn-primary layui-btn-sm" id="IndexSearchList"><i class='fa fa-search'></i>查询字段</button>
+            <button type='button' class="layui-btn layui-btn-primary layui-btn-sm" id="IndexOrderList"><i class='fa fa-sort-amount-asc'></i>排序字段</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("ReportSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择统计表分类==", new Dictionary<string, object> { })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">统计表编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="ReportId" id="ReportId" placeholder="统计表编码" autocomplete="off" class="layui-input" readonly maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label  required">统计表名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="ReportName" id="ReportName" placeholder="统计表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">数据源</label>
+        <div class="layui-input-block">
+            <input type="text" name="DbID_Exa" autocomplete="off" class="layui-input" lay-verify="required" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">关联录入表</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbId" autocomplete="off" class="layui-input" lay-verify="required" readonly>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">字体</label>
+        <div class="layui-input-block">
+            <select id="FontStyle" name="FontStyle" lay-verify='required'>
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FontStyle))
+                {
+                        <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" id="ReportRemarks" name="ReportRemarks" placeholder='备注'></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> </label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.val("formUser", {
+            "ReportSort": "@Model.ReportSort"
+            , "DbID_Exa": "@Model.DbID_Exa"
+            , "ReportId": "@Model.ReportId"
+            , "ReportName": "@Model.ReportName"
+            , "TbId": "@Model.TbId"
+            , "FontStyle": "@Model.FontStyle"
+            , "ReportRemarks": "@Model.ReportRemarks"
+        });
+
+        $("#IndexColList").click(function () {
+            exLayer.open("显示列", "/SysStats/ReportBasic/IndexColList?rpId=" + $("#ReportId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $("#IndexSearchList").click(function () {
+            exLayer.open("查询字段", "/SysStats/ReportBasic/IndexSearchList?rpId=" + $("#ReportId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $("#IndexOrderList").click(function () {
+            exLayer.open("排序字段", "/SysStats/ReportBasic/IndexOrderList?rpId=" + $("#ReportId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysStats/ReportBasic/EditReportBasic", "post", { guid: $("#ReportId").val(), tbid: $("#FromTbId").val(), entity: data.field }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    $(window.parent.document).find('#btn_refresh').click();//刷新
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+    });
+</script>

@@ -1,0 +1,175 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <input style="display: none" name="FlowId" id="FlowId" value="@Model.FlowId">
+    <div class="layui-form-item">
+        <label class="layui-form-label">模式选择</label>
+        <div class="layui-input-block">
+            <select name="SearchMode" id="SearchMode">
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "sys_searchmode"))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+            <tip>数据列表页面 - 查看编辑模式（对所有用户）</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">自定义模式</label>
+        <div class="layui-input-block">
+            <textarea name="SearchMode_Exa" id="SearchMode_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 38px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-refresh" id="refresh_SearchMode_Exa">刷新</i></a>
+                <a href="javascript:;"><i class="fa fa-edit" id="sel_SearchMode_Exa">设置</i></a>
+            </span>
+            <tip>以上用户可自定义『模式选择』,如单独设置admin可查看所有数据</tip>
+        </div>
+    </div>
+    <hr class="layui-border-black">
+
+    <div class="layui-form-item" id="divEditUser">
+        <label class="layui-form-label">编辑用户</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="EditUser" id="EditUser">
+            <textarea name="EditUser_Exa" id="EditUser_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 38px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="_EditUser">选择</i></a>
+                <a href="javascript:;"><i class="fa fa-check" id="allEditUser">所有</i></a>
+            </span>
+            <tip>以上用户才能添加|编辑|删除数据 - 对基础信息表有效</tip>
+        </div>
+        <hr class="layui-border-black">
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理用户</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="ManageUser" id="ManageUser">
+            <textarea name="ManageUser_Exa" id="ManageUser_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 38px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="_ManageUser">选择</i></a>
+                <a href="javascript:;"><i class="fa fa-check" id="allManageUser">所有</i></a>
+            </span>
+            <tip>以上用户可管理(转交、锁定、解锁)所有数据，在数据管理页面操作</tip>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">管理用户</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="ManageUser2" id="ManageUser2">
+            <textarea name="ManageUser2_Exa" id="ManageUser2_Exa" class="layui-textarea" readonly="readonly"></textarea>
+            <span style="position: absolute;bottom: 38px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="_ManageUser2">选择</i></a>
+                <a href="javascript:;"><i class="fa fa-check" id="allManageUser2">所有</i></a>
+            </span>
+            <tip>以上用户可管理(转交、锁定、解锁)本部门及下级部门数据，在数据管理页面操作</tip>
+        </div>
+    </div>
+    <hr class="layui-border-black">
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+        form.render();
+
+        formValExa();
+
+        form.val("formEdit", {
+            "SearchMode": "@Model.SearchMode"
+            , "EditUser": "@Model.EditUser"
+            , "EditUser_Exa": "@Model.EditUser_Exa"
+            , "ManageUser": "@Model.ManageUser"
+            , "ManageUser_Exa": "@Model.ManageUser_Exa "
+            , "ManageUser2": "@Model.ManageUser2"
+            , "ManageUser2_Exa": "@Model.ManageUser2_Exa"
+            , "SearchMode_Exa": "@Model.SearchMode_Exa"
+        });
+        function formValExa() {
+            if ($('#FlowId').val().startsWith('bi_')) {
+                $("#divEditUser").show();
+            }
+            else {
+                $("#divEditUser").hide();
+            }
+        }
+
+        $('#allEditUser').on('click', function () {
+            $('#EditUser').val("#all#");
+            $('#EditUser_Exa').val("所有用户");
+
+        });
+        $('#allManageUser').on('click', function () {
+            $('#ManageUser').val("#all#");
+            $('#ManageUser_Exa').val("所有用户");
+
+        });
+        $('#allManageUser2').on('click', function () {
+            $('#ManageUser2').val("#all#");
+            $('#ManageUser2_Exa').val("所有用户");
+
+        });
+
+        $('#sel_SearchMode_Exa').on('click', function () {
+            var tbid = $("#FlowId").val();
+            exLayer.open("自定义模式", "/SysTable/TbBasic/TbSearchMode?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+        $('#refresh_SearchMode_Exa').on('click', function () {
+            exUtils.ajax("/SysTable/TbBasic/GetsearchMode?flowId=" + $("#FlowId").val(), "get", {}, true).done(function (response) {
+                $("#SearchMode_Exa").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //选择用户
+        $('#EditUser_Exa').on('click', function () {
+            // exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits1&sId=" + $("#EditUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $('#_EditUser').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits1&sId=" + $("#EditUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //选择用户
+        $('#ManageUser_Exa').on('click', function () {
+            // exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits2&sId=" + $("#ManageUser").val(), '100%', '100%', '100px', '100px', null, null);
+        });
+        $('#_ManageUser').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits2&sId=" + $("#ManageUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $('#ManageUser2_Exa').on('click', function () {
+            // exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits3&sId=" + $("#ManageUser2").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $('#_ManageUser2').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tblimits3&sId=" + $("#ManageUser2").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbBasic/EditTbLimits", "post", { model: data.field, fwid: $("#FlowId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    })
+</script>

@@ -1,0 +1,177 @@
+﻿@using Think9.Models;
+@model Think9.Models.ModuleEntity;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+<style type="text/css">
+    #sltIcon {
+        height: 38px;
+        line-height: 38px;
+        margin-left: 40px;
+        float: left;
+        display: block;
+    }
+
+    #spnIcon {
+        font-size: 24px;
+        line-height: 38px;
+        float: left;
+        margin-left: 12px;
+    }
+</style>
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="_frm" value="@ViewBag.Frm">
+    <input style="display: none" id="PId" value="@ViewBag.PId">
+    <input style="display:none" id="_plit" value="@ViewBag.Split">@*多选框字符分割*@
+    @*一些不需要更新的隐藏字段*@
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.FontFamily)
+
+    <div class="layui-form-item" id="divParent">
+        <label class="layui-form-label required">上级菜单</label>
+        <div class="layui-input-block">
+            <select id="ParentId" name="ParentId" lay-search=''>
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">菜单名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="FullName" placeholder="菜单名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="10">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接路径</label>
+        <div class="layui-input-block">
+            <input type="text" name="UrlAddress" placeholder="链接路径" autocomplete="off" class="layui-input">
+            <tip style="color: #FE7300; font-size: 12px;">录入表菜单：发布模式为_TB?tbid=主表编码；调试模式为去除前缀tb_的主表编码；中间不能有空格<br />统计表菜单：发布模式为_RP?rpid=统计表编码；调试模式为去除前缀rp_的统计表编码；中间不能有空格</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单图标</label>
+        <div class="layui-input-block">
+            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                <input type="text" id="Icon" name="Icon" placeholder="菜单图标" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                <a id="sltIcon" href="javascript:;" style="color:blue"><i class="fa fa-check"></i>选择</a>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色权限</label>
+        <div class="layui-input-block">
+            <input style="display: none" id="RoleStr" name="RoleStr">
+            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.RoleList).Where(x => x.ClassID == "sys_role"))
+            {
+                <input type="checkbox" name="sys_role" value="@item.Value" title="@item.Text" lay-filter="sys_role" lay-skin="primary">
+            }
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        getRole();
+
+        //赋值
+        form.val("formUser", {
+            "FullName": "@Model.FullName",
+            "UrlAddress": "@Model.UrlAddress",
+            "FontFamily": "@Model.FontFamily",
+            "Icon": "@Html.Raw(Model.Icon)",
+            "ParentId": "@Model.ParentId",
+            "OrderNo": "@Model.OrderNo"
+        });
+
+        function getRole() {
+            //复选框 多选
+            $('#RoleStr').val('@Model.RoleStr');
+            $('input[name=sys_role]').each(function () {
+                if ($('#RoleStr').val().indexOf($('#_plit').val() + $(this).val() + $('#_plit').val()) != -1) {
+                    $(this).prop('checked', true);
+                }
+            });
+        }
+
+        //复选框 多选
+        form.on('checkbox(sys_role)', function (data) {
+            var arr_role = [];
+            $('input[name=sys_role]:checked').each(function () {
+                arr_role.push($(this).val());
+            });
+            var _role = $('#_plit').val();
+            for (const elem of arr_role) {
+                _role = _role + elem + $('#_plit').val();
+            }
+            if (_role == $('#_plit').val()) {
+                _role = '';
+            }
+            $('#RoleStr').val(_role);
+        });
+
+        form.on("submit(edit)", function (data) {
+            if ($('#RoleStr').val() == '') {
+                layer.msg('请选择角色权限');
+                return false;
+            }
+
+            if ($('#ParentId').val() == '0') {
+                exLayer.confirm('上级菜单如果选择『根目录』，该菜单只会出现在页面顶部作为『标签』显示，并且点击『标签』不会跳转到设定的链接，确定继续吗？', function () {
+                    Edit(data);
+                })
+            }
+            else {
+                Edit(data);
+            }
+            return false;
+        });
+
+        if ($("#PId").val() == "0") {
+            /*  $("#divParent").hide();*/
+        }
+
+        function Edit(data) {
+            exUtils.ajax("/SysBasic/Module/Edit", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    if ($('#_frm').val() == 'list') {
+                        parent.layui.treeGrid.reload('tableId', { url: "/SysBasic/Module/GetList" });
+                    }
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+        document.addEventListener('keyup', function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); //阻止回车默认行为
+            }
+        });
+        $("#sltIcon").on("click", function () {
+            exLayer.open("选择图标", "/SysBasic/Module/Icon", '100%', '100%', '0px', '0px', null, null);
+        })
+
+    });
+</script>

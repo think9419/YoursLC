@@ -1,0 +1,450 @@
+﻿[
+    {
+        "index": 999999,
+        "tag": "tab",
+        "name": "tab_999999",
+        "options": [
+            {
+                "title": "选项1",
+                "value": "tab1",
+                "checked": false
+            },
+            {
+                "title": "选项2",
+                "value": "tab2",
+                "checked": true
+            }
+        ],
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 1,
+                        "tag": "grid",
+                        "name": "grid_0d842d68136547b98ec1936d635af9f6",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 31,
+                                        "tag": "input",
+                                        "name": "inTotal",
+                                        "label": "合计",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入合计",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 32,
+                                        "tag": "input",
+                                        "name": "inzf01",
+                                        "label": "字符01",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符01",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "index": 2,
+                        "tag": "grid",
+                        "name": "grid_5966ab6d8e704a2799c4a3a6dc1cbd20",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 33,
+                                        "tag": "input",
+                                        "name": "inzf02",
+                                        "label": "字符02",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符02",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 34,
+                                        "tag": "input",
+                                        "name": "inzf03",
+                                        "label": "字符03",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符03",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "index": 3,
+                        "tag": "grid",
+                        "name": "grid_ab23b9f4cdf94cc8964764e3c4136e8a",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 35,
+                                        "tag": "input",
+                                        "name": "inzf04",
+                                        "label": "字符04",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符04",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 36,
+                                        "tag": "input",
+                                        "name": "inzf05",
+                                        "label": "字符05",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符05",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "index": 4,
+                        "tag": "grid",
+                        "name": "grid_c5228d6de9bb4c7c86dee5d139ccf727",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 37,
+                                        "tag": "input",
+                                        "name": "inzf06",
+                                        "label": "字符06",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符06",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 38,
+                                        "tag": "input",
+                                        "name": "inzf07",
+                                        "label": "字符07",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入字符07",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "input",
+                        "name": "inSuperiorCode",
+                        "label": "上级编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入上级编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inState",
+                        "label": "状态",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入状态",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 7,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 8,
+                        "tag": "input",
+                        "name": "inQuantity02",
+                        "label": "数量02",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入数量02",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 9,
+                        "tag": "input",
+                        "name": "inQuantity01",
+                        "label": "数量01",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入数量01",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 10,
+                        "tag": "img",
+                        "name": "inPicture",
+                        "label": "图片",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    },
+                    {
+                        "index": 11,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 12,
+                        "tag": "file",
+                        "name": "inEnclosure",
+                        "label": "附件",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    },
+                    {
+                        "index": 13,
+                        "tag": "input",
+                        "name": "inEject",
+                        "label": "弹出",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入弹出",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 14,
+                        "tag": "input",
+                        "name": "inDropdown",
+                        "label": "下拉",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入下拉",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    },
+                    {
+                        "index": 15,
+                        "tag": "grid",
+                        "name": "grid_9ccb05fcb8a246b29f4bb3ead5cedc37",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 17,
+                                        "tag": "input",
+                                        "name": "Integer09",
+                                        "label": "整数",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入整数",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 18,
+                                        "tag": "input",
+                                        "name": "inAddress",
+                                        "label": "地址",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入地址",
+                                        "_default": "＠randomint10000",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "index": 16,
+                        "tag": "grid",
+                        "name": "grid_848b32d784be40fea1eec64a60535371",
+                        "column": "2",
+                        "children": [
+                            {
+                                "children": [
+                                    {
+                                        "index": 19,
+                                        "tag": "input",
+                                        "name": "inCoding",
+                                        "label": "编码",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "placeholder": "请输入编码",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false,
+                                        "verify": ""
+                                    }
+                                ]
+                            },
+                            {
+                                "children": [
+                                    {
+                                        "index": 20,
+                                        "tag": "date",
+                                        "name": "inDate",
+                                        "label": "日期",
+                                        "labelwidth": "110",
+                                        "msg": "",
+                                        "labelhide": false,
+                                        "data_dateformat": "yyyy-MM-dd",
+                                        "placeholder": "yyyy-MM-dd",
+                                        "_default": "",
+                                        "width": 100,
+                                        "required": false,
+                                        "disabled": false
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]

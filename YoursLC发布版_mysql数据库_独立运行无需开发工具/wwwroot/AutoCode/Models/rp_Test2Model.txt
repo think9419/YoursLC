@@ -1,0 +1,21 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:35:17
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体参数类【统计表】  生成时间：2024-09-24 13:35:17
+	/// </summary>
+	public class Test2Prm_Model : UserParmEntity
+	{
+		#region Model
+		/// <summary>
+		/// 供应商id
+		/// </summary>
+		public string prmSupplierID { get; set; }
+		#endregion Model
+	}
+}

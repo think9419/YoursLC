@@ -1,0 +1,39 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "设置录入表锁定期限为非0，则用户List页面点击编辑按钮则锁定数据，Form页面点击保存按钮则解锁数据，锁定期间并且没有超过锁定期限规定的时间，不能再编辑数据，确保每次只能有一个用户编辑数据",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inCoding",
+        "label": "编码",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编码",
+        "_default": "＠randomint10000",
+        "width": 100,
+        "required": true,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 2,
+        "tag": "input",
+        "name": "inName",
+        "label": "名称",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入名称",
+        "_default": "＠sysuserid",
+        "width": 100,
+        "required": true,
+        "disabled": false,
+        "verify": ""
+    }
+]

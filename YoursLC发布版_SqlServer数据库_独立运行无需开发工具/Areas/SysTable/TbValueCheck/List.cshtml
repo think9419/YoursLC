@@ -1,0 +1,116 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<blockquote class="layui-elem-quote layui-text">
+    『录入校验』是指录入数据时须遵守的『规则规范』，校验式由指标值、SQL函数、四则运算符(加减乘除及括号)、数字组成，校验式左右需最终转化为数字<br>
+    可对输入的数字及文本字符进行校验，如可进行数字的区间校验，如大于某个值或者小于某值，还可进行单价乘以数量必须等于总额等
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbValueCheck/GetList?tbid=" + $("#tbid").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            page: true,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "IOrder", title: "序号", width: 70 },
+                { title: "表达式", templet: "#Tp01" },
+                { field: "Explain", title: "提示说明" },
+                { title: "启用", templet: "#Tp02", width: 80 },
+                { title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.ID);
+                    break;
+                case "del":
+                    del(data.ID);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.open("新建录入校验", "/SysTable/TbValueCheck/Add?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(id) {
+            exLayer.open("编辑录入校验", "/SysTable/TbValueCheck/Edit?id=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/SysTable/TbValueCheck/Delete", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbValueCheck/GetList?tbid=" + $("#tbid").val()
+            });
+        }
+    });
+</script>
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建录入校验</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href='javascript:;' class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+<script type='text/html' id='Tp01'>
+    <span>{{d.LeftValue}} {{d.Compare}} {{d.RightValue}}</span>
+</script>
+<script type='text/html' id='Tp02'>
+    {{#  if(d.isUse == "0"){ }}
+    <span>禁用</span>
+    {{#  }else{ }}
+    <span>启用</span>
+    {{#  } }}
+</script>

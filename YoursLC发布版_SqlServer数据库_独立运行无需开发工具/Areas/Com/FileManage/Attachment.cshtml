@@ -1,0 +1,188 @@
+﻿@{
+    ViewBag.Title = "附件上传";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<input style="display:none" id="listid" value="@ViewBag.ListId">
+<input style="display:none" id="fwid" value="@ViewBag.FwId">
+<input style="display:none" id="attachmentId" value="@ViewBag.attachmentId">
+<input style="display:none" id="prcid" value="@ViewBag.PrcId">
+<input style="display:none" id="userid" value="@ViewBag.UserId">
+<input style="display:none" id="A1" value="@ViewBag.A1">
+<input style="display:none" id="A2" value="@ViewBag.A2">
+<input style="display:none" id="A3" value="@ViewBag.A3">
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-input-block" style="text-align: right;margin-top: 20px;">
+            <button class="layui-btn" id="btn_Upload">
+                <i class="layui-icon layui-icon-upload"></i>附件上传
+            </button>
+        </div>
+    </div>
+    <div class="layui-row">
+        <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(["table", 'form', 'layer', 'upload', 'exLayer', 'exUtils', "element"], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+            let table = layui.table;
+            let exLayer = layui.exLayer;
+            let exUtils = layui.exUtils;
+            let element = layui.element;
+
+            setUpLoadBut();
+
+            let ThisTable = table.render({
+                elem: "#tableId",
+                url: "/Com/FileManage/GetFileList?attid=" + $('#attachmentId').val() + "&fwid=" + $('#fwid').val() + "&prcid=" + $('#prcid').val() + "&A2=" + $('#A2').val() + "&A3=" + $('#A3').val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                method: "POST",
+                page: true,
+                toolbar: "#toolbarTpl",
+                defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+                cols: [[
+                    { type: "numbers", title: "NO.", fixed: 'left' },
+                    { field: "FullName", title: "文件名称", sort: true },
+                    { field: "TotalSize", title: "文件大小", width: 120, sort: true },
+                    { field: "DocType", title: "类型", width: 120, sort: true },
+                    { field: "createTime", title: "上传时间", width: 150 },
+                    { field: "UserId", title: "上传人", width: 150, sort: true },
+                    { title: "下载", width: 70, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" },
+                    { title: "删除", width: 70, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tp2" }
+                ]],
+                done: function (res, curr, count) {
+                }
+            });
+
+            table.on("tool(tableFilter)", function (obj) {
+                let data = obj.data;
+                switch (obj.event) {
+                    case "download":
+                        download(data.FullName);
+                        break;
+                    case "delete":
+                        del(data.Id, data.FullName);
+                        break;
+                }
+            });
+
+            table.on("toolbar(tableFilter)", function (obj) {
+                switch (obj.event) {
+                    case "refresh":
+                        ThisTable.reload({
+                            url: "/Com/FileManage/GetFileList?attid=" + $('#attachmentId').val() + "&fwid=" + $('#fwid').val() + "&prcid=" + $('#prcid').val() + "&A2=" + $('#A2').val() + "&A3=" + $('#A3').val(),
+                            page: { curr: 1 }
+                        });
+                        break;
+                }
+            });
+
+            upload.render({
+                elem: '#id'
+                , url: '/api/upload/'
+
+            });
+
+            upload.render({
+                elem: '#btn_Upload',
+                field: 'file',
+                url: '@Url.Action("AttUplaod")',
+                auto: true,
+                exts: '@ViewBag.exts',
+                choose: function (obj) {
+                },
+                progress: function (n, elem, res, index) {
+                    var percent = n + '%' //获取进度百分比
+                    element.progress('demo', percent); //可配合 layui 进度条元素使用
+                    console.log(elem); //得到当前触发的元素 DOM 对象。可通过该元素定义的属性值匹配到对应的进度条。
+                    console.log(res); //得到 progress 响应信息
+                    console.log(index); //得到当前上传文件的索引，多文件上传时的进度条控制，如：
+                    element.progress('demo-' + index, n + '%'); //进度条
+                },
+                before: function () {
+                    this.data = {
+                        attid: $('#attachmentId').val(),
+                        listid: $('#listid').val(),
+                        userid: $('#userid').val(),
+                        prcid: $('#prcid').val(),
+                        fwid: $('#fwid').val()
+                    }
+                    layer.load(2);
+                },
+                done: function (res) {
+                    if (res.code == 0) {
+                        $(window.parent.document).find('#_attachmentId').val(res.src);//将attachmentId传到父页面
+
+                        ThisTable.reload({
+                            url: "/Com/FileManage/GetFileList?attid=" + $('#attachmentId').val() + "&fwid=" + $('#fwid').val() + "&prcid=" + $('#prcid').val() + "&A2=" + $('#A2').val() + "&A3=" + $('#A3').val(),
+                            page: { curr: 1 }
+                        });
+                    }
+                    else {
+                        layer.alert('上传失败', {
+                            icon: 2
+                        });
+                    }
+                    layer.closeAll('loading');
+                },
+                error: function () {
+                    layer.alert('上传失败', {
+                        icon: 2
+                    });
+                }
+            });
+
+            function setUpLoadBut() {
+                if ($('#A1').val() == "2") {
+                    $('#btn_Upload').attr('class', 'layui-btn layui-btn-disabled');//无上传权限
+                    $('#btn_Upload').attr('disabled', 'disabled');//无上传权限
+                }
+            }
+
+            function download(filename) {
+                window.open('/Com/FileManage/Download?attid=' + $('#attachmentId').val() + "&filename=" + filename + "&uid=" + $('#userid').val() + "&fwid=" + $('#fwid').val() + "&listid=" + $('#listid').val(), "_blank");
+            }
+
+            function del(id, filename) {
+                exLayer.confirm("确定要删除吗？", function () {
+                    exUtils.ajax("/Com/FileManage/DeleteFile", "get", {
+                        id: id, attid: $('#attachmentId').val(), listid: $('#listid').val(), fwid: $('#fwid').val(), uid: $('#userid').val(), filename: filename
+                    }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        $(".layui-laypage-btn")[0].click();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                })
+            }
+
+            $('#btn_OK').on('click', function () {
+                $(window.parent.document).find('#_attachmentId').val(res.src);//将attachmentId传到父页面
+            });
+        });
+    </script>
+
+    <script type='text/html' id='operation_Tpl'>
+        {{#  if(d.A2 == '1'){ }}
+        <a href="javascript:;" class='layui-btn layui-btn-normal layui-btn-xs' title='下载数据' lay-event='download' id='download'><i class='fa fa-download'></i></a>
+        {{#  }else{ }}
+        <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled' id='download'><i class='fa fa-download'></i></a>
+        {{#  } }}
+    </script>
+    <script type='text/html' id='operation_Tp2'>
+        {{#  if(d.A3 == '1'){ }}
+        <a class='layui-btn layui-btn-danger layui-btn-xs' title='删除数据' lay-event='delete' id='delete'><i class='fa fa-trash-o'></i></a>
+        {{#  }else{ }}
+        <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled' id='delete'><i class='fa fa-trash-o'></i></a>
+        {{#  } }}
+    </script>
+
+}

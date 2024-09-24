@@ -1,0 +1,117 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Form";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+    <input style="display:none" id="_id" value="@ViewBag.Id">
+    <input style="display:none" id="ReportId" value="@ViewBag.rpId">
+    <input style="display:none" id="_tbid" value="@ViewBag.tbid">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">类别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="IndexType" value="0" title="录入表(视图)字段" id="Sort_0" lay-filter="selectIndexType" checked="checked" disabled>
+                <input type="radio" name="IndexType" value="1" title="自定义统计指标" id="Sort_1" lay-filter="selectIndexType" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divIndexId">
+            <label class="layui-form-label required">显示列</label>
+            <div class="layui-input-block">
+                <input type='text' name='IndexId' id='IndexId' autocomplete='off' class='layui-input' lay-verify='required' placeholder='请输入列名' readonly>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">列名|表头</label>
+            <div class="layui-input-block">
+                <input type='text' name='ColName' id='ColName' autocomplete='off' class='layui-input' maxlength='10' lay-verify='required' placeholder='请输入列名|表头'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md8">
+                    <label class="layui-form-label required">列宽(cm)</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='ColWidth' id='ColWidth' autocomplete='off' class='layui-input' maxlength='3' lay-verify='required|integer' placeholder='请输入列宽'>
+                    </div>
+                </div>
+                <div class="layui-col-md4" align="left">
+                    <div class="layui-input-block">
+                        <input type="hidden" name="IsSum" value="0">
+                        <input type="checkbox" id="IsSum" name="IsSum" value="1" title="求和">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">序号</label>
+            <div class="layui-input-block">
+                <input type='text' name='OrderNo' id='OrderNo' autocomplete='off' class='layui-input' maxlength='3' lay-verify='required|integer' placeholder='请输入序号'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="edit" id="edit">编辑</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "table"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let table = layui.table;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+        formValExa();//控件赋值-复选框和图片
+
+        //赋值--不包括多选框和图片
+        form.val("formUser", {
+            "IndexId": "@Model.IndexId"
+            , "ColName": "@Model.ColName"
+            , "OrderNo": "@Model.OrderNo"
+            , "ColWidth": "@Model.ColWidth"
+        });
+
+        //控件赋值
+        function formValExa() {
+            if (@Model.IsSum == "1") {
+                $('#IsSum').attr("checked", true);
+            }
+            else {
+                $("#IsSum").removeAttr("checked");
+            }
+        }
+
+        //点击保存按钮
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysStats/ReportBasic/EditReportIndexCol", "post", { model: data.field, id: $("#_id").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableCol', { url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#_tbid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

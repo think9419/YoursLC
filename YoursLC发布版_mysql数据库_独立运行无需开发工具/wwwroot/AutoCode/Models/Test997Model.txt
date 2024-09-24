@@ -1,0 +1,60 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:42
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:42
+	/// </summary>
+	 [Table("tb_Test997")]
+	public class Test997Model : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 地址
+		/// </summary>
+		public string inAddress { get; set; }
+		/// <summary>
+		/// 测试60
+		/// </summary>
+		public string inTest60 { get; set; }
+		/// <summary>
+		/// 测试59
+		/// </summary>
+		public string inTest59 { get; set; }
+		/// <summary>
+		/// 测试58
+		/// </summary>
+		public string inTest58 { get; set; }
+		/// <summary>
+		/// 测试57
+		/// </summary>
+		public string inTest57 { get; set; }
+		/// <summary>
+		/// 测试56
+		/// </summary>
+		public string inTest56 { get; set; }
+		/// <summary>
+		/// 测试55
+		/// </summary>
+		public string inTest55 { get; set; }
+		/// <summary>
+		/// 测试54
+		/// </summary>
+		public string inTest54 { get; set; }
+		/// <summary>
+		/// 测试53
+		/// </summary>
+		public string inTest53 { get; set; }
+		/// <summary>
+		/// 测试52
+		/// </summary>
+		public string inTest52 { get; set; }
+		#endregion Model
+		
+	}
+}

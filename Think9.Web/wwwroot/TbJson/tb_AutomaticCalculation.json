@@ -1,0 +1,190 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inXS01",
+                        "label": "A",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数01",
+                        "_default": "＠randomdec10",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "input",
+                        "name": "inXS02",
+                        "label": "B",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数02",
+                        "_default": "＠randomdec10",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inXS03",
+                        "label": "C",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数03",
+                        "_default": "＠randomdec10",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_3",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 7,
+                        "tag": "input",
+                        "name": "inXS04",
+                        "label": "小数04",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "A+B+C",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": true,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 8,
+                        "tag": "input",
+                        "name": "inXS05",
+                        "label": "小数05",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "A*B除C",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": true,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 9,
+                        "tag": "input",
+                        "name": "inXS06",
+                        "label": "小数06",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "A+B*C",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": true,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 3,
+        "tag": "grid",
+        "name": "grid_auto_6",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 10,
+                        "tag": "input",
+                        "name": "inXS07",
+                        "label": "小数07",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "子表列1合计",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 11,
+                        "tag": "input",
+                        "name": "inXS08",
+                        "label": "小数08",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "子表列3合计",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": []
+            }
+        ]
+    },
+    {
+        "index": 0,
+        "tag": "gridtable",
+        "name": "tb_Subtable05",
+        "label": "子表",
+        "labelwidth": 110,
+        "labelhide": true,
+        "width": 100
+    }
+]

@@ -1,0 +1,402 @@
+﻿@model Think9.Models.RuleListEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<blockquote class="layui-elem-quote layui-text">
+    <span id="sp_searchmode">为录入表指标选择『数据规范』，可实现自动填写（如设置『自动编号』实现文本框自动填写）、选择输入（如为录入表指标选择『单列选择』确定录入表控件数据源）<br />『数据规范』使用步骤  1：定义数据规范；2：为录入表指标选择『数据规范』</span>
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<input style="display: none" name="classid" id="classid" value="@ViewBag.ClassID">
+<div class="layui-row layui-col-space10">
+    <div class="layui-col-xs12 layui-col-sm2 layui-col-md2">
+        <fieldset class="table-fieldset">
+            <div id="div_A">
+                <label class="layui-form-label">
+                    <a id="a1" style="font-weight: bold; color: #FE7300;">  <span class="layui-left-nav"><i class="fa fa-cog"></i>系统指标</span></a>
+                </label>
+                <label class="layui-form-label">
+                    <a id="a2">  <span class="layui-left-nav"><i class="fa fa-edit"></i>自动编号</span></a>
+                </label>
+                <label class="layui-form-label">
+                    <a id="a6">  <span class="layui-left-nav"><i class="fa fa-reorder"></i>单列选择</span></a>
+                </label>
+                <label class="layui-form-label">
+                    <a id="a7">  <span class="layui-left-nav"><i class="fa fa-list-ul"></i>多列选择</span></a>
+                </label>
+                <label class="layui-form-label">
+                    <a id="a8">  <span class="layui-left-nav"><i class="fa fa-sort-amount-asc"></i>树形选择</span></a>
+                </label>
+            </div>
+        </fieldset>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm10 layui-col-md10">
+        <fieldset class="table-fieldset" id="searchfield" style="display: none;">
+            <legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询&nbsp;<span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+            <div style="margin: 5px 5px 5px 5px">
+                <form class="layui-form layui-form-pane" action="">
+                    <div class="layui-form-item">
+                        <div class="layui-inline">
+                            <input type="text" name="key" id="key" placeholder="名称关键词" class="layui-input">
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button><button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </fieldset>
+        <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+    </div>
+</div>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        var openWH = miniPage.getOpenWidthHeight();
+        let $ = layui.jquery;
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        $("#a1").click(function () {
+            $("#key").val('');
+            $("#classid").val("1");
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+            setFont();
+            $("#a1").css("font-weight", "Bold");
+            $("#a1").css("color", "#FE7300");
+            $("#sp_searchmode").text("『系统指标』包括当前日期、当前用户部门名称等，可实现文本框自动填写");
+            return false;
+        });
+
+        $("#a2").click(function () {
+            $("#key").val('');
+            $("#classid").val("2");
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+            setFont();
+            $("#a2").css("font-weight", "Bold");
+            $("#a2").css("color", "#FE7300");
+            $("#sp_searchmode").text("『自动编号』按照一定规则生成字符，可实现文本框自动填写");
+            return false;
+        });
+
+        $("#a6").click(function () {
+            $("#key").val('');
+            $("#classid").val("6");
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+            setFont();
+            $("#a6").css("font-weight", "Bold");
+            $("#a6").css("color", "#FE7300");
+            $("#sp_searchmode").html("『单列选择』为下拉框、多选框、单选框、弹出选择页面设置动态数据源（即数据选项），实现选择输入，常用于下拉框、多选框、单选框。<i class='fa fa-external-link'></i>表示从外部数据库取数");
+            return false;
+        });
+
+        $("#a7").click(function () {
+            $("#key").val('');
+            $("#classid").val("7");
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+            setFont();
+            $("#a7").css("font-weight", "Bold");
+            $("#a7").css("color", "#FE7300");
+            $("#sp_searchmode").html("『多列选择』为下拉框、多选框、单选框、弹出选择页面设置动态数据源（即数据选项），实现选择输入，常用于文本框的弹出选择。<i class='fa fa-external-link'></i>表示从外部数据库取数");
+            return false;
+        });
+
+        $("#a8").click(function () {
+            $("#key").val('');
+            $("#classid").val("8");
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+            setFont();
+            $("#a8").css("font-weight", "Bold");
+            $("#a8").css("color", "#FE7300");
+            $("#sp_searchmode").text("『树形选择』根据Value前缀按层次显示数据(如3个选项Value分别为 A，A01， A011，将显示为╋选项1，---├『选项2』，------├『选项3』)，常用于行政区划、商品分类等；录入指标设置为『树形选择』，默认查询结果将包括选择项的下级，即如选择A01，查询结果将包括A011及所有前缀包含A01的数据");
+            return false;
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val(),
+            limits: [10, 50, 100, 200],
+            limit: 10,
+            page: true,
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "select", type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "RuleName", title: "名称", width: 250, sort: true, templet: "#RuleName" },
+                { field: "Used", title: "已关联", sort: true, hide: layui.device().mobile ? true : false },
+                { field: "_look", title: "预览", width: 60, align: "center", templet: "#operationTp2" },
+                { field: "_operate", title: "操作", width: 120, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                if ($("#classid").val() == '1') {
+                    $(".layui-table-box").find("[data-field='select']").css("display", "none");
+                }
+                set();
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.RuleId, data.RuleType);
+                    break;
+                case "del":
+                    del(data.RuleId);
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+                case "look":
+                    look(data.RuleId, data.RuleName);
+                    break;
+            }
+        });
+
+        //查询
+        $("#search").click(function () {
+            search();
+        });
+
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].RuleId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+            exLayer.confirm("确定要删除吗？删除后，已关联该数据规范的录入表指标需重新指定数据规范！", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysTable/RuleList/BatchDel", "get", { idsStr: idsStr }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                        $(".layui-laypage-btn")[0].click();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        function search() {
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+            if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+            return false;
+        }
+
+        function set() {
+            var classname = "";
+            if ($("#classid").val() == "2") {
+                classname = "自动编号";
+            }
+            if ($("#classid").val() == "6") {
+                classname = "单列选择";
+            }
+            if ($("#classid").val() == "7") {
+                classname = "多列选择";
+            }
+            if ($("#classid").val() == "8") {
+                classname = "树形选择";
+            }
+
+            if (classname != '') {
+                $("#add").attr("style", "display:block;");
+                $("#batchDel").attr("style", "display:block;");
+                $("#add").html("<i class='fa fa-plus'></i>新建" + classname);
+                if (layui.device().mobile) {
+                    $("#add").html("<i class='fa fa-plus'></i>新建");
+                    $("#batchDel").html('<i class="fa fa-trash-o"></i>删除');
+                }
+            }
+            else {
+                $("#add").attr("style", "display:none;");
+                $("#batchDel").attr("style", "display:none;");
+            }
+        }
+
+        function add() {
+            if ($("#classid").val() == '2') {
+                exUtils.ajax("/SysBasic/AutoCode/NewGuid", "post", {}, true).done(function (response) {
+                    var rid = response.extra;
+                    exLayer.open("新建自动编号", "/SysTable/RuleAuto/List?N=Y&rid=" + rid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                });
+            }
+            if ($("#classid").val() == '6') {
+                exLayer.open("新建单列选择", "/SysTable/RuleSingle/Add", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            if ($("#classid").val() == '7') {
+                exLayer.open("新建多列选择", "/SysTable/RuleMultiple/Add", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            if ($("#classid").val() == '8') {
+                exLayer.open("新建树形选择", "/SysTable/RuleTree/Add", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/RuleList/GetList?classid=" + $("#classid").val() + "&key=",
+                page: { curr: 1 }
+            });
+        }
+
+        function edit(id, classid) {
+            if (classid == '2') {
+                exLayer.open("编辑自动编号", "/SysTable/RuleAuto/List?rid=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            if (classid == '6') {
+                exLayer.open("编辑单列选择", "/SysTable/RuleSingle/Edit?rid=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            if (classid == '7') {
+                exLayer.open("编辑多列选择", "/SysTable/RuleMultiple/Edit?rid=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            if (classid == '8') {
+                exLayer.open("编辑树形选择", "/SysTable/RuleTree/Edit?rid=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+        }
+
+        function look(id, name) {
+            exLayer.open(name + " - 数据预览(最多显示100条数据)", "/SysTable/RuleLook/RuleDataList?id=" + id, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+
+        function del(id) {
+            exLayer.confirm("确定要删除吗？删除后，已关联该数据规范的录入表指标需重新指定数据规范！", function () {
+                exUtils.ajax("/SysTable/RuleList/Delete", "get", { id: id }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function setFont() {
+            $("#a1").css("font-weight", "normal");
+            $("#a2").css("font-weight", "normal");
+            $("#a6").css("font-weight", "normal");
+            $("#a7").css("font-weight", "normal");
+            $("#a8").css("font-weight", "normal");
+
+            $("#a1").css("color", "#a29c9c");
+            $("#a2").css("color", "#a29c9c");
+            $("#a6").css("color", "#a29c9c");
+            $("#a7").css("color", "#a29c9c");
+            $("#a8").css("color", "#a29c9c");
+        }
+
+        //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+        //关闭搜索
+        $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                search();
+            }
+        });
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline"><button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i>批量删除</button></div>
+    <div class="layui-inline"><button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" id="add"><i class="fa fa-plus"></i>新增</button></div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    {{#  if(d.RuleType == '1'){ }}
+    <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled'>编辑</a>
+    <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled'>删除</a>
+    {{#  } else{ }}
+    <a href='javascript:;' class='layui-btn layui-btn-normal layui-btn-xs' lay-event='edit' id='edit'>编辑</a>
+    <a href='javascript:;' class='layui-btn layui-btn-danger layui-btn-xs' lay-event='del' id='del'>删除</a>
+    {{#  } }}
+</script>
+<script type="text/html" id="operationTp2">
+    {{#  if(d.RuleType == '1' || d.RuleType == '2' ){ }}
+    <a class='layui-btn layui-btn-disabled layui-btn-xs' disabled='disabled'><i class="fa fa-file-text-o"></i></a>
+    {{#  } else{ }}
+    <a class='layui-btn layui-btn-normal layui-btn-xs' lay-event='look' id='look'><i class="fa fa-file-text-o"></i></a>
+    {{#  } }}
+</script>
+<script type="text/html" id="RuleName">
+    {{#  if(d.RuleFlag == '1'){ }}
+       <span> {{d.RuleName}}&nbsp;&nbsp;</span><span style="color: darkgrey"><i class="fa fa-external-link
+    "></i></span>
+    {{#  } else{ }}
+    {{d.RuleName}}
+    {{#  } }}
+</script>

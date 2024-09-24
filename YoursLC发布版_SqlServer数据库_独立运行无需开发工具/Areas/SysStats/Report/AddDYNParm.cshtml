@@ -1,0 +1,116 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportDYNParmEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="ReportId" name="ReportId" value="@ViewBag.RpId">
+    <div class="layui-form-item">
+        <tip>
+            <span id="spanShow" style="color:darkgrey">
+                动态行是指按照设定的读取规则实现行自增长，自增长的每一行被选定的参数将被赋值，参数赋值为单列选择的Value或拆解的字符，如设定从性别选择(单列选择)中读取，将自动增长为两行，第一行参数@性别被赋值为男（或者1）；第二行参数@性别被赋值为女（或者2）；统计表的数据行才能设置为动态行
+            </span>
+        </tip>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">选择行</label>
+        <div class="layui-input-block">
+            <select id="Postion" name="Postion" lay-verify="required">
+                <option value="">== 数据行才能设置为动态行 ==</option>
+                @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectList).FindAll(x => x.ClassID.Equals("row")))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">选择参数</label>
+        <div class="layui-input-block">
+            <select id="ParmId" name="ParmId" lay-verify="required">
+                <option value="">== 请选择 ==</option>
+                @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectList).FindAll(x => x.ClassID.Equals("parm")))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">选择方式</label>
+        <div class="layui-input-block">
+            <select id="RuleId" name="RuleId" lay-filter="selectfilter" lay-verify="required" layfilter="selectfilter">
+                <option value="">==  自定义参数选项或从已定义的数据规范(单列选择)读取 ==</option>
+                <option value="-1">自定义参数选项</option>
+                <optgroup label="从已定义的数据规范(单列选择)读取">
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectList).FindAll(x => x.ClassID.Equals("rule")))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </optgroup>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" id="divItemStr" style="display: none;">
+        <label class="layui-form-label required">参数值选项</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" id="ItemStr" name="ItemStr" placeholder='参数值选项请用#间隔,如参数值1#参数值2'></textarea>
+            <tip>参数值选项请用#间隔,如参数值1#参数值2</tip>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新 建</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysStats/ReportDYNParm/Add", "post", { rpId: $("#ReportId").val(), model: data.field }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysStats/ReportDYNParm/GetList?rpId=" + $("#ReportId").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on('select(selectfilter)', function (data) {
+            $("#divItemStr").attr("style", "display:none;");
+            $("#ItemStr").removeAttr("lay-verify");
+            if (data.value == '-1') {
+                $("#divItemStr").attr("style", "display:block;");
+                $("#ItemStr").attr("lay-verify", "required");
+            }
+        })
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

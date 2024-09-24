@@ -1,0 +1,161 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<blockquote class="layui-elem-quote">
+    只显示『固定流程』，基础信息表和自由流程不能设置『流程步骤』，如需删除流程进入『录入表管理』页面，删除录入表便可删除对应流程
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search'><i class='layui-icon layui-icon-search'></i></button> <button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "miniPage"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysFlow/Flow/GetList",
+            limit: 100,
+            toolbar: "#toolbarTpl",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }],
+            page: true,
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "FlowId", title: "编码", sort: true },
+                { field: "FlowName", title: "名称", sort: true },
+                { field: "flowType", title: "类型", sort: true, width: 100, templet: "#flowType" },
+                { title: "操作", width: 100, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        form.on("submit(search)", function (data) {
+            ThisTable.reload({
+                url: "/SysFlow/Flow/GetList?key=" + $("#key").val(),
+                page: { curr: 1 }
+            });
+            return false;
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.FlowId, data.FlowName);
+                    break;
+                case "flowprcs":
+                    flowPrcs(data.FlowId, data.FlowName, data.TbId, data.flowType);
+                    break;
+            }
+        });
+
+        function refresh() {
+            ThisTable.reload({
+            });
+        }
+
+        function edit(id, name) {
+            exLayer.open(name + " - 编辑", "/SysFlow/Flow/Edit?id=" + id, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function flowPrcs(id, name, tbid, type) {
+            if (type == "0") {
+                exLayer.yellowSighMsg("基础信息录入表不能设置流程步骤");
+                return false;
+            }
+            if (type == "2") {
+                exLayer.yellowSighMsg("自由流程无需设置流程步骤");
+                return false;
+            }
+            exLayer.open(name + "-流程步骤", "/SysFlow/FlowPrcs/List?id=" + id + "&tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                ThisTable.reload({
+                    url: "/SysFlow/Flow/GetList?key=" + $("#key").val(),
+                    page: { curr: 1 }
+                });
+                return false;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+    });
+</script>
+<script type='text/html' id='flowType'>
+    {{#  if(d.flowType == 1){ }}
+    固定流程
+    {{#  } }}
+    {{#  if(d.flowType == 2){ }}
+    自由流程
+    {{#  } }}
+    {{#  if(d.flowType == 0){ }}
+    无流程
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    {{#  if(d.flowType == '1'){ }}
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="flowprcs" id="flowprcs">流程步骤</a>
+    {{#  }else{ }}
+    <a href="javascript:;" class="layui-btn layui-btn-primary layui-btn-xs" lay-event="flowprcs" id="flowprcs"><i class="fa fa-ban"></i>流程步骤</a>
+    {{#  } }}
+</script>

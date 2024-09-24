@@ -1,0 +1,690 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="frm" value="@ViewBag.frm">
+    <input style="display:none" id="_guid" value="@ViewBag.Guid">
+    <input style="display:none" id="_frmTbId" value="">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择分类</label>
+            <div class="layui-input-block">
+                @Html.DropDownList("ReportSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择统计表分类==", new Dictionary<string, object> { })
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">统计表编码</label>
+            <div class="layui-input-block layui-col-space3">
+                <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                    <input type="text" name="ReportId" id="ReportId" placeholder="统计表编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="30">
+                </div>
+                <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                    <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                        <option value="">⇓自动生成编码</option>
+                        <option value="英文">英文</option>
+                        <option value="全拼">全拼</option>
+                        <option value="首拼">首拼</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">统计表名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="ReportName" id="ReportName" placeholder="统计表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md11">
+                    <label class="layui-form-label required">数据源</label>
+                    <div class="layui-input-block">
+                        <select id="DbID" name="DbID" lay-filter="selectDb" lay-verify="required">
+                            <option value="0">当前数据库</option>
+                            <optgroup label="⇓从外部数据库取值 - 需首先在数据源管理>>外部数据库中添加创建">
+                                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.DbList))
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                    <button type='button' class='layui-btn layui-btn-primary' id='refresh' lay-tips='刷新'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId">
+            <label class="layui-form-label required">关联表|视图</label>
+            <div class="layui-input-block">
+                <select id="FromTbId" name="FromTbId" lay-filter="selectFromTbId">
+                    <option value="">==需首先选择 -  已定义的录入表或已创建的视图==</option>
+                    <optgroup label="选择已定义的录入表 未创建数据表的录入表不能选择">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                    <optgroup label="选择已创建的视图">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.ViewList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId_Exa" style="display:none">
+            <label class="layui-form-label required">取值数据表</label>
+            <div class="layui-input-block">
+                <select id="FromTbId_Exa" name="FromTbId_Exa" lay-filter="selectFromTbId">
+                    <option value="">==需首先选择 - 从已创建的录入表、视图取值==</option>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey"><i class="layui-icon layui-icon-about" lay-tips="" data-offset="4"></i>显示列|字段</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label layui-hide"></label>
+                <div class="layui-input-block" style="margin-left:0;">
+                    <table class="layui-table" id="tableCol" lay-filter="tableFilter" style="margin-top:-10px;"> </table>
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey"><i class="layui-icon layui-icon-about" lay-tips="" data-offset="4"></i>查询字段</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label layui-hide"></label>
+                <div class="layui-input-block" style="margin-left:0;">
+                    <table class="layui-table" id="tableSearch" lay-filter="tableFilter" style="margin-top:-10px;"> </table>
+                </div>
+            </div>
+        </fieldset>
+        <br />
+        <fieldset class="table-fieldset">
+            <legend style="color:darkgrey"><i class="layui-icon layui-icon-about" lay-tips="" data-offset="4"></i>排序字段</legend>
+            <div class="layui-form-item">
+                <label class="layui-form-label layui-hide"></label>
+                <div class="layui-input-block" style="margin-left:0;">
+                    <table class="layui-table" id="tableOrder" lay-filter="tableFilter" style="margin-top:-10px;"> </table>
+                </div>
+            </div>
+        </fieldset>
+        <br>
+        <div class="layui-form-item">
+            <label class="layui-form-label required"> 选择字体</label>
+            <div class="layui-input-block">
+                <select id="FontStyle" name="FontStyle" lay-verify='required'>
+                    @foreach (valueTextEntity item in ((IEnumerable
+                    <valueTextEntity>
+                    )ViewBag.FontStyle))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备 注</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" id="ReportRemarks" name="ReportRemarks" placeholder='备注'></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> </label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add">新建统计表</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        let ColTable = table.render({
+            elem: "#tableCol",
+            url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-sm' lay-event='_del'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' lay-event='_add'><i class='fa fa-plus'></i>新增显示列</button><button type='button' class='layui-btn layui-btn-warm layui-btn-sm' lay-event='_edit'><i class='fa fa-pencil'></i>编辑</button><span class='layui-word-aux'><i class='fa fa-angle-double-left'></i>编辑列宽及排序</span></div>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { templet: '<span>1<span>', hide: true },
+                { field: "id", templet: "#id", hide: true },
+                { field: "OrderNo", title: "序号", width: 80, templet: "#OrderNo" },
+                { field: "IndexId", title: "显示列|字段", width: 200, templet: "#IndexId" },
+                { field: "ColName", title: "列名|表头", width: layui.device().mobile ? 200 : null },
+                { field: "DataType", title: "类型", width: 150, templet: "#DataType" },
+                { field: "ColWidth", title: "列宽(cm)", width: 100, templet: "#ColWidth" },
+                { field: "IsSum", title: "统计", templet: '#IsSum', width: 80 },
+                { field: "IsSum", title: "参数赋值", templet: '#Parm', width: 120 }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let SearchTable = table.render({
+            elem: "#tableSearch",
+            url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refreshSearch', icon: 'layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-sm' lay-event='_delSearch'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' lay-event='_addSearch'><i class='fa fa-plus'></i>新增查询字段</button><button type='button' class='layui-btn layui-btn-warm layui-btn-sm' lay-event='_editSearch'><i class='fa fa-pencil'></i>编辑</button><span class='layui-word-aux'><i class='fa fa-angle-double-left'></i>编辑排序</span></div>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { templet: '<span>2<span>', hide: true },
+                { field: "id", templet: "#id", hide: true },
+                { field: "OrderNo", title: "序号", width: 100, templet: "#OrderNo" },
+                { field: "IndexId", title: "字段", width: 200 },
+                { field: "Lable", title: "标签", width: 200 }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let OrderTable = table.render({
+            elem: "#tableOrder",
+            url: "/SysStats/ReportBasic/GetReportIndexOrderList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refreshOrder', icon: 'layui-bg-gray layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-sm' lay-event='_delOrder'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' lay-event='_addOrder'><i class='fa fa-plus'></i>新增排序字段</button><button type='button' class='layui-btn layui-btn-warm layui-btn-sm' lay-event='_editOrder'><i class='fa fa-pencil'></i>编辑</button><span class='layui-word-aux'><i class='fa fa-angle-double-left'></i>编辑排序</span></div>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { templet: '<span>3<span>', hide: true },
+                { field: "id", templet: "#id", hide: true },
+                { field: "OrderNo", title: "序号", width: 100, templet: "#OrderNo" },
+                { field: "IndexId", title: "字段", width: 200 },
+                { field: "OrderType", title: "方式", width: 100, templet: "#OrderType" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);//OrderType
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "_add":
+                    addIndexCol();
+                    break;
+                case "_addSearch":
+                    addIndexSearch();
+                    break;
+                case "_addOrder":
+                    addIndexOrder();
+                    break;
+
+                case "_edit":
+                    editIndexCol();
+                    break;
+                case "_editSearch":
+                    editIndexSearch();
+                    break;
+                case "_editOrder":
+                    editIndexOrder();
+                    break;
+
+                case "_del":
+                    delIndexCol();
+                    break;
+                case "_delSearch":
+                    delIndexSearch();
+                    break;
+                case "_delOrder":
+                    delIndexOrder();
+                    break;
+
+                case "_refresh":
+                    refreshIndexCol();
+                    break;
+                case "_refreshSearch":
+                    refreshIndexSearch();
+                    break;
+                case "_refreshOrder":
+                    refreshIndexOrder();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "Parmlist":
+                    exLayer.open('参数赋值', "/SysStats/ReportBasic/IndexColParmList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&colId=" + data.Id + "&dbid=" + $("#DbID").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "IndexId":
+                    var _name = "统计指标 - " + data.IndexId;
+                    exLayer.openMiddle(_name, "/SysStats/IndexStats/ShowIndexDetails?id=" + data.IndexId, '500px', '220px', layui.device().mobile);
+                    break;
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysStats/ReportBasic/AddReportBasic", "post", { guid: $("#_guid").val(), tbid: $("#_frmTbId").val(), dbid: $("#DbID").val(), entity: data.field }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    $(window.parent.document).find('#btn_refresh').click();//刷新
+                    layer.closeAll();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#ReportName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#ReportId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function foreachGridTable(flag) {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _flag = tdArr.eq(1).text();
+                var _id = tdArr.eq(2).find('input').val();
+                var _no = tdArr.eq(3).find('input').val();
+                if (_no != '' && _flag == flag) {
+                    var _row = {};
+                    _row.id = _id;
+                    _row.OrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+
+        function foreachGridTable2(flag) {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _flag = tdArr.eq(1).text();
+                var _id = tdArr.eq(2).find('input').val();
+                var _no = tdArr.eq(3).find('input').val();
+                var _width = tdArr.eq(7).find('input').val();
+                if (_no != '' && _flag == flag) {
+                    var _row = {};
+                    _row.id = _id;
+                    _row.OrderNo = _no;
+                    _row.ColWidth = _width;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+
+        function editIndexCol() {
+            var _gridList = foreachGridTable2('1');
+            exUtils.ajax('/SysStats/ReportBasic/EditReportIndexCol2', 'post', { "gridlist": _gridList }, true).done(function (response) {
+                ColTable.reload({
+                    url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function editIndexSearch() {
+            var _gridList = foreachGridTable('2');
+            exUtils.ajax('/SysStats/ReportBasic/EditReportIndexSearch', 'post', { "gridlist": _gridList }, true).done(function (response) {
+                SearchTable.reload({
+                    url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function editIndexOrder() {
+            var _gridList = foreachGridTable('3');
+            exUtils.ajax('/SysStats/ReportBasic/EditReportIndexOrder', 'post', { "gridlist": _gridList }, true).done(function (response) {
+                OrderTable.reload({
+                    url: "/SysStats/ReportBasic/GetReportIndexOrderList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function refreshIndexCol() {
+            ColTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+            });
+        }
+
+        function refreshIndexSearch() {
+            SearchTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+            });
+        }
+
+        function refreshIndexOrder() {
+            OrderTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexOrderList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+            });
+        }
+
+        function addIndexCol() {
+            if ($("#_frmTbId").val() == '') {
+                layer.msg('请选择关联表或视图');
+                return false;
+            }
+            exLayer.openMiddle("添加显示列", "/SysStats/ReportBasic/AddReportIndexCol?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(), '500px', '450px', layui.device().mobile);
+        }
+
+        function addIndexSearch() {
+            if ($("#_frmTbId").val() == '') {
+                layer.msg('请选择关联表或视图');
+                return false;
+            }
+            exLayer.openMiddle("添加查询字段", "/SysStats/ReportBasic/AddReportIndexSearch?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(), '500px', '350px', layui.device().mobile);
+        }
+
+        function addIndexOrder() {
+            if ($("#_frmTbId").val() == '') {
+                layer.msg('请选择关联表或视图');
+                return false;
+            }
+            exLayer.openMiddle("添加排序字段", "/SysStats/ReportBasic/AddReportIndexOrder?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val(), '500px', '450px', layui.device().mobile);
+        }
+
+        function delIndexCol() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableCol');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelReportIndexCol', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            ColTable.reload({
+                                url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+
+        function delIndexSearch() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableSearch');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelReportIndexSearch', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            SearchTable.reload({
+                                url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+
+        function delIndexOrder() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableOrder');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelReportIndexOrder', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            OrderTable.reload({
+                                url: "/SysStats/ReportBasic/GetReportIndexOrderList?rpId=" + $("#_guid").val() + "&tbid=" + $("#_frmTbId").val() + "&dbid=" + $("#DbID").val()
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+        //选择数据表视图
+        form.on('select(selectFromTbId)', function (data) {
+            $("#_frmTbId").val(data.value.replace("#table#", ""));
+        })
+
+        //数据源选择
+        form.on('select(selectDb)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                $("#divTbId").hide();
+                $("#divTbId_Exa").hide();
+
+                $('#TbId_Exa').removeAttr('lay-verify');
+                $('#TbId').removeAttr('lay-verify');
+
+                if (data.value == '0') {
+                    $("#divTbId").show();
+                    $('#TbId').attr('lay-verify', 'required')
+
+                    $("#_frmTbId").val($('#FromTbId').val());
+                }
+                else {
+                    $("#divTbId_Exa").show();
+                    $('#TbId_Exa').attr('lay-verify', 'required')
+                    GetSelectValueFieldByDB(data.value);
+
+                    $("#_frmTbId").val('');
+                }
+                layer.close(loading);
+
+            }, 2000);
+        })
+
+        //刷新DbID
+        $('#refresh').on('click', function () {
+            var _dbid = $("#DbID").val();
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+            setTimeout(function () {
+                if (_dbid == '0') {
+                    $("#_frmTbId").val($('#FromTbId').val());
+                }
+                else {
+                    GetSelectValueFieldByDB(_dbid);
+                    $("#_frmTbId").val('');
+                }
+                layer.close(loading);
+
+            }, 2000);
+        });
+
+        function GetSelectValueFieldByDB(id) {
+            var controlid = "#FromTbId_Exa";
+            $("" + controlid + "").empty(); //清空控件
+            $.ajax({
+                url: '/SysTable/RuleSingle/GetSelectValueFieldByDB',
+                type: 'GET',
+                data: { id: id },
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (i, item) {
+                        if (item.ClassID == 'err') {
+                            layer.msg(item.Text, { icon: 5, time: 20000, btn: ['关闭'] });
+                        }
+                        else {
+                            $("" + controlid + "").append(new Option(item.Text, item.Value));
+                        }
+                    });
+                    form.render();//不加下拉框可能不正确显示
+                },
+                error: function (xhr, textStatus, error) {
+                    console.log('请求失败', xhr.responseText);
+                    exLayer.redCrossMsg('请求失败');
+                }
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<script type='text/html' id='id'>
+    <input type="text" name="id" value="{{d.Id}}" class="layui-input">
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="DataType">
+    {{# if(d.DataType == '1000'){ }}
+    <span>datetime</span> {{# } }}
+
+    {{# if(d.DataType == '2000'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2010'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2030'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2100'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2200'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2500'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '3000'){ }}
+    <span>int</span> {{# } }}
+
+    {{# if(d.DataType == '3002'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3004'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3006'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3102'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '5200'){ }}
+    <span>img</span> {{# } }}
+</script>
+<script type="text/html" id="OrderType">
+    {{#  if(d.OrderType == '2'){ }}
+       <span>倒序</span>
+     {{#  }else{ }}
+       <span>正序</span>
+     {{#  } }}
+</script>
+<script type="text/html" id="OrderNo">
+    <input type='text' name='OrderNo' value='{{d.OrderNo}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="ColWidth">
+    <input type='text' name='ColWidth' value='{{d.ColWidth}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="Parm">
+    {{# if(d.Parm != ''){ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='Parmlist' id='Parmprcs' lay-tips='需为自定义统计指标包含的条件参数赋值'>{{d.Parm}}</a> {{# } }}
+</script>
+<script type="text/html" id="IndexId">
+    {{# if(d.TbId == '#_indexstats#'){ }}
+    <span><a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='IndexId' id='IndexId' lay-tips='点击查看'>{{d.IndexId}}</a></span>
+    {{#  }else{ }}
+    <span>{{d.IndexId}}</span>
+    {{#  } }}
+</script>

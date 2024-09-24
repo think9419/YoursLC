@@ -1,0 +1,52 @@
+﻿@model Think9.Models.RuleAutoEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" id="tbid" value="@ViewBag.tbid">
+    <input style="display: none" id="indexid" value="@ViewBag.indexid">
+    <br />
+    <div class="layui-form-item" style="text-align: center; vertical-align: middle; ">
+        <div class="layui-inline">
+            @Html.DropDownList("IndexDataType", (IEnumerable<SelectListItem>)ViewBag.DtaeTypeList, new Dictionary<string, object> { })
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbSetUp/EditColumnType", "post", { tbid: $("#tbid").val(), indexid: $("#indexid").val(), type: $("#IndexDataType").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbSetUp/GetGridTbIndexList?tbid=" + $(window.parent.document).find("#tbid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+    });
+</script>

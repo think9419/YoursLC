@@ -1,0 +1,48 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "可对主表的AfterAdd、AfterEdit、AfterFinish、AfterDelete，子表的AfterGridAdd、AfterGridEdit、AfterGridFinish、AfterGridDel事件进行自定义，以上事件分别在添加后、编辑后、提交|结束后、删除后被调用，即点击保存按钮、提交|结束按钮、删除按钮，系统自动执行已设置的sql语句或存储过程\n通过执行自定义包含参数的sql语句或调用已定义的存储过程，完成数据的新增、编辑、删除操作，达到数据同步等目的",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inCoding",
+        "label": "编码",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编码",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 2,
+        "tag": "input",
+        "name": "inName",
+        "label": "名称",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入名称",
+        "_default": "＠randomint10000",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 3,
+        "tag": "gridtable",
+        "name": "tb_Subtable11",
+        "label": "子表11",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    }
+]

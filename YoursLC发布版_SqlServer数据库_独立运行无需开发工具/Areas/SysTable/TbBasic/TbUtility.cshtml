@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-tab layui-tab-brief" lay-filter="lay-filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">List页面标签管理</li>
+            <li lay-id="2">List页面链接属性</li>
+            <li lay-id="3">PDF文档尺寸</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item  layui-show">
+                <div class="layui-form-item">
+                    <div style='text-align: Left;margin-top: 8px;'><span class="layui-word-tip"><i class="fa fa-info-circle"></i>&nbsp;自定义标签显示在List页面顶部，点击标签将按照设定的筛选条件显示查询结果</span></div>
+                </div>
+                <div class="layui-row">
+                    <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                        <label class="layui-form-label required">标题</label>
+                        <div class="layui-input-block">
+                            <input type='text' name='TagName' id='TagName' autocomplete='off' class='layui-input' maxlength='10' placeholder='标签标题' lay-verify='required'>
+                        </div>
+                    </div>
+                    <div class="layui-col-xs12 layui-col-sm4 layui-col-md4">
+                        <label class="layui-form-label">筛选条件</label>
+                        <div class="layui-input-block">
+                            <input type='text' name='FilterStr' id='FilterStr' autocomplete='off' class='layui-input' maxlength='300' placeholder='筛选条件'>
+                            <span style='position: absolute;bottom: 10px; right: 5px;'><a href='javascript:;' id='select_FilterStr'><i class='fa fa-check-square-o'></i></a></span>
+                        </div>
+                    </div>
+                    <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                        <label class="layui-form-label required">序号</label>
+                        <div class="layui-input-block">
+                            <input type='text' name='OrderNo' id='OrderNo' autocomplete='off' class='layui-input' maxlength='2' placeholder='序号' lay-verify='required|number'>
+                        </div>
+                    </div>
+                    <div class="layui-col-xs12 layui-col-sm2 layui-col-md2">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" lay-submit lay-filter="addTag" style="text-align: left;"><i class="fa fa-plus"></i>添加标签</button>
+                        </div>
+                    </div>
+                </div>
+                <table class="layui-hide" id="tabTag" lay-filter="tableFilter"></table>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <div style='text-align: Left;margin-top: 8px;'><span class="layui-word-tip"><i class="fa fa-info-circle"></i>&nbsp;设置成功后，List页面点击指标列可打开页面，包括打开录入表的显示、添加、编辑页面及统计报表页面，备注：数值型、字符型指标才能设置链接属性</span></div>
+                </div>
+                <table class="layui-hide" id="tabLink" lay-filter="tableFilter"></table>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <div style='text-align: Left;margin-top: 8px;'><span class="layui-word-tip"><i class="fa fa-info-circle"></i>&nbsp;设置导出PDF的尺寸(单位cm)，不设置导出的PDF默认为A4纸大小</span></div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">宽度</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Width' id='Width' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf宽度 默认值22cm' value="@ViewBag.Width">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">高度</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Heigh' id='Heigh' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf高度 默认值29.7cm' value="@ViewBag.Heigh">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">上边距</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Top' id='Top' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf上边距 默认值1.5cm' value="@ViewBag.Top">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">左边距</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Left' id='Left' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf左边距 默认值0.5cm' value="@ViewBag.Left">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">右边距</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Right' id='Right' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf右边距  默认值0.5cm' value="@ViewBag.Right">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" lay-tips="Bottom">下边距</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='Bottom' id='Bottom' autocomplete='off' class='layui-input' maxlength='15' lay-verify='number' placeholder='pdf下边距 默认值1.5cm' value="@ViewBag.Bottom">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" lay-tips="Bottom"></label>
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" id="editPdfSize">保存</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input style="display: none" name="TbId" id="TbId" value="@ViewBag.TbId">
+</form>
+
+<script>
+    layui.use(["table", 'form', "element", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+        form.render();
+
+        //Tab选项
+        element.on('tab(tabTag_Filter)', function (data) {
+            if (this.getAttribute('lay-id') == 'lay-id') {
+            }
+        });
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        form.val("formEdit", {
+
+        });
+
+        form.on("submit(addTag)", function (data) {
+            var _list = getControlValueList();
+            exUtils.ajax("/SysTable/TbUtility/AddTbTag", "post", { "list": _list }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    ThisTag.reload({
+                        url: "/SysTable/TbUtility/GetTagList?tbid=" + $("#TbId").val()
+                    });
+                    $("#TagName").val('');
+                    $("#FilterStr").val('');
+                    $("#OrderNo").val('');
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        let ThisTag = table.render({
+            elem: "#tabTag",
+            url: "/SysTable/TbUtility/GetTagList?tbid=" + $("#TbId").val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refreshTag', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTp2",
+            cols: [[
+                { field: "TagName", title: "标题", sort: true },
+                { field: "FilterStr", title: "筛选条件", sort: true },
+                { field: "OrderNo", title: "序号", width: 80, sort: true },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]]
+        });
+
+        let ThisLink = table.render({
+            elem: "#tabLink",
+            url: "/SysTable/TbUtility/GetIndexLinkList?tbid=" + $("#TbId").val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refreshLink', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "IndexName", title: "录入指标", sort: true },
+                { field: "LinkFlag", title: "打开页面", sort: true },
+                { field: "LinkFlag2", title: "页面类型", width: 120, sort: true },
+                { title: "操作", width: 160, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTp2" }
+            ]]
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refreshTag":
+                    ThisTag.reload({
+                        url: "/SysTable/TbUtility/GetTagList?tbid=" + $("#TbId").val()
+                    });
+                case "refreshLink":
+                    ThisLink.reload({
+                        url: "/SysTable/TbUtility/GetIndexLinkList?tbid=" + $("#TbId").val()
+                    });
+                    break;
+                case "addLink"://新增按钮事件
+                    exLayer.open("链接属性", "/SysTable/TbSetUp/AddIndexLink?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "delTag":
+                    delTag(data.Id);
+                    break;
+                case "delLink":
+                    delLink(data.IndexId);
+                    break;
+                case "editLink":
+                    editLink(data);
+                    break;
+            }
+        });
+
+        function delTag(id) {
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                exUtils.ajax("/SysTable/TbUtility/DeleteTag", "get", { id: id }, true).done(function (response) {
+                    ThisTag.reload({
+                        url: "/SysTable/TbUtility/GetTagList?tbid=" + $("#TbId").val()
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function editLink(data) {
+            exLayer.open("链接属性", "/SysTable/TbSetUp/EditIndexLink?tbid=" + $("#TbId").val() + "&indexid=" + data.IndexId, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function delLink(indexId) {
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                $('#LinkStr').val('');
+                exUtils.ajax("/SysTable/TbSetUp/DelLink", "get", {
+                    tbid: $("#TbId").val(), indexid: indexId
+                }, true).done(function (response) {
+                    ThisLink.reload({
+                        url: "/SysTable/TbUtility/GetIndexLinkList?tbid=" + $("#TbId").val()
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            });
+        }
+
+        function getControlValueList() {
+            var _list = [];
+            _list.push({ ControlID: 'TbId', ControlValue: $('#TbId').val(), ControlType: '1' });
+            _list.push({ ControlID: 'TagName', ControlValue: $('#TagName').val(), ControlType: '1' });
+            _list.push({ ControlID: 'FilterStr', ControlValue: $('#FilterStr').val(), ControlType: '1' });
+            _list.push({ ControlID: 'OrderNo', ControlValue: $('#OrderNo').val(), ControlType: '1' });
+            return _list;
+        }
+
+        function getControlValueList2() {
+            var _list = [];
+            _list.push({ ControlID: 'Width', ControlValue: $('#Width').val(), ControlType: '1' });
+            _list.push({ ControlID: 'Heigh', ControlValue: $('#Heigh').val(), ControlType: '1' });
+            _list.push({ ControlID: 'Top', ControlValue: $('#Top').val(), ControlType: '1' });
+            _list.push({ ControlID: 'Left', ControlValue: $('#Left').val(), ControlType: '1' });
+            _list.push({ ControlID: 'Right', ControlValue: $('#Right').val(), ControlType: '1' });
+            _list.push({ ControlID: 'Bottom', ControlValue: $('#Bottom').val(), ControlType: '1' });
+            return _list;
+        }
+
+        $('#editPdfSize').on('click', function () {
+            var _list = getControlValueList2();
+            exUtils.ajax("/SysTable/TbUtility/SetPdfSize", "post", { "list": _list, tbid: $("#TbId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#select_FilterStr').on('click', function () {
+            var tbid = $("#TbId").val();
+            exLayer.openMiddle("数据表字段", "/SysTable/TbSetUp/DBTable2?tbid=" + tbid, '500px', '500px', layui.device().mobile);
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+
+            }
+        });
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delTag" id="delTag">删除</a>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTp2">
+    <a class="layui-btn layui-btn-normal layui-btn-xs " lay-event="editLink" id="editLink">编辑</a>
+    <a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="delLink" id="delLink">删除</a>
+</script>
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-btn-container">
+      <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="addLink" id="addLink"><i class="fa fa-plus"></i>新增</button>
+     </div>
+</script>

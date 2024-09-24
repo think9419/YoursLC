@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="fromId" value="@ViewBag.fromid">
+    <input style="display:none" id="strId" value="@ViewBag.strId">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <div class="layui-form-item" style="text-align: center;margin-top: 10px; ">
+        <button class="layui-btn layui-btn-normal" lay-event="OK" id="OK">确定选择</button>
+    </div>
+    <div class="layui-row">
+        <div class="layui-col-md5">
+            <span>待选项</span>
+            <table class="layui-hide" id="lefttable" lay-filter="tableFilter"></table>
+        </div>
+        <div style="text-align: center; vertical-align: middle; ">
+            <div class="layui-col-md2" style="text-align: center; padding-top: 100px;" id="divBut">
+                <button type="button" class="layui-btn" id="add">
+                    添加&nbsp;<i class=" fa fa-angle-double-right
+fa-angle-"></i>
+                </button><br /><br />
+                <button type="button" class="layui-btn layui-btn-danger" id="del"><i class="fa fa-angle-double-left"></i>&nbsp;移除</button>
+            </div>
+        </div>
+        <div class="layui-col-md5">
+            <span>已选项</span>
+            <table class="layui-hide" id="righttable" lay-filter="tableFilter"></table>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        let LeftTable = table.render({
+            elem: "#lefttable",
+            url: "/Com/ComSelect/GetIndexAndSonTbList?tbid=" + $("#tbid").val(),
+            defaultToolbar: [],
+            height: layui.device().mobile ? 220 : 312,
+            method: "post",
+            cols: [[
+                { type: "checkbox" },
+                { field: "Value", title: "编码" },
+                { field: "Text", title: "名称" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        let RightTable = table.render({
+            elem: "#righttable",
+            url: "/Com/ComSelect/GetIndexAndSonTbListByStr?strID=" + $("#strId").val() + "&tbid=" + $("#tbid").val(),
+            defaultToolbar: [],
+            height: layui.device().mobile ? 220 : 312,
+            method: "post",
+            cols: [[
+                { type: "checkbox" },
+                { field: "Value", title: "编码" },
+                { field: "Text", title: "名称" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        //添加
+        $("#add").click(function () {
+            var checkStatus = table.checkStatus('lefttable');
+            var ids = [];
+
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                if ($("#strId").val().indexOf(';' + o.Value + ';') == -1) {
+                    ids.push(o.Value);
+                }
+            });
+
+            if (ids.length < 1) {
+                layer.msg('无选中项');
+                return false;
+            }
+
+            var _sel = $("#strId").val() + ";" + ids.join(";") + ";";
+            $("#strId").val(_sel);
+
+            RightTable.reload({
+                where: { strID: $("#strId").val() }
+            });
+
+            return false;
+        });
+
+        //移除
+        $("#del").click(function () {
+            var _strid = $("#strId").val();
+            var checkStatus = table.checkStatus('righttable');
+            var ids = [];
+            $(checkStatus.data).each(function (i, o) {//o即为表格中一行的数据
+                ids.push(o.Value);
+                var _sel = ";" + o.Value + ";";
+                _strid = _strid.replace(_sel, ";");
+            });
+
+            $("#strId").val(_strid);
+
+            RightTable.reload({
+                where: { strID: $("#strId").val() }
+            });
+
+            return false;
+        });
+
+        //确定
+        $("#OK").click(function () {
+            var _strid = ";";
+            var _strname = "";
+            var datas = new Array();
+            datas = layui.table.cache["righttable"];
+            for (i = 0; i < datas.length; i++) {
+                var _strid = _strid + datas[i].Value + ";";
+                var _strname = _strname + datas[i].Text + " ";
+            }
+
+            if ($("#fromId").val() == 'flowprcs01') {
+                $(window.parent.document).find('#PrcsIndex').val(_strid);
+                $(window.parent.document).find('#PrcsIndex_Exa').val(_strname);
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }
+
+            if ($("#fromId").val() == 'flowprcs02') {
+                $(window.parent.document).find('#HiddenIndex').val(_strid);
+                $(window.parent.document).find('#HiddenIndex_Exa').val(_strname);
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }
+
+            return false;
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#divBut").attr("style", "text-align: center; ");
+                $("#add").html('从待选项中添加');
+                $("#del").html('从已选项中移除');
+            }
+        });
+    })
+</script>

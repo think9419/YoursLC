@@ -1,0 +1,432 @@
+﻿@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+    <input style="display:none" id="isSelMuch" value="@Model.isSelMuch">
+    <input style="display:none" id="DataType" value="@ViewBag.DataType">
+    <input style="display:none" id="DataType2" value="@ViewBag.DataType2">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">指标名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="IndexName" id="IndexName" placeholder="指标名称" autocomplete="off" class="layui-input" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">指标编码</label>
+            <div class="layui-input-block">
+                <input type="text" name="IndexId" id="IndexId" placeholder="指标编码" autocomplete="off" class="layui-input" lay-verify="required" readonly="readonly">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">指标类型</label>
+            <div class="layui-input-block">
+                <input type="text" name="DataType" id="DataType" placeholder="指标类型" autocomplete="off" class="layui-input" readonly="readonly">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">列表排序</label>
+            <div class="layui-input-block">
+                <input type="text" name="IndexOrderNo" id="IndexOrderNo" placeholder="请输入1-999的整数 录入表内排序号须唯一" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3" readonly="readonly">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md6">
+            <label class="layui-form-label">列表表头</label>
+            <div class="layui-input-block">
+                <input type="text" name="ListHeadName" id="ListHeadName" placeholder="列表名称(表头)" autocomplete="off" class="layui-input" maxlength="30" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-col-md6">
+            <label class="layui-form-label">列表列宽</label>
+            <div class="layui-input-block">
+                <input type="text" name="ColumnWith" id="ColumnWith" placeholder="列表列宽 (5至1000之间)" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md12">
+            <label class="layui-form-label">默认值</label>
+            <div class="layui-input-block">
+                <input type="text" name="DefaultV" id="DefaultV" placeholder="输入或选择 默认值优先级高于系统指标" autocomplete="off" class="layui-input">
+                <span style="position: absolute;bottom: 10px; right: 5px;">
+                    <i class="fa fa-check" style="color:blue" id="selDefaultV"></i>
+                    <i class="fa fa-trash-o" style="color:red" id="delDefaultV"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-md12">
+            <label class="layui-form-label"><i class="layui-icon layui-icon-about" lay-tips="数值型指标才能设置计算式" data-offset="4" id="tipsAuto02"></i>计算式</label>
+            <div class="layui-input-block">
+                <input type="text" name="Auto02" id="Auto02" placeholder="自动计算式" autocomplete="off" class="layui-input" readonly>
+                <span style="position: absolute;bottom: 10px; right: 5px;">
+                    <i class="fa fa-edit" style="color:blue" id="selAuto02"></i>
+                    <i class="fa fa-trash-o" style="color:red" id="delAuto02"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">锁 定</label>
+        <div class="layui-input-block layui-col-space3">
+            <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                <select name="isLock" id="isLock" lay-filter="isLock">
+                    <option value='3'> 按行锁定</option>
+                    <option value='1'> 锁定(不可编辑)</option>
+                    <option value='2'> 不锁定</option>
+                    <option value='9'> 编辑时锁定</option>
+                </select>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm9 layui-col-md9">
+                <input type="text" name="isLock2" id="isLock2" placeholder="按行锁定时请输入行号 行号之间用空格键间隔 如1 2 3 备注：待添加行行号为0" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+
+    <fieldset class="table-fieldset">
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <input type="hidden" name="isEmpty" value="1">
+                <input type="checkbox" name="isEmpty" id="isEmpty" lay-skin="primary" title="必填" value="2" lay-filter="isEmpty">
+                <span style="position: absolute;bottom: 0px; left: 60px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="勾选后将进行不能为空检测" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-input-inline">
+                <input type="hidden" name="isPK" value="2">
+                <input type="checkbox" name="isPK" id="isPK" lay-skin="primary" title="主键" value="1" lay-filter="isPK">
+                <span style="position: absolute;bottom: 0px; left: 60px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="勾选后将设置为主键的多个字段组合在一起进行唯一检测" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-input-inline">
+                <input type="hidden" name="isUnique" value="2">
+                <input type="checkbox" name="isUnique" id="isUnique" lay-skin="primary" title="唯一" value="1" lay-filter="isUnique">
+                <span style="position: absolute;bottom: 0px; left: 60px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="勾选后将进行唯一检测" data-offset="4"></i>
+                </span>
+            </div>
+
+            <div class="layui-input-inline">
+                <input type="hidden" name="ListStat" value="2">
+                <input type="checkbox" name="ListStat" id="ListStat" lay-skin="primary" title="统计求和(数值类型)" value="1" lay-filter="ListStat">
+                <span style="position: absolute;bottom: 0px; left: 155px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="只对数值类型指标有效，勾选后将在末行显示合计值" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-input-inline">
+                <input type="hidden" name="isTime" value="2">
+                <input type="checkbox" name="isTime" id="isTime" lay-skin="primary" title="日期+时间(日期类型)" value="1" lay-filter="isTime">
+                <span style="position: absolute;bottom: 0px; left: 165px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="只对日期类型指标有效，勾选后将以YYYY-MM-DD HH:MM:SS格式显示时间" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-input-inline">
+                <input type="hidden" name="isShow" value="1">
+                <input type="checkbox" name="isShow" id="isShow" lay-skin="primary" title="隐藏列(录入页面不显示)" value="2" lay-filter="isShow">
+                <span style="position: absolute;bottom: 0px; left: 190px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="勾选后将隐藏该列，只能排在最末，即隐藏列之后不能再有非隐藏列，否则设置无效，隐藏指标可作为标志字段，可通过数据回写、自定义事件等方式修改该指标的值" data-offset="4"></i>
+                </span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-inline">
+                <input type="hidden" name="Code01" value="2">
+                <input type="checkbox" name="Code01" id="Code01" lay-skin="primary" title="可扫码" value="1" lay-filter="Code01">
+                <span style="position: absolute;bottom: 0px; left: 75px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="支持扫码枪等设备，同时可触发数据读取" data-offset="4"></i>
+                </span>
+            </div>
+            <div class="layui-input-inline">
+                <input type="hidden" name="isHtmlTag" value="2">
+                <input type="checkbox" name="isHtmlTag" id="isHtmlTag" lay-skin="primary" title="显示HtmlTag" value="1" lay-filter="isHtmlTag" disabled="disabled">
+            </div>
+            <div class="layui-input-inline" style="width:350px;">
+                <input type="text" name="FileType" id="FileType" placeholder="允许上传的附件及图片类型，不输入则不限制" autocomplete="off" class="layui-input">
+                <span style="position: absolute;bottom: 10px; right: 5px;">
+                    <i class="fa fa-check" style="color:blue" id="selFileType"></i>
+                </span>
+                <span style="position: absolute;bottom: 10px; right: -20px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="允许上传的附件及图片类型，只对附件及图片类型指标有效，格式如jpg|png|gif|bmp|jpeg|svg" data-offset="4"></i>
+                </span>
+            </div>
+        </div>
+    </fieldset>
+    <br />
+    <div class="layui-form-item">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">控件类型</label>
+                <div class="layui-input-block">
+                    @Html.DropDownList("ControlType", (IEnumerable<SelectListItem>)ViewBag.ControlType, "==请选择控件类型==", new Dictionary<string, object> { { "lay-verify", "required" } })
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <label class="layui-form-label">校验规则</label>
+                <div class="layui-input-block">
+                    @Html.DropDownList("ControlBy3", (IEnumerable<SelectListItem>)ViewBag.ValidateList, "==请选择==", new Dictionary<string, object> { })
+                </div>
+            </div>
+        </div>
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-md6">
+                <label class="layui-form-label">数据规范</label>
+                <div class="layui-input-block">
+                    <input type="text" name="RuleName" id="RuleName" placeholder="数据规范" class="layui-input" readonly="readonly">
+                    <span style="position: absolute;bottom: 25px; right: 5px;">
+                        <i class="fa fa-edit" style="color:blue" id="selRule"></i>
+                    </span>
+                    <span style="color: #FE7300; font-size: 12px;">弹出的编辑页面中选择可多选，可设置为可多选的弹出页面</span>
+                </div>
+            </div>
+            <div class="layui-col-md6">
+                <label class="layui-form-label">提示说明</label>
+                <div class="layui-input-block">
+                    <input type="text" name="ControlBy1" placeholder="控件没有值时在控件中显示的文本" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer", "element"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        getVal();
+
+        form.render(); //
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        $("#selRule").click(function () {
+            exLayer.open("录入表指标数据规范选择", "/SysTable/TbSetUp/SelectRuleList?tbid=" + $("#tbid").val() + "&indexid=" + $('#IndexId').val() + "&ismuch=" + $('#isSelMuch').val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $("#selAuto02").click(function () {
+            if ($("#DataType").val() == '3') {
+                exLayer.open("计算式", "/SysTable/TbSetUp/PUFormula?tbid=" + $("#tbid").val() + "&fid=grid" + "&some=" + $('#Auto02').val(), '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg('数值型指标才能设置计算式');
+            }
+        });
+
+        $("#selDefaultV").click(function () {
+            exLayer.openMiddle('选择系统指标', '/Com/ComSelect/SelectParm2?type=' + $("#DataType2").val(), '500px', '450px', layui.device().mobile);
+        });
+
+        $("#delAuto02").click(function () {
+            $('#Auto02').val('');
+        });
+
+        $("#delDefaultV").click(function () {
+            $('#DefaultV').val('');
+        });
+
+        //赋值
+        form.val("formEdit", {
+            "IndexId": "@Model.IndexId",
+            "IndexName": "@Model.IndexName",
+            "DataType": "@Model.DataType",
+            "IndexOrderNo": "@Model.IndexOrderNo",
+            "ListHeadName": "@Model.ListHeadName",
+            "ColumnWith": "@Model.ColumnWith",
+            "DefaultV": "@Model.DefaultV",
+            "Auto02": "@Model.Auto02",
+            "ControlType": "@Model.ControlType",
+            "ControlBy3": "@Model.ControlBy3",
+            "RuleName": "@Model.RuleName",
+            "isLock": "@Model.isLock",
+            "isLock2": "@Model.isLock2",
+            "FileType": "@Model.FileType",
+            "ControlBy1": "@Html.Raw(Model.ControlBy1)"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbSetUp/UpGridTbIndex?tbid=" + $("#tbid").val() + "&indexid=" + $('#IndexId').val(), "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.location.reload(); // 父页面刷新
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function getVal() {
+            if ($('#Auto02').val() == "") {
+                $('#tipsAuto02').attr("lay-tips", '数值型指标才能设置计算式');//Auto02
+            }
+            else {
+                $('#tipsAuto02').attr("lay-tips", GetTips('@Model.Auto02'));
+            }
+
+            if (@Model.isPK == "1") {
+                $('#isPK').attr("checked", true);
+            }
+            else {
+                $("#isPK").removeAttr("checked");
+            }
+
+            if (@Model.isUnique == "1") {
+                $('#isUnique').attr("checked", true);
+            }
+            else {
+                $("#isUnique").removeAttr("checked");
+            }
+
+            if (@Model.isEmpty == "2") {
+                $('#isEmpty').attr("checked", true);
+            }
+            else {
+                $("#isEmpty").removeAttr("checked");
+            }
+
+            if (@Model.isOrder == "1") {
+                $('#isOrder').attr("checked", true);
+            }
+            else {
+                $("#isOrder").removeAttr("checked");
+            }
+
+            if (@Model.Code01 == "1") {
+                $('#Code01').attr("checked", true);
+            }
+            else {
+                $("#Code01").removeAttr("checked");
+            }
+
+            if (@Model.ListStat == "1") {
+                $('#ListStat').attr("checked", true);
+            }
+            else {
+                $("#ListStat").removeAttr("checked");
+            }
+
+            if (@Model.isTime == "1") {
+                $('#isTime').attr("checked", true);
+            }
+            else {
+                $("#isTime").removeAttr("checked");
+            }
+
+            if (@Model.isHtmlTag == "1") {
+                $('#isHtmlTag').attr("checked", true);
+            }
+            else {
+                $("#isHtmlTag").removeAttr("checked");
+            }
+
+            if (@Model.isShow == "2") {
+                $('#isShow').attr("checked", true);
+            }
+            else {
+                $("#isShow").removeAttr("checked");
+            }
+        }
+
+        $("#selFileType").click(function () {
+            if (@ViewBag.DataType== '4') {
+                exLayer.openMiddle('选择附件类型', '/Com/ComSelect/SelectFileType', '500px', '450px', layui.device().mobile);
+            }
+            if (@ViewBag.DataType== '5') {
+                exLayer.openMiddle('选择图片类型', '/Com/ComSelect/SelectImgType', '500px', '450px', layui.device().mobile);
+            }
+        });
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        $(document).ready(function () {
+            if (@ViewBag.DataType== '1') {
+                $("#FileType").attr("disabled", "disabled");//附件类型
+                $('#selFileType').unbind('click');//附件类型
+                $("#ListStat").attr("disabled", "disabled");//统计求和模式
+                $("#Code01").attr("disabled", "disabled");//扫码
+            }
+            if (@ViewBag.DataType== '2') {
+                $("#FileType").attr("disabled", "disabled");//附件类型
+                $('#selFileType').unbind('click');//附件类型
+                $("#ListStat").attr("disabled", "disabled");//统计求和模式
+                $("#isTime").attr("disabled", "disabled");//日期加时间
+            }
+            if (@ViewBag.DataType== '3') {
+                $("#FileType").attr("disabled", "disabled");//附件类型
+                $('#selFileType').unbind('click');//附件类型
+                $("#isTime").attr("disabled", "disabled");//日期加时间
+            }
+            if (@ViewBag.DataType== '4') {
+                $("#ListStat").attr("disabled", "disabled");//统计求和模式
+                $("#isTime").attr("disabled", "disabled");//日期加时间
+                $("#DefaultV").attr("disabled", "disabled");//默认值
+                $('#selDefaultV').unbind('click');//默认值
+                $('#selRule').unbind('click');//数据规范
+                $("#Code01").attr("disabled", "disabled");//扫码
+                $("#isUnique").attr("disabled", "disabled");//唯一
+                $("#isPK").attr("disabled", "disabled");//主键
+            }
+            if (@ViewBag.DataType== '5') {
+                $("#ListStat").attr("disabled", "disabled");//统计求和模式
+                $("#isTime").attr("disabled", "disabled");//日期加时间
+                $("#DefaultV").attr("disabled", "disabled");//默认值
+                $('#selDefaultV').unbind('click');//默认值
+                $('#selRule').unbind('click');//数据规范
+                $("#Code01").attr("disabled", "disabled");//扫码
+                $("#isUnique").attr("disabled", "disabled");//唯一
+                $("#isPK").attr("disabled", "disabled");//主键
+            }
+        });
+    });
+</script>

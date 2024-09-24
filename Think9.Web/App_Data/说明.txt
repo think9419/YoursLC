@@ -1,0 +1,2 @@
+sqlserver数据库文件，sqlserver2012及以上附加。
+默认以sqllocaldb连接方式连接的就是该文件，在appSet.config中  <add key="ConnectionString" value="Data Source=(LocalDB)\MSSQLLocalDB; Initial Catalog=YoursLC; Integrated Security=True;Connect Timeout=30;  AttachDbFilename=%CONTENTROOTPATH%\\App_Data\\YoursLC.mdf" />

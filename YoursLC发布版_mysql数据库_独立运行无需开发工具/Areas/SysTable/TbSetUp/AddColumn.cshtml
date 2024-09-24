@@ -1,0 +1,80 @@
+﻿@model Think9.Models.RuleAutoEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" id="tbid" value="@ViewBag.tbid">
+    <br />
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:250px">
+            @Html.DropDownList("IndexDataType", (IEnumerable<SelectListItem>)ViewBag.DtaeTypeList, new Dictionary<string, object> { })
+        </div>
+        <div class="layui-inline">
+            <input type="text" name="name" id="name" placeholder="请输入名称" autocomplete="off" class="layui-input" maxlength="10" lay-verify="required|name">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:250px">
+            <i class="layui-icon layui-icon-about" lay-tips="勾选后将隐藏该列，只能排在最末，即隐藏列之后不能再有非隐藏列，否则设置无效，隐藏指标可作为标志字段，可通过数据回写、自定义事件等方式修改该指标的值" data-offset="4"></i>
+            <input type="hidden" name="isShow" value="1">
+            <input type="checkbox" name="isShow" id="isShow" lay-skin="primary" title="隐藏列(录入页面不显示)" value="2" lay-filter="isShow">
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">新 建</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            var isShow = '1';
+            if ($("input[type='checkbox']").is(':checked')) {
+                isShow = '2';
+            }
+            /*alert(isShow);*/
+            exUtils.ajax("/SysTable/TbSetUp/AddColumn", "post", { tbid: $("#tbid").val(), name: $("#name").val(), isShow: isShow, type: $("#IndexDataType").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysTable/TbSetUp/GetGridTbIndexList?tbid=" + $(window.parent.document).find("#tbid").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>

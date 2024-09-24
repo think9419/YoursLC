@@ -1,0 +1,93 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" id="tbid" value="@ViewBag.tbid">
+<fieldset class="table-fieldset" id="searchfield">
+    <legend style="color:darkgrey">快速查询</legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button><button type='reset' class='layui-btn layui-btn-primary'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </form>
+    </div>
+</fieldset>
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbBasic/GetRecordList?key=" + $("#key").val() + "&tbid=" + $("#tbid").val(),
+            limits: [10, 50, 100],
+            limit: 10,
+            page: true,
+            method: "post",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "OperatePerson", title: "用户", width: 100, sort: true },
+                { field: "OperateTime", title: "时间", width: 150, sort: true },
+                { field: "Info", title: "操作", sort: true }
+            ]]
+        });
+
+        //查询
+        $("#search").click(function () {
+            search();
+        });
+
+        function search() {
+            ThisTable.reload({
+                where: { key: $("#key").val(), tbid: $("#tbid").val() },
+                page: { curr: 1 }
+            });
+            return false;
+        }
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                where: { key: '', tbid: $("#tbid").val() }
+            });
+        }
+    })
+</script>

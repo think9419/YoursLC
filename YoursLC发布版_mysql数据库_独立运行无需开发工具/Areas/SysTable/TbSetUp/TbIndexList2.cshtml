@@ -1,0 +1,142 @@
+﻿@{
+    ViewBag.Title = @ViewBag.tbname + "录入表指标";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+<input style="display: none" name="isMain" id="isMain" value="@ViewBag.IsMain">
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetTableFieldsList2?tbid=" + $("#tbid").val(),
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ColumnName", title: "指 标", width: 190, sort: true },
+                { field: "DataType2", title: "类 型", width: 150, sort: true, templet: "#DataType" },
+                { field: "IndexName", title: "属 性", sort: true, width: null },
+                { title: "操作", align: "center", width: 70, templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: ''
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.ID);
+                    break;
+                case "del":
+                    del(data.ID);
+                    break;
+            }
+        });
+
+        function edit(IndexId) {
+            if ($("#isMain").val() == 'y') {
+                exLayer.open("编辑指标", "/SysTable/TbSetUp/EditMainIndex?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                exLayer.open("编辑指标", "/SysTable/TbSetUp/EditColumn?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+            }
+        }
+
+        function del(IndexId) {
+            layer.confirm("<span style='color: red;'>此操作将数据表对应字段移除，该字段的数据会被删除，并且不可恢复，确定要移除指标吗？</span>", function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexByStr", "post", { tbid: $("#tbid").val(), si: IndexId }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        refresh();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbSetUp/GetTableFieldsList2?tbid=" + $("#tbid").val()
+            });
+        }
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysTable/TbSetUp/GetTableFieldsList2?tbid=" + $("#tbid").val()
+                    });
+                    break;
+            }
+        });
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    @ViewBag.tbname
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+</script>
+<script type="text/html" id="DataType">
+    {{# if(d.DataType == '1000'){ }}
+    <span>日期</span> {{# } }}
+
+    {{# if(d.DataType == '2000'){ }}
+    <span>字符(不限定长度)</span> {{# } }}
+
+    {{# if(d.DataType == '2010'){ }}
+    <span>字符(长度10以内)</span> {{# } }}
+
+    {{# if(d.DataType == '2030'){ }}
+    <span>字符(长度30以内)</span> {{# } }}
+
+    {{# if(d.DataType == '2100'){ }}
+    <span>字符(长度100以内)</span> {{# } }}
+
+    {{# if(d.DataType == '2200'){ }}
+    <span>字符(长度200以内)</span> {{# } }}
+
+    {{# if(d.DataType == '2500'){ }}
+    <span>字符(长度500以内)</span> {{# } }}
+
+    {{# if(d.DataType == '3000'){ }}
+    <span>整数</span> {{# } }}
+
+    {{# if(d.DataType == '3002'){ }}
+    <span>2位小数</span> {{# } }}
+
+    {{# if(d.DataType == '3004'){ }}
+    <span>4位小数</span> {{# } }}
+
+    {{# if(d.DataType == '3006'){ }}
+    <span>6位小数</span> {{# } }}
+
+    {{# if(d.IndexDataType == '3102'){ }}
+    <span>金额</span> {{# } }}
+
+    {{# if(d.DataType == '5200'){ }}
+    <span>图片</span> {{# } }}
+
+    {{# if(d.DataType == '4100'){ }}
+    <span>附件</span> {{# } }}
+</script>

@@ -1,0 +1,274 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<style>
+    .layui-table-cell input {
+        height: 30px;
+        line-height: 30px;
+    }
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: 0px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+
+<input style="display:none" id="frm" value="@ViewBag.frm">
+<input style="display:none" id="maxNum" value="@ViewBag.MaxNum">
+<input style="display:none" id="colsNum" value="@ViewBag.colsNum">
+<input style="display:none" id="rpId" value="@ViewBag.rpId">
+<input style="display:none" id="rpName" value="@ViewBag.rpName">
+<input style="display:none" id="rowId" value="@ViewBag.rowId">
+
+<div class="layui-form" lay-filter="formUser">
+    <div class="layui-form-item">
+        <label class="layui-form-label">类别</label>
+        <div class="layui-input-inline" style="width:120px;">
+            <select id="Type" name="Type">
+                <option value="1">表头</option>
+                <option value="2">数据行</option>
+            </select>
+        </div>
+        <label class="layui-form-label">序 号</label>
+        <div class="layui-input-inline" style="width:120px;">
+            <input type='text' name="OrderNo" id="OrderNo" autocomplete='off' class='layui-input' placeholder='序号' lay-verify="required|number" maxlength="4">
+        </div>
+        <label class="layui-form-label" style="width:120px;">行高(cm)</label>
+        <div class="layui-input-inline" style="width:120px;">
+            <input type='text' name="Height" id="Height" autocomplete='off' class='layui-input' placeholder='行高' lay-verify="required|number" maxlength="4">
+        </div>
+        <div class="layui-input-inline">
+            <button type='button' class='layui-btn layui-btn-normal' id='editRow' lay-submit lay-filter='editRow' lay-tips='编辑行属性'>编 辑</button>
+        </div>
+    </div>
+    <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+</div>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.val("formUser", {
+            "Type": "@ViewBag.Type"
+            , "OrderNo": "@ViewBag.OrderNo"
+            , "Height": "@ViewBag.Height"
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/ReportRows/GetRowCellsList?rpId=" + $("#rpId").val() + "&rowId=" + $("#rowId").val() + "&colN=" + $("#colsNum").val(),
+            method: "get",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "Id", title: "列序", width: 70, align: "center" },
+                { field: "info9", title: "单元格", width: 240, templet: '#info9' },
+                { field: "info8", title: "参数赋值", width: 80, align: "center", templet: '#info8' },
+                { field: "info1", title: "左边框", width: 130, templet: '#info1' },
+                { field: "info2", title: "右边框", width: 130, templet: '#info2' },
+                { field: "info3", title: "上边框", width: 130, templet: '#info3' },
+                { field: "info4", title: "下边框", width: 130, templet: '#info4' },
+                { field: "info5", title: "水平排列", width: 130, templet: '#info5' },
+                { field: "info6", title: "垂直排列", width: 130, templet: '#info6' },
+                { field: "info7", title: "文字方向", width: 130, templet: '#info7' }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+                case "info9":
+                    /*alert("2");*/
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "info9":
+                    openDetail(data.info9, data.Value);
+                    break;
+                case "set":
+                    openSetCells($("#rpId").val(), $("#rowId").val(), data.Id);
+                    break;
+            }
+        });
+
+        //编辑列宽和类型
+        form.on("submit(editRow)", function (data) {
+            exUtils.ajax("/SysStats/Report/EditRow", "post", { rpId: $("#rpId").val(), rowId: $("#rowId").val(), type: $("#Type").val(), order: $("#OrderNo").val(), height: $("#Height").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听下拉
+        form.on('select(info1)', function (data) {
+            editSome(data, '1');
+        });
+        //监听下拉
+        form.on('select(info2)', function (data) {
+            editSome(data, '2');
+        });
+        //监听下拉
+        form.on('select(info3)', function (data) {
+            editSome(data, '3');
+        });
+        //监听下拉
+        form.on('select(info4)', function (data) {
+            editSome(data, '4');
+        });
+        //监听下拉
+        form.on('select(info5)', function (data) {
+            editSome(data, '5');
+        });
+        //监听下拉
+        form.on('select(info6)', function (data) {
+            editSome(data, '6');
+        });
+        //监听下拉
+        form.on('select(info7)', function (data) {
+            editSome(data, '7');
+        });
+
+        function editSome(data, num) {
+            var colN = data.elem.getAttribute("name").replace(/n_/, "");
+
+            exUtils.ajax("/SysStats/ReportRows/UpdateCellsPattern?rowId=" + $("#rowId").val() + "&colN=" + colN + "&value=" + data.value + "&num=" + num, "get", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysStats/ReportRows/GetRowCellsList?rpId=" + $("#rpId").val() + "&rowId=" + $("#rowId").val() + "&colN=" + $("#colsNum").val()
+            });
+        }
+
+        function edit(IndexId) {
+            exLayer.openMiddle("编辑指标", "/SysTable/IndexBasic/Edit/" + IndexId, '500px', '500px', layui.device().mobile);
+        }
+
+        function openDetail(name, id) {
+            var _name = "统计指标 - " + id;
+            if (id.startsWith('@@')) {
+                _name = "条件参数 - " + id;
+            }
+            exLayer.openMiddle(_name, "/SysStats/IndexStats/ShowIndexDetails?id=" + id, '500px', '220px', layui.device().mobile);
+        }
+
+        function openSetCells(rpId, rowId, colN) {
+            exLayer.open($("#rpName").val() + ' - 单元格设置', '/SysStats/ReportRows/SetCells?rowId=' + rowId + "&rpId=" + rpId + "&colN=" + colN, '100%', '100%', '0px', '0px', null, null);
+        }
+    });
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>
+
+<script type='text/html' id='info1'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info1'>
+            {{d.info1}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info2'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info2'>
+            {{d.info2}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info3'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info3'>
+            {{d.info3}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info4'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info4'>
+            {{d.info4}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info5'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info5'>
+            {{d.info5}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info6'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info6'>
+            {{d.info6}}
+        </select>
+    </div>
+</script>
+<script type='text/html' id='info7'>
+    <div class='layui-input-inline' style='width:90px;'>
+        <select name={{'n_'+d.Id}} lay-filter='info7'>
+            {{d.info7}}
+        </select>
+    </div>
+</script>
+<script type="text/html" id="info9">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="set" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.info9}}
+</script>
+<script type="text/html" id="info8">
+    <a href='javascript:;' class="layui-btn-xs" lay-event="set" lay-tips='编辑单元格'><i class='fa fa-pencil'></i></a>
+    {{d.info8}}
+</script>

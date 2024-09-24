@@ -1,0 +1,125 @@
+﻿<!doctype html>
+
+<title>代码管理</title>
+<meta charset="utf-8" />
+
+<link rel="stylesheet" href="~/codemirror/theme/dracula.css" />
+<link rel="stylesheet" href="~/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="~/codemirror/addon/hint/show-hint.css">
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script type="module" src="~/codemirror/lib/codemirror.js"></script>
+
+<article>
+    <form class="layui-form" action="">
+        <input style="display:none" id="path" value="@ViewBag.path">
+        <input style="display:none" id="button" value="@ViewBag.button">
+        <input style="display:none" id="tbid" value="@ViewBag.tbid">
+        <input style="display:none" id="type" value="@ViewBag.type">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12 layui-col-sm9 layui-col-md9">
+                <br>  文件路径： @ViewBag.path
+                <a class="layui-btn layui-btn-primary layui-btn-xs" href="/SysBasic/TempletCode/CodeRecord?filePath=@ViewBag.path" target="_blank" style="color:blue;" lay-tips='查看记录'>最后修改： @ViewBag.CreatTime</a>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                <br>
+                <button type='button' class='layui-btn layui-btn-sm' id='edit' lay-tips='编辑代码'>编 辑</button>
+                <button type='button' class='layui-btn layui-btn-sm' id='copy' lay-tips='备份代码'>备 份</button>
+                <button type='button' class='layui-btn layui-btn-sm' id='template' lay-tips='将代码作为『模板文件』'>模 板</button>
+                <button type='button' class='layui-btn layui-btn-primary layui-btn-sm' id='close'>关 闭</button>
+            </div>
+        </div>
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12">
+                <textarea id="code" name="code">@ViewBag.Code</textarea>
+            </div>
+        </div>
+    </form>
+    <script src="~/lib/layui/layui.js"></script>
+    <script src="~/js/global.js" charset="utf-8"></script>
+    <script type="module">
+        layui.use(['form', "exLayer", 'exUtils'], function () {
+            var form = layui.form,
+                exUtils = layui.exUtils,
+                layer = layui.layer;
+            let exLayer = layui.exLayer;
+            var $ = layui.$;
+
+            CodeMirror.commands.autocomplete = function (cm) {
+                cm.showHint({ hint: CodeMirror.hint.anyword });
+            }
+            var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                mode: "text/javascript",
+                lineNumbers: true,	//显示行号
+                theme: "dracula",	//设置主题
+                lineWrapping: true,	//代码折叠
+                foldGutter: true,
+                autoCloseTags: true,
+                gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+                matchBrackets: true,	//括号匹配
+                extraKeys: { "Ctrl-Space": "autocomplete" }
+            });
+
+            $("#edit").click(function () {
+                var _code = editor.getValue();
+                var _path = replaceAll($("#path").val(), '//', '!')
+
+                exUtils.ajax("/SysBasic/TempletCode/EditCode", "post", { tbid: $("#tbid").val(), code: _code, path: _path }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                }).fail(function (error) {
+                    console.log(error);
+                });
+                return false;
+            });
+
+            $("#copy").click(function () {
+                var _code = editor.getValue();
+                var _path = replaceAll($("#path").val(), '//', '!');
+
+                exLayer.confirm('将备份该文件（wwwroot/TempCode文件夹中），您确定继续吗?', function () {
+                    exUtils.ajax("/SysBasic/TempletCode/CopyCode", "post", { tbid: $("#tbid").val(), code: _code, path: _path }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                    return false;
+                })
+            });
+
+            $("#template").click(function () {
+                var _code = editor.getValue();
+                var _path = replaceAll($("#path").val(), '//', '!');
+
+                exLayer.confirm('现有文件将作为『模板文件』（AppTempletFile目录下），再次生成代码时，会拷贝最新生成的『模板文件』，您确定继续吗?', function () {
+                    exUtils.ajax("/SysBasic/TempletCode/TempletCode", "post", { tbid: $("#tbid").val(), type: $("#type").val(), code: _code, path: _path }, true).done(function (response) {
+                        exUtils.tableSuccessMsg(response.message);
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                    return false;
+                })
+            });
+
+            $("#close").click(function () {
+                window.close();
+            });
+
+            $(document).ready(function () {
+                if ($('#button').val().indexOf("edit") == -1) {
+                    $("#edit").hide();
+                }
+                if ($('#button').val().indexOf("copy") == -1) {
+                    $("#copy").hide();
+                }
+                if ($('#button').val().indexOf("template") == -1) {
+                    $("#template").hide();
+                }
+            });
+        });
+    </script>
+
+    <script>
+
+    </script>
+
+</article>

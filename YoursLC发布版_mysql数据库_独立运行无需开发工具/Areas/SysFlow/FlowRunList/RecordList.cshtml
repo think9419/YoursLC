@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" id="listid" value="@ViewBag.ListId">
+    <input style="display: none" id="fwid" value="@ViewBag.FwId">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">流程记录</li>
+            <li lay-id="2">操作记录</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+            <div class="layui-tab-item">
+                <table class="layui-hide" id="tableId02" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "element", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+
+        let $ = layui.$;
+        element.on('tab(tabTag_Filter)', function (data) {
+
+        });
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysFlow/FlowRunList/GetFlowRunPrcsList?listid=" + $("#listid").val() + "&fwid=" + $("#fwid").val(),
+            toolbar: "#toolbarTpl",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "FlowPrcs", title: "流程步骤", width: 100 },
+                { title: "状态", templet: "#runFlag", width: 80 },
+                { title: "接手", width: 160, templet: "#Begin_Tp" },
+                { title: "转交", width: 160, templet: "#Deliver_Tp" },
+                { field: "stepInfo", title: "详细", width: layui.device().mobile ? 300 : null },
+                { field: "deliverComments", width: 180, title: "转交意见" }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            },
+            text: {
+                none: '无记录'
+            }
+        });
+
+        let ThisTable02 = table.render({
+            elem: "#tableId02",
+            url: "/SysFlow/FlowRunList/GetFlowRunRecord?listid=" + $("#listid").val() + "&fwid=" + $("#fwid").val(),
+            toolbar: "#toolbarTpl",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh2', icon: 'layui-icon-refresh' }, 'exports'],
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "OperatePerson", title: "用户", width: 100, sort: true },
+                { field: "OperateTime", title: "时间", width: 200, sort: true },
+                { field: "Info", title: "操作", sort: true, width: layui.device().mobile ? 300 : null }
+            ]],
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            },
+            text: {
+                none: '无记录'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysFlow/FlowRunList/GetFlowRunPrcsList?listid=" + $("#listid").val() + "&fwid=" + $("#fwid").val()
+                    });
+                    break;
+                case "refresh2":
+                    ThisTable02.reload({
+                        url: "/SysFlow/FlowRunList/GetFlowRunRecord?listid=" + $("#listid").val() + "&fwid=" + $("#fwid").val()
+                    });
+                    break;
+            }
+        });
+    });
+</script>
+<script type='text/html' id='Begin_Tp'>
+    {{#  if(d.beginUserId != null){ }}
+    <span>{{d.beginUserId}} {{d.createTime}}</span>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<script type='text/html' id='Deliver_Tp'>
+    {{#  if(d.deliverUserId != null){ }}
+    <span>{{d.deliverUserId}} {{d.deliverTime}}</span>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<script type='text/html' id='runFlag'>
+    {{#  if(d.runFlag == '1'){ }}
+    <span style='color: #FE7300;'>待接手</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '2'){ }}
+    <span style='color: blue;'>办理中</span>
+    {{#  } }}
+    {{#  if(d.runFlag == '3'){ }}
+    <span>已办结</span>
+    {{#  } }}
+</script>
+<script type='text/html' id='stepInfo'>
+    {{#d.stepInfo}}
+</script>
+<script type="text/html" id="toolbarTpl">
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>

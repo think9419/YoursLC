@@ -1,0 +1,1201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition">
+ 	<DataSources><DataSource Name="dbXML"><ConnectionProperties><DataProvider>System.Data.DataSet</DataProvider> <ConnectString>/* Local Connection */</ConnectString></ConnectionProperties><rd:DataSourceID>7b89ecea-4d59-4953-ab0e-ba4d9dbaa1ef</rd:DataSourceID></DataSource></DataSources>
+ <DataSets>
+	<DataSet Name="dbGrid">
+		<Query><DataSourceName>dbXML</DataSourceName><CommandText>/* Local Query */</CommandText></Query>
+		<Fields>
+			<Field Name="rpId"><DataField>rpId</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="Type"><DataField>Type</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="Height"><DataField>Height</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+			<Field Name="OrderNo"><DataField>OrderNo</DataField><rd:TypeName>System.Int64</rd:TypeName></Field>
+			<Field Name="inStorageDate"><DataField>inStorageDate</DataField><rd:TypeName>System.DateTime</rd:TypeName></Field>
+			<Field Name="inWarehouseEntryNumber"><DataField>inWarehouseEntryNumber</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inWarehouse"><DataField>inWarehouse</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="inTotalAmount"><DataField>inTotalAmount</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+			<Field Name="v1"><DataField>v1</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v2"><DataField>v2</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v3"><DataField>v3</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v4"><DataField>v4</DataField><rd:TypeName>System.String</rd:TypeName></Field>
+			<Field Name="v5"><DataField>v5</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+			<Field Name="v6"><DataField>v6</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+			<Field Name="v7"><DataField>v7</DataField><rd:TypeName>System.Decimal</rd:TypeName></Field>
+		</Fields>
+	</DataSet>
+ </DataSets>
+<ReportSections>
+  <ReportSection>
+  <Body>
+	<ReportItems>
+	  <Textbox Name="Title">
+		<CanGrow>true</CanGrow>
+		<KeepTogether>true</KeepTogether>
+		<Paragraphs>
+		  <Paragraph>
+			<TextRuns>
+			  <TextRun>
+				<Value EvaluationMode="Constant">基于主子表2</Value>
+				<Style>
+				  <FontFamily>宋体</FontFamily>
+				  <FontSize>11pt</FontSize>
+				  <FontWeight>Bold</FontWeight>
+				</Style>
+			  </TextRun>
+			</TextRuns>
+			<Style />
+		  </Paragraph>
+		</Paragraphs>
+		<rd:DefaultName>Name1</rd:DefaultName>
+		 <Top>0.07cm</Top>
+		 <Left>0.5cm</Left>
+		<Height>1.2cm</Height>
+		<Width>19cm</Width>
+		<Style>
+		  <VerticalAlign>Middle</VerticalAlign>
+		  <PaddingLeft>2pt</PaddingLeft>
+		  <PaddingRight>2pt</PaddingRight>
+		  <PaddingTop>2pt</PaddingTop>
+		  <PaddingBottom>2pt</PaddingBottom>
+		</Style>
+	  </Textbox>
+	  <Tablix Name="table1">
+		<TablixBody>
+		<TablixColumns>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+			<TablixColumn> <Width>4cm</Width> </TablixColumn>
+		</TablixColumns>
+		<TablixRows>
+			<TablixRow>
+			<Height>0.9cm</Height>
+			<TablixCells>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_inStorageDate">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>入库日期</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inStorageDate</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_inWarehouseEntryNumber">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>单号</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouseEntryNumber</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_inWarehouse">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>仓库</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouse</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_inTotalAmount">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>合计</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inTotalAmount</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v1">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>编码</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v1</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v2">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>名称</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v2</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v3">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>规格</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v3</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v4">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>单位</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v4</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v5">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>单价</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v5</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v6">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>数量</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v6</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Top_v7">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>金额</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v7</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			</TablixCells>
+			</TablixRow>
+			<TablixRow>
+			<Height>0.9cm</Height>
+			<TablixCells>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="inStorageDate">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!inStorageDate.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inStorageDate</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="inWarehouseEntryNumber">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!inWarehouseEntryNumber.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouseEntryNumber</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="inWarehouse">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!inWarehouse.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouse</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="inTotalAmount">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!inTotalAmount.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inTotalAmount</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v1">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v1.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v1</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v2">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v2.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v2</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v3">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v3.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v3</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v4">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v4.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v4</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v5">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v5.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v5</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v6">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v6.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v6</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="v7">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Fields!v7.Value</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v7</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			</TablixCells>
+			</TablixRow>
+			<TablixRow>
+			<Height>0.9cm</Height>
+			<TablixCells>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_inStorageDate">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!inStorageDate.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inStorageDate</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_inWarehouseEntryNumber">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!inWarehouseEntryNumber.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouseEntryNumber</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_inWarehouse">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!inWarehouse.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inWarehouse</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_inTotalAmount">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!inTotalAmount.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>inTotalAmount</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v1">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v1.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v1</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v2">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v2.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v2</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v3">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v3.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v3</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v4">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v4.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v4</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v5">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v5.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v5</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v6">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v6.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v6</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			<TablixCell>
+			 <CellContents>
+			<Textbox Name="Sum_v7">  
+			<CanGrow>true</CanGrow>
+			<KeepTogether>true</KeepTogether>
+			<Paragraphs>
+			<Paragraph>
+			<TextRuns>
+			<TextRun>
+			 <Value>=Sum(CDec(Fields!v7.Value), "dbGrid")</Value>
+			<Style>
+			<FontFamily>宋体</FontFamily>
+			</Style>
+			</TextRun>
+			</TextRuns>
+			<Style><TextAlign>Center</TextAlign></Style>
+			</Paragraph>
+			</Paragraphs>
+			<rd:DefaultName>v7</rd:DefaultName>
+			<Style><Border><Width>0.3pt</Width></Border>
+			<LeftBorder><Style>Solid</Style></LeftBorder>
+			<RightBorder><Style>Solid</Style></RightBorder>
+			<TopBorder><Style>Solid</Style></TopBorder>
+			 <BottomBorder><Style>Solid</Style></BottomBorder>
+			<TextAlign>Center</TextAlign>
+			<VerticalAlign>Middle</VerticalAlign>
+			<PaddingLeft>2pt</PaddingLeft> <PaddingRight>2pt</PaddingRight>  <PaddingTop>2pt</PaddingTop> <PaddingBottom>2pt</PaddingBottom>
+			<WritingMode>Horizontal</WritingMode>
+			 </Style>
+			 </Textbox>
+			</CellContents>
+			</TablixCell>
+			</TablixCells>
+			</TablixRow>
+		</TablixRows>
+		</TablixBody>
+		 <TablixColumnHierarchy>
+		  <TablixMembers>
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+				<TablixMember />
+		  </TablixMembers>
+		</TablixColumnHierarchy>
+
+		 <TablixRowHierarchy>
+		  <TablixMembers>
+				<TablixMember><KeepWithGroup>After</KeepWithGroup></TablixMember>
+				<TablixMember><Group Name="table1_Details_Group"><DataElementName>Detail</DataElementName></Group><TablixMembers><TablixMember /></TablixMembers><DataElementName>Detail_Collection</DataElementName><DataElementOutput>Output</DataElementOutput> <KeepTogether>true</KeepTogether></TablixMember>
+				<TablixMember><KeepWithGroup>Before</KeepWithGroup></TablixMember>
+		  </TablixMembers>
+		</TablixRowHierarchy>
+
+		<DataSetName>dbGrid</DataSetName>
+		<Top>1.58806cm</Top>
+		<Left>0.3175cm</Left>
+		<Height>2cm</Height>
+		<Width>28cm</Width>
+		<ZIndex>1</ZIndex>
+		<Style />
+	  </Tablix>
+	</ReportItems>
+	<Height>13.5cm</Height>
+	<Style />
+  </Body>
+   <Width>44cm</Width>
+  <Page>
+	<PageHeight>29.7cm</PageHeight>
+	<PageWidth>21cm</PageWidth>
+    <LeftMargin>0.5cm</LeftMargin>
+    <RightMargin>0.5cm</RightMargin>
+    <TopMargin>1.5cm</TopMargin>
+    <BottomMargin>1.5cm</BottomMargin>
+	<ColumnSpacing>1cm</ColumnSpacing>
+	<Style />
+  </Page>
+ </ReportSection>
+</ReportSections>
+  <rd:ReportID>f2ca8aba-eb1e-4797-b7db-fd7891cc99f6</rd:ReportID>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+</Report>

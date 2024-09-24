@@ -1,0 +1,88 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+    <input style="display: none" name="from" id="from" value="@ViewBag.from">
+    <!--数据表格-->
+    <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TableList/GetWarnList?idsStr=" + $("#tbid").val() + "&from=" + $("#from").val(),
+            page: false,
+            method: "post",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "level", title: "类别", width: 80, sort: true },
+                { field: "tbid", title: "录入表编码", width: 120, sort: true },
+                { field: "indexid", title: "指标编码", width: 120, sort: true },
+                { field: "Content", title: "备注", sort: true, templet: "#Content", width: layui.device().mobile ? 200 : null },
+                { field: "Detial", title: "详细", width: 60, align: "center" }
+            ]],
+            text: {
+                none: '无记录'
+            },
+            done: function (res, curr, count) {
+                if (count == -1) {
+                    layer.msg(res.msg, { icon: 5, time: 20000, btn: ['关闭'] });//显示错误
+                }
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detial":
+                    getDetial(data.Detial);
+                    break;
+
+            }
+        });
+
+        function getDetial(id) {
+            layer.open({
+                title: ''
+                , type: 1
+                , area: ['250', '100px']
+                , content: "<a href='../AutoCode/" + id + "_tempcode.txt'  target='_blank' class='layui-btn'>点击下载</a>"
+            });
+        }
+    })
+</script>
+<script type='text/html' id='Content'>
+    {{#  if(d.level == 'err'){ }}
+    <span style="color: #FE7300;">{{d.Content}}</span>
+    {{#  }else{ }}
+    {{d.Content}}
+    {{#  } }}
+</script>
+<script type='text/html' id='Detial2'>
+    {{#  if(d.Detial != '' && d.Detial != null){ }}
+    <a href='../AutoCode/" + {{d.Detial}} + "_tempcode.txt' target='_blank' class='layui-btn'>点击下载</a>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<script type='text/html' id='Detial'>
+    {{#  if(d.Detial != '' && d.Detial != null){ }}
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detial" id="detial"><i class="fa fa-code"></i></a>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+</script>

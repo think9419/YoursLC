@@ -1,0 +1,51 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:02
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:02
+	/// </summary>
+	 [Table("tb_ThreeLevelLinkage")]
+	public class ThreeLevelLinkageModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 省
+		/// </summary>
+		public string inProvince { get; set; }
+		/// <summary>
+		/// 省 【附加】
+		/// </summary>
+		[Computed]
+		public string inProvince_Exa { get; set; }
+		/// <summary>
+		/// 市县
+		/// </summary>
+		public string inCityAndCounty { get; set; }
+		/// <summary>
+		/// 市县 【附加】
+		/// </summary>
+		[Computed]
+		public string inCityAndCounty_Exa { get; set; }
+		/// <summary>
+		/// 乡镇
+		/// </summary>
+		public string inTownship { get; set; }
+		/// <summary>
+		/// 乡镇 【附加】
+		/// </summary>
+		[Computed]
+		public string inTownship_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

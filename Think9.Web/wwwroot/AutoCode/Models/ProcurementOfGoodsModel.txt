@@ -1,0 +1,68 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:22
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:22
+	/// </summary>
+	 [Table("tb_ProcurementOfGoods")]
+	public class ProcurementOfGoodsModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 审核
+		/// </summary>
+		public string inAuditing { get; set; }
+		/// <summary>
+		/// 审核 【附加】
+		/// </summary>
+		[Computed]
+		public string inAuditing_Exa { get; set; }
+		/// <summary>
+		/// 采购编号
+		/// </summary>
+		public string inProcurementNumber { get; set; }
+		/// <summary>
+		/// 供应商
+		/// </summary>
+		public string inSupplier { get; set; }
+		/// <summary>
+		/// 供应商 【附加】
+		/// </summary>
+		[Computed]
+		public string inSupplier_Exa { get; set; }
+		/// <summary>
+		/// 经办人
+		/// </summary>
+		public string inOperator { get; set; }
+		/// <summary>
+		/// 金额合计
+		/// </summary>
+		public decimal? inTotalAmount { get; set; }
+		/// <summary>
+		/// 金额合计 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inTotalAmount_Exa { get; set; }
+		/// <summary>
+		/// 采购日期
+		/// </summary>
+		public DateTime? inPurchaseDate { get; set; }
+		/// <summary>
+		/// 采购日期 【附加】
+		/// </summary>
+		[Computed]
+		public DateTime? inPurchaseDate_Exa { get; set; }
+		/// <summary>
+		/// 备注
+		/// </summary>
+		public string inRemarks { get; set; }
+		#endregion Model
+		
+	}
+}

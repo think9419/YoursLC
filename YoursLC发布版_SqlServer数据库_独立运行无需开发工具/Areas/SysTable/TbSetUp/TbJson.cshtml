@@ -1,0 +1,263 @@
+﻿@{
+    ViewBag.Title = @ViewBag.tbname + "表单设计";
+    Layout = "~/Areas/Shared/_LayuiTbJson.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+<input style="display: none" id="isSave" value="0">
+<input style="display: none" id="NColumns" value="4">
+
+<div class="layui-fluid">
+    <form class="layui-form" lay-filter="formUser">
+        <div class="layui-row">
+            <div class="layui-col-md2">
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">
+                            表单组件
+                        </li>
+                        <li>布局辅助</li>
+                    </ul>
+                    <div class="layui-tab-content" id="layui-form-attribute">
+                        <div class="layui-tab-item layui-form layui-show">
+                            <div class="component">
+                                <div class="head">表单组件</div>
+                                <div class="component-group" id="sort_1">
+                                    <ol data-tag="input">
+                                        <div class="icon"><i class="layui-icon layui-icon-layer"></i></div>
+                                        <div class="name">单行输入</div>
+                                    </ol>
+                                    <ol data-tag="textarea">
+                                        <div class="icon"><i class="layui-icon layui-icon-align-left"></i></div>
+                                        <div class="name">多行输入</div>
+                                    </ol>
+                                    <ol data-tag="radio">
+                                        <div class="icon"><i class="fa fa-dot-circle-o"></i></div>
+                                        <div class="name">单选框</div>
+                                    </ol>
+                                    <ol data-tag="checkbox">
+                                        <div class="icon"><i class="fa fa-check-square-o"></i></div>
+                                        <div class="name">多选框</div>
+                                    </ol>
+                                    <ol data-tag="select">
+                                        <div class="icon"><i class="fa fa-unsorted"></i></div>
+                                        <div class="name">下拉选择</div>
+                                    </ol>
+                                    <ol data-tag="date">
+                                        <div class="icon"><i class="fa fa-calendar-o"></i></div>
+                                        <div class="name">日期选择</div>
+                                    </ol>
+                                    <ol data-tag="img">
+                                        <div class="icon">
+                                            <i class="fa fa-image"></i>
+                                        </div>
+                                        <div class="name">图片选择</div>
+                                    </ol>
+                                    <ol data-tag="file">
+                                        <div class="icon">
+                                            <i class="fa fa-folder"></i>
+                                        </div>
+                                        <div class="name">附 件</div>
+                                    </ol>
+                                    <ol data-tag="gridtable">
+                                        <div class="icon">
+                                            <i class="fa fa-table"></i>
+                                        </div>
+                                        <div class="name">子表</div>
+                                    </ol>
+                                </div>
+                            </div>
+                            <div class="component">
+                                <div class="head"></div>
+                                <div class="component-group" id="sort_2">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-tab-item layui-form">
+                            <div class="component">
+                                <div class="head">布局辅助</div>
+                                <div class="component-group" id="sort_3">
+                                    <ol data-tag="tab">
+                                        <div class="icon"><i class="layui-icon layui-icon-tabs smallfont"></i></div>
+                                        <div class="name">TAB选项卡</div>
+                                    </ol>
+                                    <ol data-tag="grid">
+                                        <div class="icon"><i class="layui-icon layui-icon-layouts"></i></div>
+                                        <div class="name">栅格</div>
+                                    </ol>
+                                    <ol data-tag="span">
+                                        <div class="icon"><i class="fa fa-text-width"></i></div>
+                                        <div class="name">文本</div>
+                                    </ol>
+                                    <ol data-tag="note">
+                                        <div class="icon"><i class="layui-icon layui-icon-note"></i></div>
+                                        <div class="name">便签</div>
+                                    </ol>
+                                    <ol data-tag="subtraction">
+                                        <div class="icon"><i class="layui-icon layui-icon-subtraction"></i></div>
+                                        <div class="name">分割线</div>
+                                    </ol>
+                                    <ol data-tag="tips">
+                                        <div class="icon"><i class="layui-icon layui-icon-tips"></i></div>
+                                        <div class="name">提示</div>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md8">
+                <div class="layui-card-header">
+                    <div class="fr">
+                        <div class="layui-inline">
+                            <tip style="font-size: 12px; color: #FE7300;">修改后需点击保存按钮<i class="fa fa-angle-double-right"></i></tip>
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-export">保 存</button>&nbsp;&nbsp;
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" id="tbForm">快速排列</button>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-inline" style="width:95px">
+                                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                                    <option value="">=请选择=</option>
+                                    <optgroup label="点击『快速排列』按钮可进行设置">
+                                        <option value="99">按照快速排列生成</option>
+                                    </optgroup>
+                                    <optgroup label="行列固定生成">
+                                        <option value="1">一行一列</option>
+                                        <option value="2">一行两列</option>
+                                        <option value="3">一行三列</option>
+                                        <option value="4">一行四列</option>
+                                        <option value="6">一行六列</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="creatjson">快速生成</button>&nbsp;
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-sm  layui-btn-normal layui-btn-refresh2">重新加载</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-sm  layui-btn-normal layui-btn-refresh">刷 新</button>
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-sm  layui-btn-normal layui-btn-component">预 览</button>&nbsp;
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" id="btn12" class="layui-btn layui-btn-sm layui-btn-normal">录入表指标</button>&nbsp;
+                        </div>
+                        <div class="layui-inline">
+                            <button type="button" class="layui-btn layui-btn-sm layui-btn-danger layui-form-del">删 除</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- // 表单设计区域 -->
+                <div id="formBuilder" style="width: 100%"></div>
+                <!-- // 表单隐藏域 -->
+                <textarea id="formdesign" name="formdesign" hidden></textarea>
+            </div>
+            <div class="layui-col-md2" style="padding-top: 0;">
+                <div class="layui-tab layui-tab-brief">
+                    <ul class="layui-tab-title">
+                        <li class="layui-this">组件</li>
+                        <li>表单</li>
+                    </ul>
+                    <div class="layui-tab-content" id="layui-form-attribute">
+                        <div class="layui-tab-item layui-form layui-show" id="Propertie" lay-filter="Propertie"></div>
+                        <div class="layui-tab-item">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">表单ID</label>
+                                <div class="layui-input-inline">
+                                    <input type="text" id="formname" name="formname" class="layui-input" value="@ViewBag.tbid" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="layui-htmlview" style="display: none;">
+    <textarea id="json-code"></textarea>
+    <div class="layui-htmlbtn">
+        <button id="copy-code" class="layui-btn layui-hide">复制代码</button>
+        <button id="import-code" class="layui-btn layui-hide">导入数据</button>
+    </div>
+</div>
+
+<!-- // 加载font-awesome图标 -->
+<link href="~/css/font-awesome.css?v=v1.1.20" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="~/formDesign/formDesign/formdesign.css?33">
+<!-- // 全局加载第三方JS -->
+<script src="~/lib/layui/layui_all.js"></script>
+<script src="~/js/cascadata.js?v=v1.1.20"></script>
+<script src="~/js/tinymce/tinymce.min.js?v=v1.1.20"></script>
+<script src="~/js/Sortable.js?v=v1.1.20"></script>
+<script>
+    layui.config({
+        version: true,
+        base: '/formDesign/'
+    }).extend({
+        cascader: 'cascader/cascader',
+        tags: 'tags/tags',
+        formDesign: 'formDesign/formDesign',
+    }).use(['form', 'jquery', 'flow', 'formDesign', 'tags'], function () {
+        var form = layui.form;
+        var $ = layui.jquery;
+        var tags = layui.tags;
+        var formDesign = layui.formDesign;
+
+        formDesign.render({
+            elem: '#formBuilder'
+            , eval: '#formdesign'
+        });
+
+        layui.flow.load({
+            elem: '#item-list'
+            , done: function (page, next) {
+                var list = [];
+            }
+        });
+
+        //录入指标
+        $("#btn12").click(function () {
+            var tbid = $("#tbid").val();
+            layer.open({
+                type: 2,
+                title: "录入指标管理",
+                shade: 0.5,
+                area: ['100%', '100%'],
+                anim: 2,
+                content: "/SysTable/TbSetUp/TbIndexList?tbid=" + tbid + "&isMobile=" + layui.device().mobile
+            });
+        });
+
+        //快速排列
+        $("#tbForm").click(function () {
+            var tbid = $("#tbid").val();
+            layer.open({
+                type: 2,
+                title: '@ViewBag.tbname ' + "快速排列",
+                shade: 0.5,
+                area: ['100%', '100%'],
+                anim: 2,
+                content: "/SysTable/TbSetUp/TbForm?tbid=" + tbid + "&isMobile=" + layui.device().mobile + "&nColumns=" + $('#NColumns').val()
+            });
+        });
+
+        form.on('select(AutoType)', function (data) {
+        })
+
+        $(window).on('beforeunload', function () {
+            if ($('#isSave').val() != '0') {
+                return '确定要退出本页吗？';
+            }
+        });
+    })
+</script>

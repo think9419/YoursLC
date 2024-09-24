@@ -1,0 +1,92 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:28:58
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:28:58
+	/// </summary>
+	 [Table("tb_AutomaticCalculation")]
+	public class AutomaticCalculationModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 小数01
+		/// </summary>
+		public decimal? inXS01 { get; set; }
+		/// <summary>
+		/// 小数01 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS01_Exa { get; set; }
+		/// <summary>
+		/// 小数02
+		/// </summary>
+		public decimal? inXS02 { get; set; }
+		/// <summary>
+		/// 小数02 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS02_Exa { get; set; }
+		/// <summary>
+		/// 小数03
+		/// </summary>
+		public decimal? inXS03 { get; set; }
+		/// <summary>
+		/// 小数03 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS03_Exa { get; set; }
+		/// <summary>
+		/// 小数04
+		/// </summary>
+		public decimal? inXS04 { get; set; }
+		/// <summary>
+		/// 小数04 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS04_Exa { get; set; }
+		/// <summary>
+		/// 小数05
+		/// </summary>
+		public decimal? inXS05 { get; set; }
+		/// <summary>
+		/// 小数05 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS05_Exa { get; set; }
+		/// <summary>
+		/// 小数06
+		/// </summary>
+		public decimal? inXS06 { get; set; }
+		/// <summary>
+		/// 小数06 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS06_Exa { get; set; }
+		/// <summary>
+		/// 小数07
+		/// </summary>
+		public decimal? inXS07 { get; set; }
+		/// <summary>
+		/// 小数07 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS07_Exa { get; set; }
+		/// <summary>
+		/// 小数08
+		/// </summary>
+		public decimal? inXS08 { get; set; }
+		/// <summary>
+		/// 小数08 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS08_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

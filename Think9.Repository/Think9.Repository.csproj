@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Platforms>AnyCPU;x86;x64</Platforms>
+	</PropertyGroup>
+
+	<!--sqlserver数据库为TRACE;sqlserver；mysql数据库为TRACE;mysql-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>TRACE;mysql</DefineConstants>
+	</PropertyGroup>
+	<!--sqlserver数据库为TRACE;sqlserver；mysql数据库为TRACE;mysql-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<DefineConstants>TRACE;mysql</DefineConstants>
+	</PropertyGroup>
+	<!--sqlserver数据库为TRACE;sqlserver；mysql数据库为TRACE;mysql-->
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+		<DefineConstants>TRACE;mysql</DefineConstants>
+	</PropertyGroup>
+	<!--sqlserver数据库为TRACE;sqlserver；mysql数据库为TRACE;mysql-->
+	<PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+		<DefineConstants>TRACE;mysql</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MySql.Data" Version="8.2.0" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.120">
+			<TreatAsUsed>true</TreatAsUsed>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Think9.Dapper\Think9.Dapper.csproj" />
+		<ProjectReference Include="..\Think9.IRepository\Think9.IRepository.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+
+	</ItemGroup>
+
+</Project>

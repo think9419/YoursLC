@@ -1,0 +1,13 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="数值1要大于等于数值2" horAlignment="None" verAlignment="None" Selectable="True">数值1要大于等于数值2</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编码" horAlignment="None" verAlignment="None" Selectable="True">编码</lab>
+			 <textField x="125" y="80" width="275" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCoding" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inCoding</textField>
+			<lab x="410" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="名称" horAlignment="None" verAlignment="None" Selectable="True">名称</lab>
+			 <textField x="525" y="80" width="275" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inName" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inName</textField>
+			<table2 x="10" y="125" width="790" height="120" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_Subtable21" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_Subtable21</table2>
+		</staticContent>
+	</content>
+</daReport>

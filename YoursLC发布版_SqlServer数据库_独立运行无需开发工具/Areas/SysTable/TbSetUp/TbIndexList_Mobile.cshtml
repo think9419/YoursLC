@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+</form>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetMainTbIndexList?tbid=" + $("#tbid").val(),
+            limits: [500],
+            limit: 500,
+            width: '100%',
+            method: "post",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "IndexId", title: "编码", width: 160, sort: true, templet: '<span>{{d.IndexId}}<span>' },
+                { field: "IndexName", title: "名称", width: 200, sort: true },
+                { field: "DataTypeName", title: "类型", width: 130, sort: true },
+                { title: "操作", align: "center", width: 120, templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "set":
+                    foreachGridTable();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.IndexId);
+                    break;
+                case "del":
+                    del(data.IndexId);
+                    break;
+                case "look":
+                    look(data.IndexId, data.IndexName);
+                    break;
+            }
+        });
+
+        function edit(IndexId) {
+            exLayer.open("编辑指标", "/SysTable/TbSetUp/EditMainIndex?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function del(IndexId) {
+            layer.confirm("<span style='color: red;'>此操作将数据表对应字段移除，该字段的数据会被删除，并且不可恢复，确定要移除指标吗？</span>", function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexByStr", "post", { tbid: $("#tbid").val(), si: IndexId }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        refresh();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+        }
+
+        function refresh() {
+            /* table.reload('tableId', {})*/
+            ThisTable.reload({
+                where: {
+                    tbid: $("#tbid").val()
+                }
+            });
+        }
+
+        function add() {
+            exLayer.open("添加 || 移除指标", "/SysTable/TbSetUp/RemoveMainIndex?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function foreachGridTable() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+                var _indexid = tdArr.eq(0).text();
+                var _no = tdArr.eq(3).find('input').val();
+                var _with = tdArr.eq(4).find('input').val();
+
+                if (_indexid != '') {
+                    var _row = { TbId: $("#tbid").val(), IndexId: '', ColumnWith: 0, IndexOrderNo: 0 };
+                    _row.TbId = $("#tbid").val();
+                    _row.IndexId = _indexid;
+                    _row.ColumnWith = _with;
+                    _row.IndexOrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexWidthAndNo", "post", { "list": _list }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    /*  location.reload(); //页面刷新*/
+                });
+
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" id="add"><i class="fa fa-pencil"></i>添加 || 移除指标</button>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href='javascript:;' class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id="del">移除</a>
+</script>

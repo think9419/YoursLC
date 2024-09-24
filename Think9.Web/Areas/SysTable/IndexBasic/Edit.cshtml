@@ -1,0 +1,87 @@
+﻿@using Think9.Models;
+@model Think9.Models.IndexBasicEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标分类</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("IndexSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择指标分类==", new Dictionary<string, object> { })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="IndexId" placeholder="指标编码" autocomplete="off" class="layui-input" lay-verify="required" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">指标名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="IndexName" placeholder="指标名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">指标类型</label>
+        <div class="layui-input-block">
+            <select id="IndexDataType" name="IndexDataType" lay-filter="IndexDataType" disabled="disabled">
+                <option value="">==请选择==</option>
+                @foreach (IndexDtaeTypeEntity item in ((IEnumerable<IndexDtaeTypeEntity>)ViewBag.DtaeTypeList))
+                {
+                    <option value="@item.TypeId">@item.TypeName</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="备注" name="IndexExplain" id="IndexExplain" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        //赋值
+        form.val("formEdit", {
+            "IndexSort": "@Model.IndexSort",
+            "IndexId": "@Model.IndexId",
+            "IndexName": "@Model.IndexName",
+            "IndexDataType": "@Model.IndexDataType",
+            "IndexExplain": "@Model.IndexExplain"
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/IndexBasic/Edit", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    $(window.parent.document).find('#search').click();//刷新
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

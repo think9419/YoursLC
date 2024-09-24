@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<blockquote class="layui-elem-quote layui-text">
+    『子表指标』编码固定为v1，v2...v30（非隐藏列最多不能超过30列，总列数不得超过99），编码值必须连续，即假设只有2个指标列v1，v2，再添加指标列，编码是v3；删除指标列是从后往前顺序删除<br>
+    可将指标设置为『隐藏指标』，录入页面将不显示『隐藏指标』，可通过数据回写、自定义事件等方式修改该指标列的值，备注：『隐藏指标』只能排在最末，即『隐藏指标』之后不能再有非隐藏指标<br>
+    『指标属性』更改，除唯一、主键属性外，其余都需要重新生成才能生效
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetGridTbIndexList?tbid=" + $("#tbid").val(),
+            method: "post",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "IndexId", title: "编码", width: 60, sort: true },
+                { field: "IndexName", title: "名称", sort: true, width: 260 },
+                { field: "DataTypeName", title: "类型", width: 260, sort: true, templet: '#DataTypeName' },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "del":
+                    del();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.IndexId);
+                    break;
+                case "del":
+                    del(data.IndexId);
+                    break;
+                case "dataType":
+                    dataType(data.IndexId);
+                    break;
+                case "look":
+                    look(data.IndexId, data.IndexName);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.openMiddle("添加指标列", "/SysTable/TbSetUp/AddColumn?tbid=" + $("#tbid").val(), '500px', '250px', layui.device().mobile);
+        }
+
+        function dataType(IndexId) {
+            exLayer.openMiddle("编辑指标列", "/SysTable/TbSetUp/EditColumnType?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '500px', '200px', layui.device().mobile);
+        }
+
+        function del() {
+            exLayer.confirm("将删除最末一列指标。确定要继续吗？", function () {
+                exUtils.ajax("/SysTable/TbSetUp/DelColumn", "get", { tbid: $("#tbid").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    ThisTable.reload({
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function edit(IndexId) {
+            exLayer.open("编辑指标", "/SysTable/TbSetUp/EditColumn?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function refresh() {
+            table.reload('tableId', {})
+        }
+
+        function foreachGridTable() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+                var _indexid = tdArr.eq(0).text();
+                var column2 = tdArr.eq(1).text();
+                var column3 = tdArr.eq(2).text();
+                var _with = tdArr.eq(3).find('input').val();
+                var _no = tdArr.eq(0).text();
+                if (_indexid.indexOf("v") != -1) {
+                    var _row = { TbId: $("#tbid").val(), IndexId: '', ColumnWith: 0, IndexOrderNo: 0 };
+                    _row.TbId = $("#tbid").val();
+                    _row.IndexId = _indexid;
+                    _row.ColumnWith = _with;
+                    _row.IndexOrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexWidth", "post", { "list": _list }, true).done(function (response) {
+                exUtils.tableSuccessMsg(response.message);
+                console.log(_list);
+                /*location.reload(); // 页面刷新*/
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="add" id="add"><i class="fa fa-plus"></i>添加指标列</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del" id="del"><i class="fa fa-trash-o"></i>删除指标列</button>
+    </div>
+</script>
+
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+</script>
+
+<!-- 类型 -->
+<script type="text/html" id="DataTypeName">
+    <span>{{d.DataTypeName}}&nbsp;<a href="javascript:;" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="dataType" id="dataType"><i class="fa fa-pencil" lay-tips="编辑类型"></i></a></span>
+</script>

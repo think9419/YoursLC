@@ -1,0 +1,12 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="可实现数据自动填写（系统自动生成编号），无需手动输入，常用于商品编号、入库编号等" horAlignment="None" verAlignment="None" Selectable="True">可实现数据自动填写（系统自动生成编号），无需手动输入，常用于商品编号、入库编号等</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编码" horAlignment="None" verAlignment="None" Selectable="True">编码</lab>
+			 <textField x="125" y="80" width="275" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCoding" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inCoding</textField>
+			<lab x="410" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="名称" horAlignment="None" verAlignment="None" Selectable="True">名称</lab>
+			 <textField x="525" y="80" width="275" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inName" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inName</textField>
+		</staticContent>
+	</content>
+</daReport>

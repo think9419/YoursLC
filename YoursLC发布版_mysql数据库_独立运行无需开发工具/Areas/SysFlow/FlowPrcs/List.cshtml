@@ -1,0 +1,121 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="flowId" value="@ViewBag.flowId">
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysFlow/FlowPrcs/GetListByFId?id=" + $("#flowId").val(),
+            page: false,
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "PrcsNo", title: "步骤编码", width: 120 },
+                { field: "PrcsName", title: "步骤名称", width: layui.device().mobile ? 150 : null },
+                { field: "isFirst", title: "第一步", width: 120, templet: '#switchBFirst', unresize: true },
+                { field: "strNext", title: "下一步", width: layui.device().mobile ? 150 : null },
+                { title: "操作", width: 180, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.PrcsId);
+                    break;
+                case "delprc":
+                    del(data.PrcsId);
+                    break;
+                case "next":
+                    next(data.PrcsId, data.PrcsName);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.open("新建流程步骤", "/SysFlow/FlowPrcs/AddPrcs?id=" + $("#flowId").val() + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(id) {
+            exLayer.open("编辑", "/SysFlow/FlowPrcs/EditPrcs?id=" + id + "&fid=" + $("#flowId").val() + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function next(id, name) {
+            exLayer.open(name + " 下一步", "/SysFlow/FlowPrcs/NextList?id=" + id + "&fid=" + $("#flowId").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function del(id) {
+            exUtils.ajax("/SysFlow/FlowPrcs/DelPrcs?id=" + id, "post", { id: id }, true).done(function (response) {
+                refresh();
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysFlow/FlowPrcs/GetListByFId?id=" + $("#flowId").val()
+            });
+        }
+
+        //监听切换按钮
+        form.on('switch(stateBFirst)', function (data) {
+            var name = 'isFirst';
+            var id = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysFlow/FlowPrcs/UpSomeByID?id=" + id + "&isState=" + isState + "&name=" + name + "&flowid=" + $("#flowId").val(), "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    location.reload(); // 页面刷新
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新建步骤</button>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    <a href="javascript:;" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="next" id="next">下一步</a>
+    <a href="javascript:;" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delprc" id="del">删除</a>
+</script>
+<!-- 第一步-->
+<script type="text/html" id="switchBFirst">
+    <span title="第一步"><input type="checkbox" name="isFirst" value="{{d.PrcsId}}" lay-skin="switch" lay-text="是|否" lay-filter="stateBFirst" {{ d.isFirst == 1 ? 'checked' : '' }}></span>
+</script>

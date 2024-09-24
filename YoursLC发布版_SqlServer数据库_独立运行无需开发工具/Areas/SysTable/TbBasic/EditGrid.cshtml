@@ -1,0 +1,148 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbBasicEntity;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<input style="display: none" name="id" id="id">
+<input style="display: none" name="FlowId" id="FlowId" value="@Model.FlowId">
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-form-item">
+        <label class="layui-form-label">子表编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbId" id="TbId" placeholder="子表编码" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">子表名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbName" id="TbName" placeholder="子表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item" style="display:none">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序号" autocomplete="off" class="layui-input" maxlength="3" lay-verify="required|number">
+        </div>
+    </div>
+    <div class="layui-form-item" style="display:none">
+        <label class="layui-form-label">数据初始化</label>
+        <div class="layui-input-block">
+            <input type="text" name="TBRelation" id="TBRelation" placeholder="" autocomplete="off" class="layui-input" readonly="readonly">
+            <span style="position: absolute;bottom: 6px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="editR">编辑</i></a>
+            </span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+            <label class="layui-form-label">添加模式</label>
+            <div class="layui-input-block">
+                <select name="InType" id="InType">
+                    <option value="1">可添加删除行(增加/删除按钮在右侧)</option>
+                    <option value="2">可添加删除行(增加/删除按钮在顶部)</option>
+                    <option value="0">不能添加删除行(无增加/删除按钮)需设置子表数据初始化</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+            <label class="layui-form-label"> </label>
+            <div class="layui-input-block">
+                <input type="hidden" name="isLeftNum" value="2">
+                <input type="checkbox" id="isLeftNum" name="isLeftNum" value="1" title="显示序号" lay-skin="primary">
+                <span style="position: absolute;bottom: 7px; margin-left: -10px;">
+                    <i class="layui-icon layui-icon-about" lay-tips="最左侧显示序号" data-offset="4"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" value="" name="TbExplain" id="TbExplain" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        formValExa();
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //赋值
+        form.val("formEdit", {
+            "TbId": "@Model.TbId",
+            "InType": "@Model.InType",
+            "TbName": "@Model.TbName",
+            "OrderNo": "@Model.OrderNo",
+            "TbExplain": "@Model.TbExplain"
+        });
+
+        function formValExa() {
+            if (@Model.isLeftNum == "1") {
+                $('#isLeftNum').attr("checked", true);
+            }
+            else {
+                $("#isLeftNum").removeAttr("checked");
+            }
+        }
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbBasic/EditGrid", "post", { entity: data.field, fwid: $("#FlowId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $("#editR").click(function () {
+            exLayer.open($("#TbName").val() + " - 子表数据初始化", "/SysTable/TbRelation/ListGridData?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+        $("#TBRelation").click(function () {
+            exLayer.open($("#TbName").val() + " - 子表数据初始化", "/SysTable/TbRelation/ListGridData?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                /*$("#InType").attr("title", "可动态添加删除行");*/
+            }
+        });
+    })
+</script>

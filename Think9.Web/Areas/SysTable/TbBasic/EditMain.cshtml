@@ -1,0 +1,201 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbBasicEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<input style="display: none" name="id" id="id">
+<input style="display: none" name="FlowId" id="FlowId" value="@Model.FlowId">
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择分类</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("TbSort", (IEnumerable<SelectListItem>)ViewBag.TbSortList, "==请选择分类==", new Dictionary<string, object> { })
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">主表编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbId" id="TbId" placeholder="主表编码" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">主表名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="TbName" id="TbName" placeholder="主表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                <label class="layui-form-label">录入表类型</label>
+                <div class="layui-input-block">
+                    <input type="hidden" name="isInfo" value="2">
+                    <span style="position: absolute;bottom: 7px; ">
+                        <input type="checkbox" name="isInfo" id="isInfo" lay-skin="primary" title="基础信息表" value="1" lay-filter="isInfo" disabled="disabled">
+                    </span>
+                </div>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                <div class="layui-inline">
+                    <select name="flowType" id="flowType" disabled="disabled">
+                        <option value="1">固定流程</option>
+                        <option value="2">自由流程</option>
+                        <option value="0">无流程</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm4 layui-col-md4">
+                <label class="layui-form-label">锁定期限</label>
+                <div class="layui-inline">
+                    <select lay-verify="required" name="LockUpTime" id="LockUpTime">
+                        <option value="0">0分钟</option>
+                        <option value="10">10分钟</option>
+                        <option value="20">20分钟</option>
+                        <option value="30">30分钟</option>
+                        <option value="45">45分钟</option>
+                    </select>
+                </div>
+                <i class="layui-icon layui-icon-about" lay-tips="如果选择非0，List页面点击『编辑』按钮锁定数据，Form页面点击『保存』按钮解锁数据，数据锁定并且没有超过锁定期限规定的时间，不能再编辑数据" data-offset="4" style="position: absolute;margin-left: -7px;bottom: 17px;"></i>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm2 layui-col-md2">
+                <div class="layui-inline">
+                    <input type="hidden" name="isSoftDel" value="2">
+                    <input type="checkbox" id="isSoftDel" name="isSoftDel" value="1" title="软删除">
+                    <i class="layui-icon layui-icon-about" lay-tips="勾选后将不删除数据，只将state字段修改为-1" data-offset="4" style="position: absolute;bottom: 5px;margin-left: -7px;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-form-item" id="divEditUser" style="display:none">
+        <label class="layui-form-label required">编辑用户</label>
+        <div class="layui-input-block">
+            <input type="hidden" name="EditUser" id="EditUser">
+            <input type="text" name="EditUser_Exa" id="EditUser_Exa" placeholder="选择的用户才能录入编辑数据 " autocomplete="off" class="layui-input" readonly>
+            <span style="position: absolute;bottom: 6px; right: 5px;">
+                <a href="javascript:;"><i class="fa fa-check-square-o" id="selectEditUser">选择</i></a>
+                <a href="javascript:;"><i class="fa fa-check" id="allEditUser">所有</i></a>
+            </span>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序号" autocomplete="off" class="layui-input" maxlength="3" lay-verify="required|number">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" value="" name="TbExplain" id="TbExplain" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        formValExa();
+
+        //赋值
+        form.val("formEdit", {
+            "TbSort": "@Model.TbSort",
+            "TbId": "@Model.TbId",
+            "TbName": "@Model.TbName",
+            "isInfo": "@Model.isInfo",
+            "OrderNo": "@Model.OrderNo",
+            "flowType": "@Model.flowType",
+            "LockUpTime": "@Model.LockUpTime",
+            "TbExplain": "@Model.TbExplain"
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        function formValExa() {
+            if (@Model.isInfo == "1") {
+                $('#isInfo').attr("checked", true);
+                //$("#divEditUser").show();
+                $("#EditUser_Exa").val('@Model.EditUser_Exa');
+            }
+            else {
+                $("#isInfo").removeAttr("checked");
+                //$("#divEditUser").hide();
+            }
+
+            if (@Model.isSoftDel == "1") {
+                $('#isSoftDel').attr("checked", true);
+            }
+            else {
+                $("#isSoftDel").removeAttr("checked");
+            }
+        }
+
+        //所有用户
+        $('#allEditUser').on('click', function () {
+            $('#EditUser').val("#all#");
+            $('#EditUser_Exa').val("所有用户");
+
+        });
+        //选择用户
+        $('#selectEditUser').on('click', function () {
+            exLayer.open("选择用户", "/Com/ComSelect/SelectUser?fId=tbedit&sId=" + $("#EditUser").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //管理用户
+        $('#selectUser').on('click', function () {
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 权限设置管理", "/SysTable/TbBasic/TbLimits?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //填报说明
+        $('#TbExplain2').on('click', function () {
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 填报说明", "/SysTable/TbBasic/TbExplain?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysTable/TbBasic/EditMain", "post", { entity: data.field, fwid: $("#FlowId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>

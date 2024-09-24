@@ -1,0 +1,289 @@
+﻿@{ ViewBag.Title = "";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+
+<form class="layui-form" style="padding-top: 10px;">
+    <input style="display:none" id="listid" value="@ViewBag.ListId">
+    <input style="display:none" id="flid" value="@ViewBag.FwId">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">固定流程 - 转交下一步</li>
+            <li lay-id="2">回 退</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="layui-form-item">
+                    <table class="layui-hide" id="tableId01" lay-filter="tableFilter"></table>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">办理人</label>
+                    <div class="layui-input-inline">
+                        <input type="hidden" name="ckSelectUser" value="2">
+                        <input type="checkbox" name="ckSelectUser" id="ckSelectUser" lay-skin="primary" title="不指定办理人，由流程步骤授权决定,谁先接收就由谁办理(取消勾选才能选择办理人)" value="1" lay-filter="ckSelectUser" checked="checked">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <input type='text' id="selectUserV" style="display:none">
+                        <input type='text' name="selectUserT" id="selectUserT" autocomplete='off' class='layui-input' placeholder="点击选择办理人--取消勾选才能选择" disabled="disabled">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">转交意见</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" id="ispublic1" lay-skin="primary" title="转交意见公开 " checked="checked" disabled="disabled">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <textarea class="layui-textarea" id="remarks01" placeholder="转交意见..."></textarea>
+                    </div>
+                </div>
+                <div style="display: none">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">短消息</label>
+                        <div class="layui-inline">
+                            <span> <input type="checkbox" name="ckmsg11" id="ckmsg11" lay-skin="primary" title="提醒下一步骤办理人：内部短消息 如果没有选择办理人员将不发送短信"></span>
+                        </div>
+                        <div class="layui-inline">
+                            <span><input type="checkbox" name="ckmsg12" id="ckmsg12" lay-skin="primary" title="提醒本流程的发起人：内部短消息 "></span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <textarea class="layui-textarea" id="msg01" placeholder="短消息...">@ViewBag.Msg</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" id="btnOK1">转交</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="layui-form-item">
+                    <table class="layui-hide" id="tableId02"></table>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">转交意见</label>
+                    <div class="layui-input-inline">
+                        <input type="checkbox" id="ispublic2" lay-skin="primary" title="转交意见公开" checked="checked" disabled="disabled">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <textarea class="layui-textarea" id="remarks02" placeholder="转交意见..."></textarea>
+                    </div>
+                </div>
+                <div style="display: none">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">短消息</label>
+                        <div class="layui-inline">
+                            <span> <input type="checkbox" name="ckmsg21" id="ckmsg21" lay-skin="primary" title="提醒下一步骤办理人：内部短消息 如果没有选择办理人员将不发送短信"></span>
+                        </div>
+                        <div class="layui-inline">
+                            <span><input type="checkbox" name="ckmsg22" id="ckmsg22" lay-skin="primary" title="提醒本流程的发起人：内部短消息 "></span>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <textarea class="layui-textarea" id="msg02" placeholder="短消息...">@ViewBag.Msg</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button type="button" class="layui-btn" id="btnOK2">回退</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["table", "element", 'form', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        element.on('tab(tabTag_Filter)', function (data) {
+        });
+
+        form.render();
+
+        let Table01 = table.render({
+            elem: "#tableId01",
+            url: "/SysFlow/PrcsNext/GetNextStepList?listid=" + $('#listid').val() + "&flid=" + $('#flid').val(),
+            method: "POST",
+            cols: [[
+                { type: "radio", fixed: 'left' }
+                , { type: "numbers", title: "NO.", fixed: 'left' }
+                , { field: "Value", hide: true }
+                , { field: "Text", title: "选择下一步" }
+                , { title: "办理人", width: 80, align: "center", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '<span style="color: #FE7300;">未定义下一步骤，不能转交！请联系系统管理员</span>'
+            }
+        });
+
+        let Table02 = table.render({
+            elem: "#tableId02",
+            url: "/SysFlow/PrcsNext/GetBackStepList?listid=" + $('#listid').val() + "&flid=" + $('#flid').val(),
+            method: "POST",
+            cols: [[
+                { type: "radio", fixed: 'left' }
+                , { type: "numbers", title: "NO.", fixed: 'left' }
+                , { field: "PrcsId", hide: true }
+                , { field: "FlowPrcs", title: "流程步骤" }
+                , { field: "beginUserId", title: "接手用户" }
+                , { field: "createTime", title: "接手时间" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '不能回退'
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail":
+                    detail(data.Value, data.Text);
+                    break;
+            }
+        });
+
+        form.on('checkbox(ckSelectUser)', function (data) {
+            if ($(this).prop("checked")) {
+                $('#selectUserT').attr("disabled", "disabled");
+                $('#selectUserV').val('');
+                $('#selectUserT').val('');
+                $('#selectUserT').attr('placeholder', "点击选择办理人--取消勾选才能选择");
+            } else {
+                $('#selectUserT').removeAttr("disabled");
+                $('#selectUserT').attr('placeholder', "点击选择办理人");
+            }
+        });
+
+        //选择用户
+        $('#selectUserT').on('click', function () {
+            exLayer.open("选择办理人", "/Com/ComSelect/SelectUser?fId=prcnext1&sId=" + $("#selectUserV").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        $('#btnOK1').on('click', function () {
+            var checkStatus = table.checkStatus('tableId01');
+            if (checkStatus.data.length < 1) {
+                layer.msg('请选择下一步');
+                return false;
+            }
+            var _list = [];
+            getControl01(_list);
+
+            layer.confirm('确定要转交吗？', function (index) {
+                exUtils.ajax("/SysFlow/PrcsNext/FlowPrcsNext01", "post", { listid: $("#listid").val(), list: _list }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        $(window.parent.parent.document).find('#search').click();
+                        parent.parent.layer.closeAll();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+
+        });
+
+        $('#btnOK2').on('click', function () {
+            var checkStatus = table.checkStatus('tableId02');
+            if (checkStatus.data.length < 1) {
+                layer.msg('请选择回退的步骤');
+                return false;
+            }
+            var _list = [];
+            getControl02(_list);
+
+            layer.confirm('确定要转交吗？', function (index) {
+                exUtils.ajax("/SysFlow/PrcsNext/FlowPrcsBack01", "post", { listid: $("#listid").val(), list: _list }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        $(window.parent.parent.document).find('#search').click();
+                        parent.parent.layer.closeAll();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+
+            });
+
+        });
+
+        //从控件读值
+        function getControl01(_list) {
+            //流程id
+            _list.push({ ClassID: 'classid', Text: $('#flid').val(), Value: 'fwid' });
+            //转交意见公开
+            _list.push({ ClassID: 'classid', Text: $("#ispublic1").prop("checked"), Value: 'isPublic' });
+            //选择的用户
+            _list.push({ ClassID: 'classid', Text: $('#selectUserV').val(), Value: 'selectUserId' });
+            //短消息
+            _list.push({ ClassID: 'classid', Text: $('#msg01').val(), Value: 'msg' });
+            //转交意见
+            _list.push({ ClassID: 'classid', Text: $('#remarks01').val(), Value: 'remarks' });
+            //提醒下一步骤办理人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg11").prop("checked"), Value: 'ckmsg11' });
+            //提醒本流程的发起人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg12").prop("checked"), Value: 'ckmsg12' });
+
+            var checkStatus01 = table.checkStatus('tableId01');
+            //选择的流程步骤
+            _list.push({ ClassID: 'classid', Text: checkStatus01.data[0].Value, Value: 'selectPrcsId' });
+            //是否指定了办理人
+            _list.push({ ClassID: 'classid', Text: $("#ckSelectUser").prop("checked"), Value: 'ckSelectUser' });
+
+        }
+
+        //从控件读值 回退
+        function getControl02(_list) {
+            //流程id
+            _list.push({ ClassID: 'classid', Text: $('#flid').val(), Value: 'fwid' });
+            //转交意见公开
+            _list.push({ ClassID: 'classid', Text: $("#ispublic2").prop("checked"), Value: 'isPublic' });
+            //短消息
+            _list.push({ ClassID: 'classid', Text: $('#msg02').val(), Value: 'msg' });
+            //转交意见
+            _list.push({ ClassID: 'classid', Text: $('#remarks02').val(), Value: 'remarks' });
+            //提醒下一步骤办理人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg21").prop("checked"), Value: 'ckmsg21' });
+            //提醒本流程的发起人
+            _list.push({ ClassID: 'classid', Text: $("#ckmsg22").prop("checked"), Value: 'ckmsg22' });
+
+            var checkStatus02 = table.checkStatus('tableId02');
+            //回退选择的流程步骤
+            _list.push({ ClassID: 'classid', Text: checkStatus02.data[0].PrcsId, Value: 'selectPrcsId' });
+            //回退选择的办理人-即接手人
+            _list.push({ ClassID: 'classid', Text: checkStatus02.data[0].beginUserId, Value: 'selectUserId' });
+        }
+
+        function detail(id, name) {
+            exLayer.openMiddle(name + " - 办理人", "/SysFlow/FlowPrcs/PrcsTransactor/" + id, '500px', '450px', layui.device().mobile);
+        }
+
+    })
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a class='layui-btn layui-btn-primary layui-btn-xs' href='javascript:;' lay-event='detail' id='detail'><i class="fa fa-search"></i> </a>
+</script>

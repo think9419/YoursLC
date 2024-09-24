@@ -1,0 +1,122 @@
+﻿@using Think9.Models;
+@model Think9.Models.valueTextEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+
+<input style="display:none" id="listid" value="@ViewBag.listid">
+<input style="display:none" id="frm" value="@ViewBag.frm">
+<input style="display:none" id="rpId" value="@ViewBag.rpId">
+<input style="display:none" id="parmId" value="@ViewBag.parmId">
+<input style="display:none" id="parmType" value="@ViewBag.parmType">
+<div class="layui-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label required">Value</label>
+        <div class="layui-input-block">
+            <input type='text' name='Value' id='Value' autocomplete='off' class='layui-input' maxlength='30' lay-verify='required' placeholder='输入Value值'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">Text</label>
+        <div class="layui-input-block">
+            <input type='text' name='Text' id='Text' autocomplete='off' class='layui-input' maxlength='30' lay-verify='required' placeholder='输入Text值'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type='text' name='OrderNo' id='OrderNo' autocomplete='off' class='layui-input' maxlength='4' placeholder='输入排序号' lay-verify='required|number'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" id="addItem" lay-submit lay-filter="addItem">添加</button>
+        </div>
+    </div>
+</div>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/ReportParmQuery/GetParmQueryItem?listid=" + $("#listid").val() + "&frm=" + $("#frm").val(),
+            method: "get",
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "Value", title: "Value", width: 150, sort: true },
+                { field: "Text", title: "Text", sort: true },
+                { field: "OrderNo", title: "OrderNo", width: 80, sort: true },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "del":
+                    del(data.Exa);
+                    break;
+            }
+        });
+
+        //点击保存按钮
+        form.on("submit(addItem)", function (data) {
+            exUtils.ajax('/SysStats/ReportParmQuery/AddItem', 'post', {
+                model: data.field, listid: $('#listid').val(), frm: $('#frm').val(), parmid: $('#parmId').val()
+            }, true).done(function (response) {
+                $('#Value').val("");
+                $('#Text').val("");
+                $('#OrderNo').val(response.extra);
+
+                refresh();
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysStats/ReportParmQuery/GetItem?listid=" + $("#listid").val() + "&frm=" + $("#frm").val()
+            });
+        }
+
+        function del(id) {
+            exUtils.ajax("/SysStats/ReportParmQuery/DelItem", "get", { id: id, frm: $("#frm").val() }, true).done(function (response) {
+                refresh();
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del" id="del">删除</a>
+</script>

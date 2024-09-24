@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+
+<fieldset class="table-fieldset" id="sqlStatement" style="display:none">
+    <legend style="color:darkgrey">建表sql<span><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_sql"></i></span></legend>
+    <span style="text-align: right; display: block; "> <button type="button" class="layui-btn layui-btn-xs" id="copy"><i class="fa fa-code"></i>复制</button></span>
+    <div style="margin: 5px 5px 5px 5px" id="_code">
+        @ViewBag.sql
+    </div>
+</fieldset>
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        $("#close_sql").click(function () {
+            $("#sqlStatement").attr("style", "display:none");
+        });
+
+        $("#copy").click(function () {
+            var controlID = "_code";
+
+            var div = document.getElementById(controlID);
+            if (document.body.createTextRange) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(div);
+                range.select();
+            } else if (window.getSelection) {
+                var selection = window.getSelection();
+                var range = document.createRange();
+                range.selectNodeContents(div);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                /*if(selection.setBaseAndExtent){
+                    selection.setBaseAndExtent(text, 0, text, 1);
+                }*/
+            } else {
+                console.warn("none");
+            }
+            document.execCommand("Copy"); // 执行浏览器复制命令
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetTableFieldsList?tbid=" + $("#tbid").val(),
+            defaultToolbar: ['exports'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ColumnName", title: "字段名", width: 190, sort: true },
+                { field: "DataType", title: "类 型", width: 120, sort: true },
+                { field: "IndexName", title: "备 注", sort: true, width: layui.device().mobile ? 250 : null }
+            ]],
+            done: function (res, curr, count) {
+                if (count == 0) {
+                    $("#add").attr("class", "layui-btn layui-btn-warm layui-btn-sm");
+                }
+                else {
+                    $("#add").removeAttr("lay-event");
+                }
+            },
+            text: {
+                none: '请点击『创建数据表』按钮'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "sql":
+                    sql();
+                    break;
+            }
+        });
+
+        function add() {
+            exUtils.ajax("/SysTable/TbBasic/CreatTableDB", "post", { tbid: $("#tbid").val().trim() }, true).done(function (response) {
+                ThisTable.reload({
+                    where: { tbid: $("#tbid").val().trim() }
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        }
+
+        function sql() {
+            var display = $('#sqlStatement').css('display');
+            if (display == 'none') {
+                $("#sqlStatement").show();
+            }
+            else {
+                $("#sqlStatement").hide();
+            }
+        }
+    })
+</script>
+<!-- 头工具栏模板-->
+<script type="text/html" id="toolbarTpl">
+    <button type="button" class="layui-btn  layui-btn-normal layui-btn-sm" lay-event="sql" id="sql"><i class="fa fa-code"></i>sql语句</button>
+    <button class="layui-btn layui-btn-disabled layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>创建数据表</button>
+</script>

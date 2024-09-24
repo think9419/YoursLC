@@ -1,0 +1,12 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="35" width="790" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="设置录入表锁定期限为非0，则用户List页面点击编辑按钮则锁定数据，Form页面点击保存按钮则解锁数据，锁定期间并且没有超过锁定期限规定的时间，不能再编辑数据，确保每次只能有一个用户编辑数据" horAlignment="None" verAlignment="None" Selectable="True">设置录入表锁定期限为非0，则用户List页面点击编辑按钮则锁定数据，Form页面点击保存按钮则解锁数据，锁定期间并且没有超过锁定期限规定的时间，不能再编辑数据，确保每次只能有一个用户编辑数据</lab>
+			<lab x="10" y="80" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编码" horAlignment="None" verAlignment="None" Selectable="True">编码</lab>
+			 <textField x="125" y="80" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inCoding" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inCoding</textField>
+			<lab x="10" y="125" width="110" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="名称" horAlignment="None" verAlignment="None" Selectable="True">名称</lab>
+			 <textField x="125" y="125" width="675" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inName" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inName</textField>
+		</staticContent>
+	</content>
+</daReport>

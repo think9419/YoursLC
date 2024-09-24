@@ -1,0 +1,426 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" action="">
+    <input style="display:none" id="_tbid" value="@ViewBag.TbId">
+    <blockquote class="layui-elem-quote  layui-text">
+        『固定流程』通过『流程步骤』设置『保密字段』及『只读字段』，『自由流程』和『基础信息表』在此页面设置『只读|保密字段』<br>不勾选『仅只读』选项则设置为『不可写并保密』，修改后无需『重新生成』便能生效
+    </blockquote>
+    <span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+        <i class="fa fa-close" style="color: #FFAB00;"></i>
+    </span>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId3' id='ObjId3' autocomplete='off' class='layui-input' placeholder='选择用户'>
+        </div>
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='IndexId3' id='IndexId3' autocomplete='off' class='layui-input' placeholder='选择指标字段'>
+        </div>
+        <div class="layui-inline">
+            <input type="checkbox" id="isHidden3" name="isHidden3" title="仅只读">
+            <i class="layui-icon layui-icon-about" lay-tips="勾选后仅不可写该字段，不勾选则同时隐藏内容" data-offset="4" style="position: absolute;bottom: 5px;margin-left: -7px;"></i>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add3" lay-filter="add3" lay-submit>添加</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId' id='ObjId' autocomplete='off' class='layui-input' placeholder='选择组织机构'>
+        </div>
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='IndexId' id='IndexId' autocomplete='off' class='layui-input' placeholder='选择指标字段'>
+        </div>
+        <div class="layui-inline">
+            <input type="checkbox" id="isHidden" name="isHidden" title="仅只读">
+            <i class="layui-icon layui-icon-about" lay-tips="勾选后仅不可写该字段，不勾选则同时隐藏内容" data-offset="4" style="position: absolute;bottom: 5px;margin-left: -7px;"></i>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add" lay-filter="add" lay-submit>添加</button>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='ObjId2' id='ObjId2' autocomplete='off' class='layui-input' placeholder='选择角色'>
+        </div>
+        <div class="layui-inline" style="width:400px;">
+            <input type='text' name='IndexId2' id='IndexId2' autocomplete='off' class='layui-input' placeholder='选择指标字段'>
+        </div>
+        <div class="layui-inline">
+            <input type="checkbox" id="isHidden2" name="isHidden2" title="仅只读" lay-tips="勾选后仅不可写该字段，不勾选则同时隐藏内容">
+            <i class="layui-icon layui-icon-about" lay-tips="勾选后仅不可写该字段，不勾选则同时隐藏内容" data-offset="4" style="position: absolute;bottom: 5px;margin-left: -7px;"></i>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add2" lay-filter="add2" lay-submit>添加</button>
+        </div>
+    </div>
+</form>
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "tableSelect", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let $ = layui.$;
+
+        form.render();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ObjTable = tableSelect.render({
+            elem: '#ObjId',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=1',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ObjTable2 = tableSelect.render({
+            elem: '#ObjId2',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=2',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ObjTable3 = tableSelect.render({
+            elem: '#ObjId3',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetObjListForPage?type=3',
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable = tableSelect.render({
+            elem: '#IndexId',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable2 = tableSelect.render({
+            elem: '#IndexId2',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let IndexTable3 = tableSelect.render({
+            elem: '#IndexId3',//定义输入框input对象 必填
+            checkedKey: 'Id',//表格的唯一建值，影响到选中状态 必填
+            searchKey: 'keyword',//搜索输入框的id值
+            searchPlaceholder: '关键词搜索',//搜索输入框的提示文字
+            table: {
+                url: '/SysTable/TbBasic/GetIndexListForPage?tbid=' + $("#_tbid").val(),
+                limits: [10, 50, 100],
+                limit: 10,
+                page: true,
+                method: "GET",
+                cols: [[
+                    { type: 'checkbox' }
+                    , { type: 'numbers', title: 'NO.' }
+                    , { field: "Id", title: "编码", width: null }//可修改，如width: 100
+                    , { field: "Text", title: "名称", width: null }//可修改，如width: 100
+                ]]
+            },
+            done: function (elem, data) {
+                var NEWJSON = [];
+                layui.each(data.data, function (index, item) {
+                    NEWJSON.push(item.Id);
+                })
+                elem.val(NEWJSON.join(";"));
+            }
+        })
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: '/SysTable/TbBasic/GetTbHiddenIndexList?tbid=' + $("#_tbid").val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "isHidden", title: "只读|保密", width: 120 },
+                { field: "ObjType", title: "对象类别", sort: true, width: 100, templet: "#ObjType" },
+                { field: "ObjId", title: "对象编码", sort: true },
+                { field: "IndexId", title: "保密字段", sort: true }
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        form.on("submit(add)", function () {
+            var isHidden = 'y';
+            if ($("#isHidden").is(':checked')) {
+                isHidden = 'n';
+            }
+            if ($("#ObjId").val().trim() == '') {
+                layer.msg('请选择组织机构');
+                return false;
+            }
+            if ($("#IndexId").val().trim() == '') {
+                layer.msg('选择指标字段');
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/TbBasic/AddTbHiddenIndex", "post", { tbid: $("#_tbid").val(), objId: $("#ObjId").val(), indexId: $("#IndexId").val(), objType: 1, isHidden: isHidden }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId").val('');
+                $("#IndexId").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on("submit(add2)", function () {
+            var isHidden = 'y';
+            if ($("#isHidden2").is(':checked')) {
+                isHidden = 'n';
+            }
+
+            if ($("#ObjId2").val().trim() == '') {
+                layer.msg('请选择角色');
+                return false;
+            }
+            if ($("#IndexId2").val().trim() == '') {
+                layer.msg('选择指标字段');
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/TbBasic/AddTbHiddenIndex", "post", { tbid: $("#_tbid").val(), objId: $("#ObjId2").val(), indexId: $("#IndexId2").val(), objType: 2, isHidden: isHidden }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId2").val('');
+                $("#IndexId2").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on("submit(add3)", function () {
+            var isHidden = 'y';
+            if ($("#isHidden3").is(':checked')) {
+                isHidden = 'n';
+            }
+
+            if ($("#ObjId3").val().trim() == '') {
+                layer.msg('请选择用户');
+                return false;
+            }
+            if ($("#IndexId3").val().trim() == '') {
+                layer.msg('选择指标字段');
+                return false;
+            }
+
+            exUtils.ajax("/SysTable/TbBasic/AddTbHiddenIndex", "post", { tbid: $("#_tbid").val(), objId: $("#ObjId3").val(), indexId: $("#IndexId3").val(), objType: 3, isHidden: isHidden }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+                $("#ObjId3").val('');
+                $("#IndexId3").val('');
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                where: { tbid: $("#_tbid").val() }
+            });
+        }
+
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].Id + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysTable/TbBasic/DelTbHiddenIndex", "get", { tbid: $("#_tbid").val(), idsStr: idsStr }, true).done(function (response) {
+                        refresh();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+
+            //消息提示
+            $(document).on("mouseenter", "*[lay-tips]", function () {
+                var remind = $(this).attr("lay-tips");
+                var tips = $(this).data("offset") || 4;
+                var color = $(this).data("color") || '#88858e';
+                layer.tips(remind, this, {
+                    time: -1,
+                    tips: [tips, color],
+                    area: ['auto', 'auto'],
+                });
+            }).on("mouseleave", "*[lay-tips]", function () {
+                layer.closeAll("tips");
+            });
+        }
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-btn-container">
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i></button>
+    </div>
+</script>
+<script type='text/html' id='ObjType'>
+    {{#  if(d.ObjType == '1'){ }}
+    组织机构
+    {{#  } }}
+    {{#  if(d.ObjType == '2'){ }}
+    角色
+    {{#  } }}
+    {{#  if(d.ObjType == '3'){ }}
+    用户
+    {{#  } }}
+</script>
+<script type='text/html' id='isHidden2'>
+    {{#  if(d.isHidden == 'y'){ }}
+    <span>只读|保密</span>
+    {{#  } else{ }}
+    <span>禁用</span>
+    {{#  } }}
+</script>

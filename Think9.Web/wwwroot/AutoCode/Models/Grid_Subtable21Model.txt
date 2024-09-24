@@ -1,0 +1,77 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:34
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【子表】  生成时间：2024-09-24 13:29:34
+	/// </summary>
+	 [Table("tb_Subtable21")]
+	public class Subtable21Model : GridTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 名称
+		/// </summary>
+		public string v1 { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		[Computed]
+		public string v1_Exa { get; set; }
+		/// <summary>
+		/// 名称
+		/// </summary>
+		[Computed]
+		public string v1_Lock { get; set; }
+		/// <summary>
+		///名称
+		/// </summary>
+		[Computed]
+		public string v1_JS { get; set; }
+		/// <summary>
+		/// 数值1
+		/// </summary>
+		public long? v2 { get; set; }
+		/// <summary>
+		/// 数值1
+		/// </summary>
+		[Computed]
+		public string v2_Exa { get; set; }
+		/// <summary>
+		/// 数值1
+		/// </summary>
+		[Computed]
+		public string v2_Lock { get; set; }
+		/// <summary>
+		///数值1
+		/// </summary>
+		[Computed]
+		public string v2_JS { get; set; }
+		/// <summary>
+		/// 数值2
+		/// </summary>
+		public long? v3 { get; set; }
+		/// <summary>
+		/// 数值2
+		/// </summary>
+		[Computed]
+		public string v3_Exa { get; set; }
+		/// <summary>
+		/// 数值2
+		/// </summary>
+		[Computed]
+		public string v3_Lock { get; set; }
+		/// <summary>
+		///数值2
+		/// </summary>
+		[Computed]
+		public string v3_JS { get; set; }
+		#endregion Model
+		
+	}
+}

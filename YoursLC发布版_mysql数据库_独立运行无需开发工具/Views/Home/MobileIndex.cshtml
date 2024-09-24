@@ -1,0 +1,193 @@
+﻿@model Think9.Models.WebEntity
+@{
+    ViewBag.Title = Model.SiteName;
+}
+<!-- 更换主体 Eg:orange_theme|blue_theme -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="~/images/favicon.ico">
+    <link rel="stylesheet" href="~/lib/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="~/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="~/css/layuimini.css?v=2.0.1" media="all">
+    <link rel="stylesheet" href="~/css/themes/default.css" media="all">
+    <link rel="stylesheet" href="~/css/public.css" media="all">
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style id="layuimini-bg-color">
+    </style>
+</head>
+<body class="layui-layout-body layuimini-all">
+    <style>
+        layuimini-main {
+            margin: 0px 0px 0px 0px;
+            border: 0px solid #ffffff;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+    </style>
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header header">
+            <div class="layui-logo layuimini-logo layuimini-back-home"></div>
+            <div class="layuimini-header-content">
+                <a>
+                    <div class="layuimini-tool"><i title="展开" class="fa fa-outdent" data-side-fold="1"></i></div>
+                </a>
+
+                <!--移动端头部菜单-->
+                <ul class="layui-nav layui-layout-left layuimini-header-menu layuimini-mobile-show">
+                    <li class="layui-nav-item">
+                        <a href="javascript:;"><i class="fa fa-list-ul"></i>选择模块</a>
+                        <dl class="layui-nav-child layuimini-menu-header-mobile">
+                        </dl>
+                    </li>
+                </ul>
+
+                <ul class="layui-nav layui-layout-right">
+                    <li class="layui-nav-item" lay-unselect>
+                        <a style="font-size: 16px;" href="@Url.Content("/Home?M=y")"><i class="fa fa-home"></i></a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a style="font-size: 16px;" href="javascript:;" data-refresh="刷新"><i class="fa fa-refresh"></i></a>
+                    </li>
+                    <li class="layui-nav-item" lay-unselect>
+                        <a style="font-size: 16px;" class="layui-icon layui-icon-notice" data-notice="消息" id="noticeMarker">
+                        </a>
+                    </li>
+                    <li class="layui-nav-item layuimini-setting">
+                        <a style="font-size: 16px;" href="javascript:;">@ViewBag.Account</a>
+                        <dl class="layui-nav-child">
+                            <dd>
+                                <a href="javascript:;" id="UserInfo" data-title="基本信息" data-icon="fa fa-gears">基本信息</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" id="UserPwd" data-title="修改密码" data-icon="fa fa-gears">修改密码</a>
+                            </dd>
+                            <dd>
+                                <hr>
+                            </dd>
+                            <dd>
+                                <a href="@Url.Content("/Login")">
+                                    <i class="fa fa-sign-out"></i> 退出登录
+                                </a>
+                            </dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item layuimini-select-bgcolor" lay-unselect>
+                        <a style="font-size: 18px;" href="javascript:;" data-bgcolor="配色方案"><i class="fa fa-ellipsis-v"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!--无限极左侧菜单-->
+        <div class="layui-side layui-bg-cyan layuimini-menu-left">
+        </div>
+
+        <!--初始化加载层-->
+        @*<div class="layuimini-loader">
+        <div class="layuimini-loader-inner"></div>
+        </div>*@
+
+        <!--移动端遮罩层-->
+        <div class="layuimini-make"></div>
+
+        <!-- 移动导航 -->
+        <div class="layuimini-site-mobile"><i class="layui-icon"></i></div>
+
+        <div class="layui-body">
+            <div class="layui-card layuimini-page-header layui-hide">
+                <div class="layui-breadcrumb layuimini-page-title">
+                    <a lay-href="" href="/">主页</a><span lay-separator="">/</span>
+                    <a><cite>常规管理</cite></a><span lay-separator="">/</span>
+                    <a><cite>系统设置</cite></a>
+                </div>
+            </div>
+            <div class="layuimini-content-page">
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/layui/layui.js" charset="utf-8"></script>
+    <script src="~/js/lay-config.js?v=2.0.0" charset="utf-8"></script>
+    <script>
+        layui.use(['jquery', 'layer', 'miniAdmin', 'miniTongji', 'notice'], function () {
+            var $ = layui.jquery,
+                layer = layui.layer,
+                notice = layui.notice,
+                miniAdmin = layui.miniAdmin;
+
+            $(function () {
+                GetSmsCount();
+            });
+
+            function GetSmsCount() {
+                $.ajax({
+                    url: "/Message/GetSmsCount",
+                    dataType: "json",
+                    async: true,
+                    success: function (data) {
+                        if (data.MsgCout > 0) {
+                            $('#noticeMarker').html('<span class="layui-badge-dot"></span>');
+                            notice.options = {
+                                positionClass: "toast-bottom-right",//弹出的位置,
+                                onclick: function () {
+                                    $('#noticeMarker').click();
+                                },
+                            };
+                            notice.info('您有' + data.MsgCout + '条信息未读');
+                        }
+                        else {
+                            $('#noticeMarker').html('');
+                        }
+                    }
+                });
+            };
+
+            $('#UserInfo').on('click', function () {
+                layer.open({
+                    type: 2,
+                    title: "基本信息",
+                    shade: 0.5,
+                    area: ["350px", "450px"],
+                    anim: 2,
+                    content: "/Home/UserInfo"
+                });
+            });
+
+            $('#UserPwd').on('click', function () {
+                layer.open({
+                    type: 2,
+                    title: "修改密码",
+                    shade: 0.5,
+                    area: ["350px", "320px"],
+                    anim: 2,
+                    content: "/Home/UserPwd"
+                });
+            });
+
+            var options = {
+                iniUrl: "SysBasic/Module/GetLeftTree?mobile=y", // 初始化接口
+                clearUrl: "api/clear.json", // 缓存清理接口
+                renderPageVersion: true,    // 初始化页面是否加版本号
+                bgColorDefault: false,      // 主题默认配置
+                multiModule: true,          // 是否开启多模块
+                menuChildOpen: false,       // 是否默认展开菜单
+                loadingTime: 0,             // 初始化加载时间
+                pageAnim: true,             // 切换菜单动画
+            };
+            miniAdmin.render(options);
+        });
+    </script>
+</body>
+</html>

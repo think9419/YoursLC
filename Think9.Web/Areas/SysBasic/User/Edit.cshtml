@@ -1,0 +1,135 @@
+﻿@model Think9.Models.UserEntity
+@{ ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+
+<form class="layui-form" lay-filter="formUser">
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.UserPassword)
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户名</label>
+        <div class="layui-input-block">
+            <input type="text" name="Account" placeholder="用户名" autocomplete="off" class="layui-input" lay-verify="required" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="RealName" placeholder="姓名" autocomplete="off" class="layui-input" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户部门</label>
+
+        <div class="layui-input-block">
+            <input type="text" id="DeptNo" lay-filter="tree" name="DeptNo" placeholder="==请选择部门==" autocomplete="off" class="layui-input" readonly="readonly" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">用户角色</label>
+        <div class="layui-input-block">
+            @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewBag.RoleList, "==请选择角色==", new Dictionary<string, object> { { "lay-verify", "required" } })
+        </div>
+    </div>
+
+        <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <select id="Gender" name="Gender">
+                <option value="1">男</option>
+                <option value="0">女</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号码</label>
+        <div class="layui-input-block">
+            <input type="text" name="MobilePhone" placeholder="手机号码" autocomplete="off" class="layui-input" maxlength="11" lay-verify='phone'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">微信</label>
+        <div class="layui-input-block">
+            <input type="text" name="WeChat" placeholder="微信" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="Email" placeholder="邮箱" autocomplete="off" class="layui-input" lay-verify='email'>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">出生日期</label>
+        <div class="layui-input-block">
+            <input type="text" name="Birthday" id="Birthday" placeholder="出生日期" autocomplete="off" class="layui-input" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+        </div>
+    </div>
+           <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <select id="EnabledMark" name="EnabledMark">
+                <option value="0">启用</option>
+                <option value="1">禁用</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type ="button" class="layui-btn" lay-submit lay-filter="add">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "upload", "layer", "treeSelect"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let upload = layui.upload;
+        let layer = layui.layer;
+        let treeSelect = layui.treeSelect;
+        let $ = layui.$;
+
+     treeSelect.render({
+         elem: "#DeptNo",
+         data: "/SysBasic/Organize/GetOrganizeTreeSelect",
+         type: "GET"
+        @if (Model.DeptNo != "")
+        {
+            <text>,success: function (d) {
+            treeSelect.checkNode('tree', "@Model.DeptNo");
+            treeSelect.refresh('tree');
+            }</text>
+        }
+      });
+
+        //表单赋值
+        form.val("formUser", {
+            "Account": "@Model.Account",
+            "RealName": "@Model.RealName",
+            "Gender": "@Model.Gender",
+            "MobilePhone": "@Model.MobilePhone",
+            "WeChat": "@Model.WeChat",
+            "Email": "@Model.Email",
+            "Birthday": showDate("@Model.Birthday"),
+            "DepartmentId": "@Model.DeptNo",
+            "RoleId": "@Model.RoleId",
+            "EnabledMark": "@Model.EnabledMark"
+        });
+
+        form.render(); //更新全部
+
+    form.on("submit(add)", function (data) {
+        exUtils.ajax("/SysBasic/User/Edit", "post", data.field, true).done(function (response) {
+            exLayer.greenTickMsg(response.message, function () {
+                parent.layui.table.reload('tableId', { url: "/SysBasic/User/GetPageListBySearch" });
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            });
+        }).fail(function (error) {
+            console.log(error);
+        });
+        return false;
+    });
+
+    });
+</script>

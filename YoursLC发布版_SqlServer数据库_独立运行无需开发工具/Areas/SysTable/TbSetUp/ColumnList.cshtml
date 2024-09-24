@@ -1,0 +1,335 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<style>
+    .layui-table-cell input {
+        height: 30px;
+        line-height: 30px;
+    }
+
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: 0px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<blockquote class="layui-elem-quote layui-text">
+    『子表指标』编码固定为v1，v2...v30（子表非隐藏列最多不能超过30列，总列数不得超过99），编码值必须连续，即假设只有2个指标列v1，v2，再添加指标列，编码是v3；删除指标列是从后往前顺序删除<br>
+    可将指标设置为『隐藏指标』，录入页面将不显示『隐藏指标』，可通过数据回写、自定义事件等方式修改该指标列的值，备注：『隐藏指标』只能排在最末，即『隐藏指标』之后不能再有非隐藏指标<br>
+    『指标属性』更改，除唯一、主键属性外，其余都需要重新生成才能生效
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetGridTbIndexList?tbid=" + $("#tbid").val(),
+            method: "post",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "IndexId", title: "编码", width: 60, sort: true },
+                { field: "IndexName", title: "名称", sort: true, templet: '#IndexName' },
+                { field: "DataTypeName", title: "类型", width: 160, sort: true, templet: '#DataTypeName' },
+                { field: "ColumnWith", title: "<i class='layui-icon layui-icon-about' lay-tips='list页面列宽' data-offset='4'></i>列宽", width: 80, templet: '#ColumnWith', sort: true, totalRow: true },
+                { field: "isEmpty", title: "必填", width: 80, templet: '#switchBEmpty', unresize: true, sort: true },
+                { field: "isLock", title: "<i class='layui-icon layui-icon-about' lay-tips='包含锁定、不锁定、按行锁定及编辑时锁定选项' data-offset='4'></i>锁定", width: 80, templet: '#switchBLock', unresize: true, sort: true },
+                { field: "ControlType", title: "控件类型", width: 140, templet: '#ControlType' },
+                { field: "RuleId", title: "<i class='layui-icon layui-icon-about' lay-tips='控件为文本框时数据规范设置为单列选择、多列选择、树形选择，点击后弹出数据选择' data-offset='4'></i>数据规范", width: 160, templet: '#RuleId' },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "set":
+                    foreachGridTable();
+                    break;
+                case "add":
+                    add();
+                    break;
+                case "del":
+                    del();
+                    break;
+                case "refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.IndexId);
+                    break;
+                case "del":
+                    del(data.IndexId);
+                    break;
+                case "dataType":
+                    dataType(data.IndexId);
+                    break;
+                case "look":
+                    look(data.IndexId, data.IndexName);
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.openMiddle("添加指标列", "/SysTable/TbSetUp/AddColumn?tbid=" + $("#tbid").val(), '500px', '250px', layui.device().mobile);
+        }
+
+        function look(id, name) {
+            exLayer.open(name + " - 数据预览(最多显示100条数据)", "/SysTable/RuleLook/RuleDataListByTbIndexID?indexid=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function dataType(IndexId) {
+            exLayer.openMiddle("编辑指标列", "/SysTable/TbSetUp/EditColumnType?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '500px', '200px', layui.device().mobile);
+        }
+
+        function del() {
+            exLayer.confirm("<span style='color: red;' >将删除最末一列指标，此操作不可恢复，确定继续吗？</span>", function () {
+                exUtils.ajax("/SysTable/TbSetUp/DelColumn", "get", { tbid: $("#tbid").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    ThisTable.reload({
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        function edit(IndexId) {
+            exLayer.open("编辑指标", "/SysTable/TbSetUp/EditColumn?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function refresh() {
+            table.reload('tableId', {})
+        }
+
+        function foreachGridTable() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+                var _indexid = tdArr.eq(0).text();
+                var column2 = tdArr.eq(1).text();
+                var column3 = tdArr.eq(2).text();
+                var _with = tdArr.eq(3).find('input').val();
+                var _no = tdArr.eq(0).text();
+                if (_indexid.indexOf("v") != -1) {
+                    var _row = { TbId: $("#tbid").val(), IndexId: '', ColumnWith: 0, IndexOrderNo: 0 };
+                    _row.TbId = $("#tbid").val();
+                    _row.IndexId = _indexid;
+                    _row.ColumnWith = _with;
+                    _row.IndexOrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexWidth", "post", { "list": _list }, true).done(function (response) {
+                exUtils.tableSuccessMsg(response.message);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //监听切换按钮
+        form.on('switch(stateBEmpty)', function (data) {
+            var name = 'isEmpty';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    /*location.reload(); // 页面刷新*/
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBOrder)', function (data) {
+            var name = 'isOrder';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    /*location.reload(); // 页面刷新*/
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBLock)', function (data) {
+            var name = 'isLock';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    /*location.reload(); // 页面刷新*/
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //数据规范
+        form.on('select(RuleId)', function (data) {
+            var ruleid = data.value;
+            var indexid = data.elem.getAttribute("name").replace(/rule_/, "");
+
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexRule?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&ruleid=" + ruleid, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //控件类型
+        form.on('select(ControlType)', function (data) {
+            var typeid = data.value;
+            var indexid = data.elem.getAttribute("name").replace(/type_/, "");
+
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexControlType?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&typeid=" + typeid, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="del" id="del"><i class="fa fa-trash-o"></i>删除指标列</button>
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-warm" lay-event="add" id="add"><i class="fa fa-plus"></i>添加指标列</button>
+         <a href='@ViewBag.linkStr' target="_blank"  id="indexList" class="layui-btn layui-btn-sm layui-btn-normal"><i class="fa fa-list-ul"></i>指标属性</a>
+        <button class="layui-btn layui-btn-sm layui-btn-normal" lay-event="set" id="set"><i class="layui-icon layui-icon-list" lay-tips="保存列宽"></i>保 存</button>
+    </div>
+    <div class="layui-inline">
+        <span class="layui-word-aux"><i class="fa fa-angle-double-left"></i>保存列宽</span>
+    </div>
+</script>
+<!-- 控件类型 -->
+<script type='text/html' id='ControlType'>
+    <div class='layui-input-inline' style='width:80px;'>
+        <select name={{'type_'+d.IndexId}} lay-filter='ControlType'>
+            {{d.ControlType_Exa}}
+        </select>
+    </div>
+</script>
+<!-- 数据规范 -->
+<script type='text/html' id='RuleId'>
+    <div class='layui-input-inline' style='width:100px;'>
+        <select name={{'rule_'+d.IndexId}} lay-filter='RuleId' data-value={{d.RuleId}}>
+            <option value="">==不选择==</option>
+            <optgroup label="清除所选">
+                <option value="">==ㄨ清除==</option>
+            </optgroup>
+            {{d.Rule_Exa}}
+            <optgroup label="清除所选">
+                <option value="">==ㄨ清除==</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class='layui-input-inline'>
+        &nbsp;
+        <a href="javascript:;" class='layui-btn layui-btn-normal layui-btn-xs' lay-event='look' id='look' lay-tips="预览 - 只能预览单列选择、多列选择、树形选择类型的数据"><i class="fa fa-file-text-o"></i></a>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">更多</a>
+</script>
+<!-- 必填 -->
+<script type="text/html" id="switchBEmpty">
+    <span title="必填"><input type="checkbox" name="isEmpty" value="{{d.IndexId}}" lay-skin="switch" lay-text="必填|" lay-filter="stateBEmpty" {{ d.isEmpty == 2 ? 'checked' : '' }}></span>
+</script>
+<!-- 排序 -->
+<script type="text/html" id="switchBOrder">
+    <span title="排序"><input type="checkbox" name="isOrder" value="{{d.IndexId}}" lay-skin="switch" lay-text="排序|" lay-filter="stateBOrder" {{ d.isOrder == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 是否锁定？1是2否 -->
+<script type="text/html" id="switchBLock">
+    <span title="锁定"><input type="checkbox" name="isLock" value="{{d.IndexId}}" lay-skin="switch" lay-text="锁定|" lay-filter="stateBLock" {{ d.isLock == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 列宽 -->
+<script type="text/html" id="ColumnWith">
+    <input type="text" name="ColumnWith" value="{{d.ColumnWith}}" class="layui-input" maxlength="4" style="height:28px;" lay-verify="required|number">
+</script>
+<!-- 类型 -->
+<script type="text/html" id="DataTypeName">
+    <span>{{d.DataTypeName}}&nbsp;<a href="javascript:;" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="dataType" id="dataType"><i class="fa fa-pencil" lay-tips="编辑类型"></i></a></span>
+</script>
+<!-- 名称 -->
+<script type="text/html" id="IndexName">
+    {{#  if(d.isShow == "2"){ }}
+    {{d.IndexName}}<span style='color: #FE7300;'>{隐藏}</span>
+    {{#  }else{ }}
+    {{d.IndexName}}
+    {{#  } }}
+</script>

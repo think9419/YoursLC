@@ -1,0 +1,105 @@
+﻿@{
+    ViewBag.Title = "图片上传";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<input style="display:none" id="indexid" value="@ViewBag.indexid">
+<input style="display:none" id="from" value="@ViewBag.from">
+<input style="display:none" id="src" value="@ViewBag.src">
+<input style="display:none" id="filename" value="@ViewBag.fname">
+<input style="display:none" id="prcno" value="@ViewBag.prcno">
+<input style="display:none" id="btnDisabled" value="@ViewBag.btnDisabled">
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-input-block" style="text-align: center;margin-top: 20px;margin-left:-15px;">
+            <button class="layui-btn" id="btn_Upload">
+                <i class="layui-icon layui-icon-upload"></i>上传图片
+            </button>
+            <button class="layui-btn" lay-submit lay-filter="btn_OK" id="btn_OK">确 定</button>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-input-block" style="text-align: center;margin-left:0;">
+            <div class="layui-upload-list">
+                <img id="F_Img" height="300" src='@ViewBag.src' />
+            </div>
+        </div>
+        <div class="layui-input-block" style="text-align: center;margin-left:0;">
+            <div class="layui-upload-list">
+                <a id="down" href="@ViewBag.src2" target='_blank'> <i class="fa fa-search-plus">查看原图</i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'upload'], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+
+            upload.render({
+                elem: '#btn_Upload',
+                field: 'file',
+                url: '@Url.Action("ImgUplaod")',
+                auto: true,
+                exts: '@ViewBag.FileType',// 设置允许上传的格式
+                accept: 'images',//指定允许上传时校验的文件类型
+                acceptMime: 'image/*',//规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
+                choose: function (obj) {
+                },
+                before: function () {  //文件提交上传前的回调
+                    this.data = {
+                        tbid: $('#tbid').val(),
+                        oldName: $('#filename').val()
+                    }
+                    layer.load(2);
+                },
+                done: function (res) {
+                    if (res.code == 0) {
+                        $("#src").val(res.src);
+                        $("#F_Img").attr("src", res.src);
+                        $("#filename").val(res.filename);
+
+                        getVal();
+
+                        layer.closeAll('loading');
+                    } else {
+                        layer.closeAll('loading');
+                        layer.alert(res.msg, {
+                            icon: 2
+                        });
+                    }
+                },
+                error: function () {
+                    layer.alert('上传失败', {
+                        icon: 2
+                    });
+                }
+            });
+
+            $('#btn_OK').on('click', function () {
+                getVal();
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            });
+
+            function getVal() {
+                $(window.parent.document).find('#' + $("#indexid").val()).attr('src', $("#src").val());
+                $(window.parent.document).find('#' + $("#indexid").val()).attr('alt', $("#filename").val());
+                $(window.parent.document).find('#' + $("#indexid").val() + '_Exa').val($("#filename").val());
+            }
+
+            $(document).ready(function () {
+                //根据字段是否可写确定按钮状态
+                if ($('#btnDisabled').val() == "Y") {
+                    $('#btn_Upload').attr('class', 'layui-btn layui-btn-disabled');//无上传权限
+                    $('#btn_Upload').attr('disabled', 'disabled');//无上传权限
+                }
+            });
+        });
+    </script>
+}

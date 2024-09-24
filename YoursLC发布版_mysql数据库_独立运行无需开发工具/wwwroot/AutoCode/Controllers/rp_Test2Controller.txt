@@ -1,0 +1,160 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:35:17
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Think9.Models;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+using Think9.Services.CodeBuild;
+
+namespace Think9.Controllers.CodeBuild
+{
+    /// <summary>
+    /// Controller -
+    /// </summary>
+    public partial class Test2Controller : BaseController
+    {
+        private ComService comService = new ComService();
+        private Test2Service rpTest2Service = new Test2Service();
+        private readonly string _rpid = "rp_Test2";//统计表编码
+        private readonly string _rpname = "测试2";//统计表名称
+        //当前用户 可统一修改
+        private CurrentUserEntity GetUser()
+        {
+            return GetCurrentUser();
+        }
+
+        /// <summary>
+        /// 调试模式下点击左侧菜单触发，菜单链接路径为去除rp_前缀的统计表编码
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override ActionResult Index(int? id)
+        {
+            ViewBag.SelectList = rpTest2Service.GetSelectList(GetUser());//查询条件有下拉框时为下拉选项赋值
+            return base.Index(id);
+        }
+
+        /// <summary>
+        /// 显示数据,从其他页面打开
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Show()
+        {
+            ViewBag.SelectList = rpTest2Service.GetSelectList(GetUser());//查询条件有下拉框时为下拉选项赋值
+            return View(rpTest2Service.GetModel(HttpContext.Request));
+        }
+
+        /// <summary>
+        /// 统计表，点击查询按钮触发
+        /// </summary>
+        /// <param name="type">格式html/pdf/excel/doc</param>
+        /// <returns></returns>
+        public ActionResult GetReport(string type)
+        {
+            string err = "";
+			Test2Prm_Model prm = rpTest2Service.GetModel(GetUser(), null);
+
+
+            ActionResult result = Report(ref err, type, prm);
+            if (!string.IsNullOrEmpty(err))
+            {
+                return Json(err);
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        public ActionResult Report(ref string err, string type, Test2Prm_Model prm)
+        {
+            string url = "";
+            FileContentResult file = null;
+            prm = prm == null ? new Test2Prm_Model() : prm;
+            string guid = System.Guid.NewGuid().ToString("N");
+            string newFileName = guid + "." + type.Replace("_", "");
+            if (type == "excel")
+            {
+                newFileName = guid + ".xlsx";
+            }
+            if (type == "doc")
+            {
+                newFileName = guid + ".docx";
+            }
+            string sourcePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\TempFile\\" + newFileName);
+
+            try
+            {
+                RdlcDeviceEntity device = rpTest2Service.GetRdlcDevice(_rpid, _rpname, prm);
+                if (string.IsNullOrEmpty(device.Err))
+                {
+                    if (type == "html" || type == "_html")
+                    {
+                        byte[] _byte = RDLCReport.ExportHtml(ref err, device);
+                        if (string.IsNullOrEmpty(err))
+                        {
+                            file = File(_byte, "text/html");
+                        }
+                    }
+
+                    if (type == "pdf")
+                    {
+                        //width默认22cm，heigh默认29.7cm 可为width、heigh参数传入数值，适应不同文档和打印尺寸
+                        byte[] _byte = RDLCReport.ExportPdf(ref err, device);
+                        if (string.IsNullOrEmpty(err))
+                        {
+                            file = File(_byte, "application/pdf");
+                        }
+                    }
+
+                    if (type == "excel")
+                    {
+                        byte[] _byte = RDLCReport.ExportXlsx(ref err, device);
+                        Think9.Util.Helper.FileHelper.CreateFile(sourcePath, _byte);
+                        url = "<br><br><div class=\"layui-form-item\" style=\"text-align: center;width: 200px;\"><a href='../TempFile/" + newFileName + "' target ='_blank' class='layui-btn'>点击下载</a></div>";
+                    }
+
+                    if (type == "doc")
+                    {
+                        byte[] _byte = RDLCReport.ExportDocx(ref err, device);
+                        Think9.Util.Helper.FileHelper.CreateFile(sourcePath, _byte);
+                        url = "<br><br><div class=\"layui-form-item\" style=\"text-align: center;width: 200px;\"><a href='../TempFile/" + newFileName + "' target ='_blank' class='layui-btn'>点击下载</a></div>";
+                    }
+
+                    if (string.IsNullOrEmpty(err))
+                    {
+                        if(string.IsNullOrEmpty(url))
+                        {
+                            return file;
+                        }
+                        else
+                        {
+                            return Json(SuccessTip("", url));
+                        }
+                    }
+                    else
+                    {
+                        return Json(err);
+                    }
+                }
+                else
+                {
+                    err = device.Err;
+                    return Json(device.Err);
+                }
+            }
+            catch (Exception ex)
+            {
+                err = ex.Message;
+                return Json(ErrorTip(ex));
+            }
+        }
+    }
+}

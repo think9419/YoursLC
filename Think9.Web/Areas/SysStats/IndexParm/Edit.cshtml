@@ -1,0 +1,70 @@
+﻿@using Think9.Models;
+@model Think9.Models.IndexParmEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formEdit">
+    <div class="layui-form-item">
+        <label class="layui-form-label">参数编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="ParmId" placeholder="参数编码" autocomplete="off" class="layui-input" lay-verify="required" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">参数名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="ParmName" placeholder="参数名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" required>参数类型</label>
+        <div class="layui-input-block">
+            <select id="DataType" name="DataType" disabled="disabled">
+                <option value="string">字符</option>
+                <option value="int">整数</option>
+                <option value="decimal">小数</option>
+                <option value="DateTime">日期</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备 注</label>
+        <div class="layui-input-block">
+            <textarea placeholder="备注" name="ParmExplain" id="IndexExplain" class="layui-textarea" maxlength="200"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.val("formEdit", {
+            "ParmId": "@Model.ParmId",
+            "ParmName": "@Model.ParmName",
+            "DataType": "@Model.DataType",
+            "ParmExplain": "@Model.ParmExplain"
+        });
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysStats/IndexParm/Edit", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysStats/IndexParm/GetListBySearch" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

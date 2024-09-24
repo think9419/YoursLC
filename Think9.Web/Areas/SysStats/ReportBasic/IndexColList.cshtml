@@ -1,0 +1,244 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="DbID" value="@Model.DbID">
+<input style="display:none" id="ReportId" value="@Model.ReportId">
+<input style="display:none" id="FromTbId" value="@Model.TbId">
+<table class="layui-table" id="tableCol" lay-filter="tableFilter"> </table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ColTable = table.render({
+            elem: "#tableCol",
+            url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-sm' lay-event='_del'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' lay-event='_add'><i class='fa fa-plus'></i>添加显示列</button><button type='button' class='layui-btn layui-btn-warm layui-btn-sm' lay-event='_edit'><i class='fa fa-pencil'></i>编辑</button><span class='layui-word-aux'><i class='fa fa-angle-double-left'></i>编辑列宽及排序</span></div>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { templet: '<span>1<span>', hide: true },
+                { field: "id", templet: "#id", hide: true },
+                { field: "OrderNo", title: "序号", width: 80, templet: "#OrderNo" },
+                { field: "IndexId", title: "显示列", width: 200, templet: "#IndexId" },
+                { field: "ColName", title: "列名|表头", width: layui.device().mobile ? 200 : null },
+                { field: "DataType", title: "类型", width: 150, templet: "#DataType" },
+                { field: "ColWidth", title: "列宽(cm)", width: 100, templet: "#ColWidth" },
+                { field: "IsSum", title: "统计", templet: '#IsSum', width: 80 },
+                { field: "IsSum", title: "参数赋值", templet: '#Parm', width: 120 },
+                { title: "操作", width: 80, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "_add":
+                    addIndexCol();
+                    break;
+
+                case "_edit":
+                    editIndexCol();
+                    break;
+
+                case "_del":
+                    delIndexCol();
+                    break;
+
+                case "_refresh":
+                    reFeshIndexCo();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "Parmlist":
+                    exLayer.open('参数赋值', "/SysStats/ReportBasic/IndexColParmList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&colId=" + data.Id + "&dbid=" + $("#DbID").val(), '100%', '100%', '0px', '0px', null, null);
+                    break;
+                case "IndexId":
+                    var _name = "统计指标 - " + data.IndexId;
+                    exLayer.openMiddle(_name, "/SysStats/IndexStats/ShowIndexDetails?id=" + data.IndexId, '500px', '220px', layui.device().mobile);
+                    break;
+                case "edit":
+                    exLayer.openMiddle("编辑显示列", "/SysStats/ReportBasic/EditReportIndexCol?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val() + "&id=" + data.Id, '500px', '450px', layui.device().mobile);
+                    break;
+            }
+        });
+
+        function addIndexCol() {
+            if ($("#FromTbId").val() == '') {
+                layer.msg('请选择录入表');
+                return false;
+            }
+            exLayer.openMiddle("添加显示列", "/SysStats/ReportBasic/AddReportIndexCol?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val(), '500px', '450px', layui.device().mobile);
+        }
+
+        function editIndexCol() {
+            var _gridList = foreachGridTable('1');
+            exUtils.ajax('/SysStats/ReportBasic/EditReportIndexCol2', 'post', { "gridlist": _gridList }, true).done(function (response) {
+                ColTable.reload({
+                    url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function delIndexCol() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableCol');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelReportIndexCol', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            ColTable.reload({
+                                url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val()
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+
+        function reFeshIndexCo() {
+            ColTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val()
+            });
+        }
+
+        function foreachGridTable(flag) {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _flag = tdArr.eq(1).text();
+                var _id = tdArr.eq(2).find('input').val();
+                var _no = tdArr.eq(3).find('input').val();
+                var _width = tdArr.eq(7).find('input').val();
+                if (_no != '' && _flag == flag) {
+                    var _row = {};
+                    _row.id = _id;
+                    _row.OrderNo = _no;
+                    _row.ColWidth = _width;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type='text/html' id='id'>
+    <input type="text" name="id" value="{{d.Id}}" class="layui-input">
+</script>
+<script type="text/html" id="DataType">
+    {{# if(d.DataType == '1000'){ }}
+    <span>datetime</span> {{# } }}
+
+    {{# if(d.DataType == '2000'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2010'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2030'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2100'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2200'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2500'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '3000'){ }}
+    <span>int</span> {{# } }}
+
+    {{# if(d.DataType == '3002'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3004'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3006'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3102'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '5200'){ }}
+    <span>img</span> {{# } }}
+</script>
+<script type="text/html" id="OrderType">
+    {{#  if(d.OrderType == '2'){ }}
+       <span>倒序</span>
+     {{#  }else{ }}
+       <span>正序</span>
+     {{#  } }}
+</script>
+<script type="text/html" id="Parm">
+    {{# if(d.Parm != ''){ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='Parmlist' id='Parmprcs' lay-tips='需为自定义统计指标包含的条件参数赋值'>{{d.Parm}}</a> {{# } }}
+</script>
+<script type="text/html" id="IndexId">
+    {{# if(d.TbId == '#_indexstats#'){ }}
+    <span><a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='IndexId' id='IndexId' lay-tips='点击查看'>{{d.IndexId}}</a></span>
+    {{#  }else{ }}
+    <span>{{d.IndexId}}</span>
+    {{#  } }}
+</script>
+<script type="text/html" id="OrderNo">
+    <input type='text' name='OrderNo' value='{{d.OrderNo}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="ColWidth">
+    <input type='text' name='ColWidth' value='{{d.ColWidth}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="operation_Tpl">
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+</script>

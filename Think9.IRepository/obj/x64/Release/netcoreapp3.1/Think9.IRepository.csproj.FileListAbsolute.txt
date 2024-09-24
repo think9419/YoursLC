@@ -1,0 +1,15 @@
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.IRepository.deps.json
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.IRepository.dll
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.IRepository.pdb
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.Dapper.dll
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.Models.dll
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.Dapper.pdb
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\bin\x64\Release\netcoreapp3.1\Think9.Models.pdb
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.csproj.AssemblyReference.cache
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.GeneratedMSBuildEditorConfig.editorconfig
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.AssemblyInfoInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.AssemblyInfo.cs
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.csproj.CoreCompileInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.csproj.CopyComplete
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.dll
+D:\A_Think9_NetCore_Y2021\Think9.IRepository\obj\x64\Release\netcoreapp3.1\Think9.IRepository.pdb

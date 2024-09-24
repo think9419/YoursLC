@@ -1,0 +1,149 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportParmQueryEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="ReportId" value="@ViewBag.RpId">
+    <input style="display:none" id="listid" value="@ViewBag.id">
+    <input style="display:none" id="frm" name="frm" value="add">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择参数</label>
+        <div class="layui-input-block">
+            <input type="text" name="ParmId" id="ParmId" autocomplete="off" class="layui-input" readonly>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">控件类型</label>
+        <div class="layui-input-block">
+            <select id="ControlType" name="ControlType" lay-verify="required" disabled="disabled">
+                @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectList).FindAll(x => x.ClassID.Equals("ControlType")))
+                {
+
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div id="divRule" style="display:none">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">选择项</label>
+            <div class="layui-input-block">
+                <select id="RuleId" name="RuleId" lay-filter="selectRule" lay-verify="required">
+                    <option value="-1">自定义选项</option>
+                    <optgroup label="从数据规范(单列选择)读取">
+                        @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectList).FindAll(x => x.ClassID.Equals("rule")))
+                        {
+
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" style="text-align: right;">
+            <div class="layui-inline">
+                <span class="layui-word-aux">选择从数据规范读取则无需再自定义选项，选项将从数据规范中读取<i class="fa fa-angle-double-right"></i></span>
+            </div>
+            <div class="layui-inline">
+                <button type="button" class="layui-btn layui-btn-normal layui-btn-sm" id="addItem"><i class="fa fa-plus"></i>自定义选项</button>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">Placeholder</label>
+        <div class="layui-input-block">
+            <input type="text" name="ControlPlaceholder" id="ControlPlaceholder" placeholder="ControlPlaceholder" autocomplete="off" class="layui-input" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">标签</label>
+        <div class="layui-input-block">
+            <input type="text" name="ControlLable" id="ControlLable" placeholder="ControlLable" autocomplete="off" class="layui-input" maxlength="7">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" id="OrderNo" placeholder="排序-按照序号顺序排列控件" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="2">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.val("formUser", {
+            "ParmId": "@Model.ParmId"
+            , "ControlType": "@Model.ControlType"
+            , "RuleId": "@Model.RuleId"
+            , "ControlPlaceholder": "@Model.ControlPlaceholder"
+            , "ControlLable": "@Model.ControlLable"
+            , "OrderNo": "@Model.OrderNo"
+        });
+
+        formValExa();
+
+        function formValExa() {
+            $("#divRule").attr("style", "display:none;");
+            if ('@Model.ControlType' == '2') {
+                $("#divRule").attr("style", "display:block;");
+            }
+        }
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysStats/ReportParmQuery/EditParmQuery", "post", { rpId: $("#ReportId").val(), listid: $("#listid").val(), model: data.field }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysStats/ReportParmQuery/GetParmQueryList?rpId=" + $("#ReportId").val() });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('#addItem').on('click', function () {
+            if ($('#ParmId').val() == "") {
+                alert("请选择参数");
+                return false;
+            }
+            if ($('#ControlType').val() != "2") {
+                alert("下拉选择才需要设定自定义选项");
+                return false;
+            }
+            exLayer.open('自定义选项', '/SysStats/Report/QueryParmItem?rpId=' + $('#ReportId').val() + '&parmid=' + $('#ParmId').val() + '&frm=add&listid=' + $('#listid').val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+    });
+</script>

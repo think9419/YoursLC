@@ -1,0 +1,64 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "数值1要大于等于数值2",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 3,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "gridtable",
+        "name": "tb_Subtable21",
+        "label": "子表21",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    }
+]

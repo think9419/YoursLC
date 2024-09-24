@@ -1,0 +1,341 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display:none" id="frm" value="@ViewBag.frm">
+    <input style="display:none" id="_guid" value="@ViewBag.Guid">
+    <input style="display:none" id="_frmTbId" value="">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择分类</label>
+            <div class="layui-input-block">
+                @Html.DropDownList("ReportSort", (IEnumerable<SelectListItem>)ViewBag.SortList, "==请选择统计表分类==", new Dictionary<string, object> { })
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">统计表编码</label>
+            <div class="layui-input-block layui-col-space3">
+                <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                    <input type="text" name="ReportId" id="ReportId" placeholder="统计表编码" autocomplete="off" class="layui-input" lay-verify="required|id" maxlength="30">
+                </div>
+                <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                    <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                        <option value="">⇓自动生成编码</option>
+                        <option value="英文">英文</option>
+                        <option value="全拼">全拼</option>
+                        <option value="首拼">首拼</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">统计表名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="ReportName" id="ReportName" placeholder="统计表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md11">
+                    <label class="layui-form-label required">数据源</label>
+                    <div class="layui-input-block">
+                        <select id="DbID" name="DbID" lay-filter="selectDb" lay-verify="required">
+                            <option value="0">当前数据库</option>
+                            <optgroup label="⇓从外部数据库取值 - 需首先在数据源管理>>外部数据库中添加创建">
+                                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.DbList))
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </optgroup>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-col-md1">
+                    <button type='button' class='layui-btn layui-btn-primary' id='refresh' lay-tips='刷新'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId">
+            <label class="layui-form-label required">关联表|视图</label>
+            <div class="layui-input-block">
+                <select id="FromTbId" name="FromTbId" lay-filter="selectFromTbId">
+                    <option value="">==需首先选择 -  已定义的录入表或已创建的视图==</option>
+                    <optgroup label="选择已定义的录入表 未创建数据表的录入表不能选择">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                    <optgroup label="选择已创建的视图">
+                        @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.ViewList))
+                        {
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divTbId_Exa" style="display:none">
+            <label class="layui-form-label required">取值数据表</label>
+            <div class="layui-input-block">
+                <select id="FromTbId_Exa" name="FromTbId_Exa" lay-filter="selectFromTbId">
+                    <option value="">==需首先选择 - 从已创建的录入表、视图取值==</option>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        ⇑需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required"> 选择字体</label>
+            <div class="layui-input-block">
+                <select id="FontStyle" name="FontStyle" lay-verify='required'>
+                    @foreach (valueTextEntity item in ((IEnumerable
+                    <valueTextEntity>
+                    )ViewBag.FontStyle))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备 注</label>
+            <div class="layui-input-block">
+                <textarea class="layui-textarea" id="ReportRemarks" name="ReportRemarks" placeholder='备注'></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"> </label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add">新建统计表</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysStats/ReportBasic/AddReportBasic", "post", { guid: $("#_guid").val(), tbid: $("#_frmTbId").val(), dbid: $("#DbID").val(), entity: data.field }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    $(window.parent.document).find('#btn_refresh').click();//刷新
+                    layer.closeAll();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#ReportName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return false;
+            }
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#ReportId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //选择数据表视图
+        form.on('select(selectFromTbId)', function (data) {
+            $("#_frmTbId").val(data.value.replace("#table#", ""));
+        })
+
+        //数据源选择
+        form.on('select(selectDb)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                $("#divTbId").hide();
+                $("#divTbId_Exa").hide();
+
+                $('#TbId_Exa').removeAttr('lay-verify');
+                $('#TbId').removeAttr('lay-verify');
+
+                if (data.value == '0') {
+                    $("#divTbId").show();
+                    $('#TbId').attr('lay-verify', 'required')
+
+                    $("#_frmTbId").val($('#FromTbId').val());
+                }
+                else {
+                    $("#divTbId_Exa").show();
+                    $('#TbId_Exa').attr('lay-verify', 'required')
+                    GetSelectValueFieldByDB(data.value);
+
+                    $("#_frmTbId").val('');
+                }
+                layer.close(loading);
+
+            }, 2000);
+        })
+
+        //刷新DbID
+        $('#refresh').on('click', function () {
+            var _dbid = $("#DbID").val();
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+            setTimeout(function () {
+                if (_dbid == '0') {
+                    $("#_frmTbId").val($('#FromTbId').val());
+                }
+                else {
+                    GetSelectValueFieldByDB(_dbid);
+                    $("#_frmTbId").val('');
+                }
+                layer.close(loading);
+
+            }, 2000);
+        });
+
+        function GetSelectValueFieldByDB(id) {
+            var controlid = "#FromTbId_Exa";
+            $("" + controlid + "").empty(); //清空控件
+            $.ajax({
+                url: '/SysTable/RuleSingle/GetSelectValueFieldByDB',
+                type: 'GET',
+                data: { id: id },
+                dataType: 'json',
+                success: function (result) {
+                    $.each(result, function (i, item) {
+                        if (item.ClassID == 'err') {
+                            layer.msg(item.Text, { icon: 5, time: 20000, btn: ['关闭'] });
+                        }
+                        else {
+                            $("" + controlid + "").append(new Option(item.Text, item.Value));
+                        }
+                    });
+                    form.render();//不加下拉框可能不正确显示
+                },
+                error: function (xhr, textStatus, error) {
+                    console.log('请求失败', xhr.responseText);
+                    exLayer.redCrossMsg('请求失败');
+                }
+            });
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<script type='text/html' id='id'>
+    <input type="text" name="id" value="{{d.Id}}" class="layui-input">
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="DataType">
+    {{# if(d.DataType == '1000'){ }}
+    <span>datetime</span> {{# } }}
+
+    {{# if(d.DataType == '2000'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2010'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2030'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2100'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2200'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '2500'){ }}
+    <span>string</span> {{# } }}
+
+    {{# if(d.DataType == '3000'){ }}
+    <span>int</span> {{# } }}
+
+    {{# if(d.DataType == '3002'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3004'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3006'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '3102'){ }}
+    <span>decimal</span> {{# } }}
+
+    {{# if(d.DataType == '5200'){ }}
+    <span>img</span> {{# } }}
+</script>
+<script type="text/html" id="OrderType">
+    {{#  if(d.OrderType == '2'){ }}
+       <span>倒序</span>
+     {{#  }else{ }}
+       <span>正序</span>
+     {{#  } }}
+</script>
+<script type="text/html" id="OrderNo">
+    <input type='text' name='OrderNo' value='{{d.OrderNo}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="ColWidth">
+    <input type='text' name='ColWidth' value='{{d.ColWidth}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="Parm">
+    {{# if(d.Parm != ''){ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='Parmlist' id='Parmprcs' lay-tips='需为自定义统计指标包含的条件参数赋值'>{{d.Parm}}</a> {{# } }}
+</script>
+<script type="text/html" id="IndexId">
+    {{# if(d.TbId == '#_indexstats#'){ }}
+    <span><a class='layui-btn-primary layui-btn-sm' style='color: #FE7300;' href='javascript:;' lay-event='IndexId' id='IndexId' lay-tips='点击查看'>{{d.IndexId}}</a></span>
+    {{#  }else{ }}
+    <span>{{d.IndexId}}</span>
+    {{#  } }}
+</script>

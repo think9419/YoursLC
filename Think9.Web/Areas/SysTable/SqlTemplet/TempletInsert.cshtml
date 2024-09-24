@@ -1,0 +1,214 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<style>
+    .layui-table-cell input {
+        height: 30px;
+        line-height: 30px;
+    }
+
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: 0px;
+        margin-left: -7px;
+        margin-right: -15px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="tbid" name="tbid" value="@ViewBag.tbid">
+    <div class="layui-form-item" style="text-align: center;">
+        <button type="button" class="layui-btn" lay-submit lay-filter="ok">确 定</button>
+    </div>
+    <div class="layui-form-item">
+        <textarea style="border:0;border-radius:5px;background-color:rgba(241,241,241,.98);height: 100px;padding: 10px;" class="layui-textarea" id="Sql" name="Sql" placeholder='选择目标表及字段操作后自动生成SQL语句'></textarea>
+    </div>
+    <div class="layui-form-item">
+        <select id="FromTbid" name="FromTbid" lay-filter="selectfilter">
+            <option value="">== 选择Insert操作的目标表  需首先选择==</option>
+            @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.FromTbList))
+            {
+                <option value="@item.Value">@item.Text</option>
+            }
+        </select>
+    </div>
+    <div class="layui-form-item">
+    </div>
+    <div class="layui-collapse" lay-filter="test" lay-accordion>
+        <div class="layui-colla-item">
+            <h2 class="layui-colla-title" style="color: #FE7300;" id="hTable">插入字段</h2>
+            <div class="layui-colla-content" id="divTable">
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "element"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/SqlTemplet/GetTableFieldsList?tbid=" + $("#FromTbid").val(),
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "ColumnName", title: "目标列", hide: true },
+                { field: "IndexName", title: "目标列" },
+                { title: "=", templet: '<span>=</span>', width: 30 },
+                { title: "当前数据", width: 280, templet: '#IndexList' }
+            ]],
+            done: function (res, curr, count) {
+
+            },
+            text: {
+                none: '请选择目标表-未创建数据表的录入表不能显示'
+            }
+        });
+
+        form.on('select(selectfilter)', function (data) {
+            ThisTable.reload({
+                url: "/SysTable/SqlTemplet/GetTableFieldsList?tbid=" + data.value
+            });
+            $("#divTable").attr("class", "layui-colla-content layui-show");
+        })
+
+        form.on('select(IndexList)', function (data) {
+            var _gridList = getFields();
+            var column = '(';
+            var value = '(';
+            for (var i in _gridList) {
+                if (i == 0) {
+                    column += '' + _gridList[i].columnName;
+                    if (_gridList[i].indexid == 'Null') {
+                        value += '' + _gridList[i].indexid;
+                    }
+                    else {
+                        value += '@@' + _gridList[i].indexid;
+                    }
+                }
+                else {
+                    column += ',' + _gridList[i].columnName;
+                    if (_gridList[i].indexid == 'Null') {
+                        value += ',' + _gridList[i].indexid;
+                    }
+                    else {
+                        value += ',@@' + _gridList[i].indexid;
+                    }
+                }
+            }
+
+            column += ')';
+            value += ')';
+
+            var _tb = '';
+            if ($("#FromTbid").val().indexOf('.') == -1) {
+                _tb = $("#FromTbid").val();
+            }
+            else {
+                _tb = $("#FromTbid").val().split('.')[1];
+            }
+            var sql = 'INSERT INTO ' + _tb + ' ' + column + ' VALUES ' + value;
+
+            $("#Sql").val(sql);
+            $(window.parent.document).find('#ExecuteSql').val($("#Sql").val());
+            $(window.parent.document).find('#tipsSql').attr("lay-tips", GetTips($('#Sql').val()));
+
+            layer.msg("完成后请点击确定按钮");
+        });
+
+        form.on("submit(ok)", function (data) {
+            $(window.parent.document).find('#ExecuteSql').val($("#Sql").val());
+            $(window.parent.document).find('#tipsSql').attr("lay-tips", GetTips($('#Sql').val()));
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        });
+
+        function getFields() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");
+            for (var i = 0; i < trList.length; i++) {
+                var tdArr = trList.eq(i).find("td");
+                var _columnName = tdArr.eq(1).text();
+                var _indexid = tdArr.eq(4).find('select').val();
+                if (_indexid != '' && _indexid != undefined) {
+                    var _row = {};
+                    _row.indexid = _indexid;
+                    _row.columnName = _columnName;
+                    _list.push(_row);
+                }
+            }
+
+            return _list;
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        function GetTips(some) {
+            var _return = "";
+            $.ajax({
+                url: "/SysTable/TbIndex/GetTbIndexTips",
+                type: "post",
+                data: { str: some },
+                dataType: "json",
+                async: false,
+                success: function (result) {
+                    _return = result;
+                }
+            });
+            return _return;
+        };
+    });
+</script>
+<script type='text/html' id='IndexList'>
+    <div class='layui-input-inline' style='width:240px;'>
+        <select name={{'type_'+d.ColumnName}} lay-filter='IndexList'>
+            <option value="">== 请选择 ==</option>
+            <option value="Null">Null值 可做为占位符</option>
+            @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.FieldList))
+            {
+                                            <option value="@item.Value">@item.Text</option>
+            }
+            <option value="Null">Null值 可做为占位符</option>
+        </select>
+    </div>
+</script>

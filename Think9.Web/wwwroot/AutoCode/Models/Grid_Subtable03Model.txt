@@ -1,0 +1,134 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:28:53
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【子表】  生成时间：2024-09-24 13:28:53
+	/// </summary>
+	 [Table("tb_Subtable03")]
+	public class Subtable03Model : GridTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 日期
+		/// </summary>
+		public DateTime? v1 { get; set; }
+		/// <summary>
+		/// 日期
+		/// </summary>
+		[Computed]
+		public string v1_Exa { get; set; }
+		/// <summary>
+		/// 日期
+		/// </summary>
+		[Computed]
+		public string v1_Lock { get; set; }
+		/// <summary>
+		///日期
+		/// </summary>
+		[Computed]
+		public string v1_JS { get; set; }
+		/// <summary>
+		/// 文本框
+		/// </summary>
+		public string v2 { get; set; }
+		/// <summary>
+		/// 文本框
+		/// </summary>
+		[Computed]
+		public string v2_Exa { get; set; }
+		/// <summary>
+		/// 文本框
+		/// </summary>
+		[Computed]
+		public string v2_Lock { get; set; }
+		/// <summary>
+		///文本框
+		/// </summary>
+		[Computed]
+		public string v2_JS { get; set; }
+		/// <summary>
+		/// 弹出选择
+		/// </summary>
+		public string v3 { get; set; }
+		/// <summary>
+		/// 弹出选择
+		/// </summary>
+		[Computed]
+		public string v3_Exa { get; set; }
+		/// <summary>
+		/// 弹出选择
+		/// </summary>
+		[Computed]
+		public string v3_Lock { get; set; }
+		/// <summary>
+		///弹出选择
+		/// </summary>
+		[Computed]
+		public string v3_JS { get; set; }
+		/// <summary>
+		/// 下拉选择
+		/// </summary>
+		public string v4 { get; set; }
+		/// <summary>
+		/// 下拉选择
+		/// </summary>
+		[Computed]
+		public string v4_Exa { get; set; }
+		/// <summary>
+		/// 下拉选择
+		/// </summary>
+		[Computed]
+		public string v4_Lock { get; set; }
+		/// <summary>
+		///下拉选择
+		/// </summary>
+		[Computed]
+		public string v4_JS { get; set; }
+		/// <summary>
+		/// 图片
+		/// </summary>
+		public string v5 { get; set; }
+		/// <summary>
+		/// 图片
+		/// </summary>
+		[Computed]
+		public string v5_Exa { get; set; }
+		/// <summary>
+		/// 图片
+		/// </summary>
+		[Computed]
+		public string v5_Lock { get; set; }
+		/// <summary>
+		///图片
+		/// </summary>
+		[Computed]
+		public string v5_JS { get; set; }
+		/// <summary>
+		/// 附件
+		/// </summary>
+		public string v6 { get; set; }
+		/// <summary>
+		/// 附件
+		/// </summary>
+		[Computed]
+		public string v6_Exa { get; set; }
+		/// <summary>
+		/// 附件
+		/// </summary>
+		[Computed]
+		public string v6_Lock { get; set; }
+		/// <summary>
+		///附件
+		/// </summary>
+		[Computed]
+		public string v6_JS { get; set; }
+		#endregion Model
+		
+	}
+}

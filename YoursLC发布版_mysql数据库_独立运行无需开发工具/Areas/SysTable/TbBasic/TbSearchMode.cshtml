@@ -1,0 +1,126 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form" action="">
+    <input style="display:none" id="_tbid" value="@ViewBag.TbId">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <select id="UserId" name="UserId" lay-search='' lay-verify="required">
+                <option value="">==请选择用户==</option>
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "users"))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+        <div class="layui-inline" style="width:400px;">
+            <select name="TypeId" id="TypeId">
+                @foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "sys_searchmode"))
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn layui-btn-normal" id="add" lay-filter="add" lay-submit>添加</button>
+        </div>
+    </div>
+</form>
+
+<!--数据表格-->
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbBasic/GetTbSearchModeList?tbid=" + $("#_tbid").val(),
+            page: false,
+            method: "get",
+            defaultToolbar: [{ title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "UserId", title: "用户", width: 120, sort: true },
+                { field: "TypeId", title: "类别", sort: true }
+            ]],
+            done: function (res, curr, count) {
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    refresh();
+                    break;
+                case "batchDel":
+                    batchDel();
+                    break;
+            }
+        });
+
+        form.on("submit(add)", function () {
+            exUtils.ajax("/SysTable/TbBasic/AddTbSearchMode", "post", { tbid: $("#_tbid").val(), userid: $("#UserId").val(), typeid: $("#TypeId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function refresh() {
+            ThisTable.reload({
+                where: { tbid: $("#_tbid").val() }
+            });
+        }
+
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].UserId + ",";
+                }
+            } else {
+                layer.msg("未选择有效数据");
+                return false;
+            }
+
+            exLayer.confirm("确定要删除吗？", function (index) {
+                layer.close(index);
+                if (idsStr) {
+                    exUtils.ajax("/SysTable/TbBasic/DelSearchMode", "get", { tbid: $("#_tbid").val(), idsStr: idsStr }, true).done(function (response) {
+                        refresh();
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            });
+        }
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-btn-container">
+        <button type="button" class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i></button>
+    </div>
+</script>

@@ -1,0 +1,150 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportIndexColEntity;
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+    <input style="display:none" id="ReportId" value="@ViewBag.rpId">
+    <input style="display:none" id="_tbid" value="@ViewBag.tbid">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">类别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="IndexType" value="0" title="录入表(视图)字段" id="Sort_0" lay-filter="selectIndexType" checked="checked">
+                <input type="radio" name="IndexType" value="1" title="自定义统计指标" id="Sort_1" lay-filter="selectIndexType" disabled>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divIndexId">
+            <label class="layui-form-label required">选择</label>
+            <div class="layui-input-block">
+                <select name='IndexId' id="IndexId">
+                    <option value="">== 请选择 ==</option>
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.FieldList).FindAll(x => x.ClassID.Equals("valuetext")))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" id="divIndexId2" style="display: none;">
+            <label class="layui-form-label required">选择</label>
+            <div class="layui-input-block">
+                <select name='IndexId2' id="IndexId2" lay-filter='IndexList'>
+                    <option value="">== 请选择 ==</option>
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.IndexList))
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">列名|表头</label>
+            <div class="layui-input-block">
+                <input type='text' name='ColName' id='ColName' autocomplete='off' class='layui-input' maxlength='10' lay-verify='required' placeholder='请输入列名|表头'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md8">
+                    <label class="layui-form-label required">列宽(cm)</label>
+                    <div class="layui-input-block">
+                        <input type='text' name='ColWidth' id='ColWidth' autocomplete='off' class='layui-input' maxlength='3' lay-verify='required|integer' placeholder='请输入列宽' value="6">
+                    </div>
+                </div>
+                <div class="layui-col-md4" align="left">
+                    <div class="layui-input-block">
+                        <input type="hidden" name="IsSum" value="0">
+                        <input type="checkbox" id="IsSum" name="IsSum" value="1" title="求和">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">序号</label>
+            <div class="layui-input-block">
+                <input type='text' name='OrderNo' id='OrderNo' autocomplete='off' class='layui-input' maxlength='3' lay-verify='required|integer' placeholder='请输入序号'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add" id="add">添加</button>&nbsp;
+                <input type="checkbox" id="continue" title="连续添加">
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "table"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let table = layui.table;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+
+        //点击保存按钮
+        form.on("submit(add)", function (data) {
+            var _sort = $('input:radio[name="IndexType"]:checked').val();
+            var _index = '';
+            var _tbid = $("#_tbid").val();
+            if (_sort == "0") {
+                _index = $("#IndexId").val();
+            }
+            else {
+                _index = $("#IndexId2").val();
+                _tbid = '#_indexstats#';
+            }
+            if (_index == '') {
+                layer.msg("未选择");
+                return false;
+            }
+            exUtils.ajax("/SysStats/ReportBasic/AddReportIndexCol", "post", { model: data.field, rpId: $("#ReportId").val(), tbid: _tbid, index: _index }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableCol', { url: "/SysStats/ReportBasic/GetReportIndexColList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#_tbid").val() });
+                    if ($("#continue").is(':checked')) {
+                        var _OrderNo = Number($("#OrderNo").val()) + 1;
+                        $("#OrderNo").val(_OrderNo);
+                        $("#ColName").val("");
+                    }
+                    else {
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        form.on('radio(selectIndexType)', function (data) {
+            var _sort = $('input:radio[name="IndexType"]:checked').val();
+            if (_sort == "0") {
+                $("#divIndexId2").attr("style", "display:none;");
+                $("#divIndexId").attr("style", "display:block;");
+            }
+            else {
+                $("#divIndexId").attr("style", "display:none;");
+                $("#divIndexId2").attr("style", "display:block;");
+            }
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

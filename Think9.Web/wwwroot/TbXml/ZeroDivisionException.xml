@@ -1,0 +1,13 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="小数01" horAlignment="None" verAlignment="None" Selectable="True">小数01</lab>
+			 <textField x="130" y="30" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inXS01" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inXS01</textField>
+			<lab x="420" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="小数02" horAlignment="None" verAlignment="None" Selectable="True">小数02</lab>
+			 <textField x="540" y="30" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inXS02" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inXS02</textField>
+			<lab x="10" y="75" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="小数03" horAlignment="None" verAlignment="None" Selectable="True">小数03</lab>
+			 <textField x="130" y="75" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inXS03" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inXS03</textField>
+		</staticContent>
+	</content>
+</daReport>

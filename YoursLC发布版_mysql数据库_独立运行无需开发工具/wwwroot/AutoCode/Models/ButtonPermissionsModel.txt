@@ -1,0 +1,47 @@
+﻿/*******************************************************************************
+ * Create:admin 2024-09-24 13:29:10
+ * Description: YoursLc有源低代码 http://yourslc.top Model类
+*********************************************************************************/
+
+using System;
+using DapperExtensions;
+namespace Think9.Models 
+{
+	/// <summary>
+	/// 实体类【主表】  生成时间：2024-09-24 13:29:10
+	/// </summary>
+	 [Table("tb_ButtonPermissions")]
+	public class ButtonPermissionsModel : MainTBEntity
+	{
+		#region Model
+		/// <summary>
+		/// 审核
+		/// </summary>
+		public string inAuditing { get; set; }
+		/// <summary>
+		/// 审核 【附加】
+		/// </summary>
+		[Computed]
+		public string inAuditing_Exa { get; set; }
+		/// <summary>
+		/// 省
+		/// </summary>
+		public string inProvince { get; set; }
+		/// <summary>
+		/// 省 【附加】
+		/// </summary>
+		[Computed]
+		public string inProvince_Exa { get; set; }
+		/// <summary>
+		/// 小数04
+		/// </summary>
+		public decimal? inXS04 { get; set; }
+		/// <summary>
+		/// 小数04 【附加】
+		/// </summary>
+		[Computed]
+		public decimal? inXS04_Exa { get; set; }
+		#endregion Model
+		
+	}
+}

@@ -1,0 +1,484 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<style>
+    .layui-table-cell input {
+        height: 30px;
+        line-height: 30px;
+    }
+
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: 0px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="tbid" value="@ViewBag.tbid">
+
+    <div class="layui-form-item">
+        <div style='text-align: Left;margin-top: 8px;'><span class="layui-word-tip"><i class="fa fa-info-circle"></i>&nbsp;『指标属性』修改，除唯一、主键属性外，其余都需要重新生成才能生效</span></div>
+    </div>
+    <fieldset class="table-fieldset" id="searchfield" style="display:none">
+        <legend style="color:darkgrey">快速查询</legend>
+        <div class="layui-form">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <input type="text" name="key" id="key" placeholder="关键词搜索" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button type="button" class="layui-btn layui-btn-primary" id="search"><i class="layui-icon layui-icon-search"></i></button><button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+
+        //指标查询
+        $("#search").click(function () {
+            refresh();
+            return false;
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbSetUp/GetMainTbIndexList?tbid=" + $("#tbid").val(),
+            limits: [500],
+            limit: 500,
+            width: '100%',
+            method: "post",
+            defaultToolbar: [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { field: "IndexId", title: "编码", width: 150, sort: true, templet: '<span>{{d.IndexId}}<span>' },
+                { field: "IndexName", title: "名称", width: 170, templet: '#IndexName', sort: true },
+                { field: "DataTypeName", title: "类型", width: 130, sort: true },
+                { field: "IndexOrderNo", title: "<i class='layui-icon layui-icon-about' lay-tips='list和form页面按照序号排列' data-offset='4'></i>序号", width: 90, templet: '#IndexOrderNo', sort: true },
+                { field: "ColumnWith", title: "<i class='layui-icon layui-icon-about' lay-tips='list页面列宽' data-offset='4'></i>列宽", width: 90, templet: '#ColumnWith', sort: true, totalRow: true },
+                { field: "isEmpty", title: "必填", width: 80, templet: '#switchBEmpty', unresize: true, sort: true },
+                { field: "isLock", title: "<i class='layui-icon layui-icon-about' lay-tips='包含锁定、不锁定及编辑时锁定选项' data-offset='4'></i>锁定", width: 90, templet: '#switchBLock', unresize: true, sort: true, hide: true },
+                { field: "isOrder", title: "序号", width: 80, templet: '#switchBOrder', unresize: true, sort: true, hide: true },
+                { field: "isColumnShow2", title: "隐藏", width: 80, templet: '#switchBShow', unresize: true, sort: true, hide: true },
+                { field: "ControlType", title: "控件类型", width: 140, templet: '#ControlType' },
+                { field: "RuleId", title: "<i class='layui-icon layui-icon-about' lay-tips='控件为文本框时数据规范设置为单列选择、多列选择、树形选择，点击后弹出数据选择' data-offset='4'></i>数据规范", width: 160, templet: '#RuleId' },
+                { field: "isColumnShow2", title: "列表显示", width: 80, templet: '#switchBColumnShow2', unresize: true, sort: true },
+                { field: "isSearch2", title: "快速查询", width: 80, templet: '#switchBSearch2', unresize: true, sort: true },
+                { title: "操作", align: "center", width: 120, templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            },
+            text: {
+                none: '无数据'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add":
+                    add();
+                    break;
+                case "set":
+                    foreachGridTable();
+                    break;
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysTable/TbSetUp/GetMainTbIndexList?tbid=" + $("#tbid").val()
+                    });
+                    break;
+                case "searchShow":
+                    searchShow();
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "edit":
+                    edit(data.IndexId);
+                    break;
+                case "del":
+                    del(data.IndexId);
+                    break;
+                case "look":
+                    look(data.IndexId, data.IndexName);
+                    break;
+            }
+        });
+
+        function look(id, name) {
+            exLayer.open(name + " - 数据预览(最多显示100条数据)", "/SysTable/RuleLook/RuleDataListByTbIndexID?indexid=" + id + "&tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function edit(IndexId) {
+            exLayer.open("编辑指标", "/SysTable/TbSetUp/EditMainIndex?tbid=" + $("#tbid").val() + "&indexid=" + IndexId, '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function del(IndexId) {
+            layer.confirm("<span style='color: red;'>此操作将数据表对应字段移除，该字段的数据会被删除，并且不可恢复，确定要移除指标吗？</span>", function (index) {
+                exUtils.ajax("/SysTable/TbSetUp/RemoveTbIndexByStr", "post", { tbid: $("#tbid").val(), si: IndexId }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        refresh();
+                    });
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            });
+        }
+
+        function refresh() {
+            ThisTable.reload({
+                url: "/SysTable/TbSetUp/GetMainTbIndexList?tbid=" + $("#tbid").val() + "&key=" + $("#key").val()
+            });
+        }
+
+        function add() {
+            exLayer.open("添加 || 移除指标", "/SysTable/TbSetUp/RemoveMainIndex?tbid=" + $("#tbid").val(), '100%', '100%', '0px', '0px', null, null);
+        }
+
+        function searchShow() {
+            var display = $('#searchfield').css('display');
+            if (display == 'none') {
+                $("#searchfield").show();
+                document.body.scrollTop = document.documentElement.scrollTop = 0;
+            }
+            else {
+                $("#searchfield").hide();
+            }
+        }
+
+        function foreachGridTable() {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+                var _indexid = tdArr.eq(1).text();
+                var _no = tdArr.eq(4).find('input').val();
+                var _with = tdArr.eq(5).find('input').val();
+
+                if (_indexid != '') {
+                    var _row = { TbId: $("#tbid").val(), IndexId: '', ColumnWith: 0, IndexOrderNo: 0 };
+                    _row.TbId = $("#tbid").val();
+                    _row.IndexId = _indexid;
+                    _row.ColumnWith = _with;
+                    _row.IndexOrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexWidthAndNo", "post", { "list": _list }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        //监听切换按钮
+        form.on('switch(stateBEmpty)', function (data) {
+            var name = 'isEmpty';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    refresh();
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBOrder)', function (data) {
+            var name = 'isOrder';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBLock)', function (data) {
+            var name = 'isLock';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBColumnShow2)', function (data) {
+            var name = 'isColumnShow2';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBColumnShow)', function (data) {
+            var name = 'isColumnShow';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBSearch2)', function (data) {
+            var name = 'isSearch2';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBShow)', function (data) {
+            var name = 'isShow';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //监听切换按钮
+        form.on('switch(stateBSearch)', function (data) {
+            var name = 'isSearch';
+            var indexid = this.value;
+            var isState = data.elem.checked;
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexSome?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&isState=" + isState + "&name=" + name, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //数据规范
+        form.on('select(RuleId)', function (data) {
+            var ruleid = data.value;
+            var indexid = data.elem.getAttribute("name").replace(/rule_/, "");
+
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexRule?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&ruleid=" + ruleid, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //控件类型
+        form.on('select(ControlType)', function (data) {
+            var typeid = data.value;
+            var indexid = data.elem.getAttribute("name").replace(/type_/, "");
+
+            exUtils.ajax("/SysTable/TbSetUp/UpTbIndexControlType?tbid=" + $("#tbid").val() + "&indexid=" + indexid + "&typeid=" + typeid, "post", null, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+
+        $('#key').keydown(function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault(); // 阻止默认行为
+                refresh();
+                return false;
+            }
+        });
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $(".layui-table-box").attr("overflow", "auto");
+                $(".layui-table-body").attr("overflow", "auto");
+                $(".layui-table-cell").attr("overflow", "auto");
+            }
+            // $("#indexList").attr("href", "/SysTable/TbSetUp/TbIndexList2?tbid=" + $("#tbid").val() + "&isMain=y");
+        });
+    })
+</script>
+<!-- 头工具栏模板 -->
+<script type="text/html" id="toolbarTpl">
+    <div class="layui-inline">
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-warm" lay-event="add" id="add"><i class="fa fa-pencil"></i>添加 || 移除指标</button>
+            <a href='@ViewBag.linkStr' target="_blank"  class="layui-btn layui-btn-sm layui-btn-normal"><i class="fa fa-list-ul"></i>指标属性</a>
+        <button type="button" class="layui-btn layui-btn-sm layui-btn-normal" lay-event="set" id="set"><i class="layui-icon layui-icon-list" lay-tips="保存序号和列宽"></i>保 存</button>
+    </div>
+    <div class="layui-inline">
+        <span class="layui-word-aux"><i class="fa fa-angle-double-left"></i>保存序号和列宽</span>
+    </div>
+</script>
+<!-- 控件类型 -->
+<script type='text/html' id='ControlType'>
+    <div class='layui-input-inline' style='width:100px;'>
+        <select name={{'type_'+d.IndexId}} lay-filter='ControlType'>
+            {{d.ControlType_Exa}}
+        </select>
+    </div>
+</script>
+<!-- 数据规范 -->
+<script type='text/html' id='RuleId'>
+    <div class='layui-input-inline' style='width:100px;'>
+        <select name={{'rule_'+d.IndexId}} lay-filter='RuleId' data-value={{d.RuleId}}>
+            <option value="">==未选择==</option>
+            <optgroup label="清除所选">
+                <option value="">==ㄨ清除==</option>
+            </optgroup>
+            {{d.Rule_Exa}}
+            <optgroup label="清除所选">
+                <option value="">==ㄨ清除==</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class='layui-input-inline'>
+        &nbsp;
+        <a href='javascript:;' class='layui-btn layui-btn-normal layui-btn-xs' lay-event='look' id='look' lay-tips="预览 - 只能预览单列选择、多列选择、树形选择类型的数据"><i class="fa fa-file-text-o"></i></a>
+    </div>
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href='javascript:;' class="layui-btn layui-btn-warm layui-btn-xs" lay-event="edit" id="edit">更多</a>
+    <a href='javascript:;' class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id="del">移除</a>
+</script>
+<!-- 必填 -->
+<script type="text/html" id="switchBEmpty">
+    <span title="必填"><input type="checkbox" name="isEmpty" value="{{d.IndexId}}" lay-skin="switch" lay-text="必填|" lay-filter="stateBEmpty" {{ d.isEmpty == 2 ? 'checked' : '' }}></span>
+</script>
+<!-- 排序 -->
+<script type="text/html" id="switchBOrder">
+    <span title="排序"><input type="checkbox" name="isOrder" value="{{d.IndexId}}" lay-skin="switch" lay-text="排序|" lay-filter="stateBOrder" {{ d.isOrder == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 是否隐藏？1显示2不显示 -->
+<script type="text/html" id="switchBShow">
+    <span title="查询列表中该列显示"><input type="checkbox" name="isColumnShow" value="{{d.IndexId}}" lay-skin="switch" lay-text="隐藏|" lay-filter="stateBShow" {{ d.isShow == 2 ? 'checked' : '' }}></span>
+</script>
+<!-- 是否锁定？1是2否 -->
+<script type="text/html" id="switchBLock">
+    <span title="锁定"><input type="checkbox" name="isLock" value="{{d.IndexId}}" lay-skin="switch" lay-text="锁定|" lay-filter="stateBLock" {{ d.isLock == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 列表显示(list)？1显示2不显示 -->
+<script type="text/html" id="switchBColumnShow2">
+    <span title="列表显示"><input type="checkbox" name="isColumnShow2" value="{{d.IndexId}}" lay-skin="switch" lay-text="显示|" lay-filter="stateBColumnShow2" {{ d.isColumnShow2 == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 查询列表中该列显示？1显示2不显示 -->
+<script type="text/html" id="switchBColumnShow">
+    <span title="查询列表中该列显示"><input type="checkbox" name="isColumnShow" value="{{d.IndexId}}" lay-skin="switch" lay-text="显示|" lay-filter="stateBColumnShow" {{ d.isColumnShow == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 是否做为查询条件？1是2不是 -->
+<script type="text/html" id="switchBSearch">
+    <span title="是否做为查询条件"><input type="checkbox" name="isSearch" value="{{d.IndexId}}" lay-skin="switch" lay-text="是|否" lay-filter="stateBSearch" {{ d.isSearch == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 是否做为快速查询条件？1是2不是 -->
+<script type="text/html" id="switchBSearch2">
+    <span title="是否做为快速查询条件"><input type="checkbox" name="isSearch2" value="{{d.IndexId}}" lay-skin="switch" lay-text="是|否" lay-filter="stateBSearch2" {{ d.isSearch2 == 1 ? 'checked' : '' }}></span>
+</script>
+<!-- 列宽 -->
+<script type="text/html" id="ColumnWith">
+    <input type="text" name="ColumnWith" value="{{d.ColumnWith}}" class="layui-input" maxlength="4" style="height:28px;" lay-verify="required|number">
+</script>
+<!-- 排序号 -->
+<script type="text/html" id="IndexOrderNo">
+    <input type="text" name="IndexOrderNo" value="{{d.IndexOrderNo}}" class="layui-input" maxlength="3" style="height:28px;" lay-verify="required|integer">
+</script>
+<!-- 名称 -->
+<script type="text/html" id="IndexName">
+    {{#  if(d.isShow == "2"){ }}
+    {{d.IndexName}}<span style='color: #FE7300;'>{隐藏}</span>
+    {{#  }else{ }}
+    {{d.IndexName}}
+    {{#  } }}
+</script>

@@ -1,0 +1,175 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="DbID" value="@Model.DbID">
+<input style="display:none" id="ReportId" value="@Model.ReportId">
+<input style="display:none" id="FromTbId" value="@Model.TbId">
+<table class="layui-table" id="tableSearch" lay-filter="tableFilter"> </table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let SearchTable = table.render({
+            elem: "#tableSearch",
+            url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refreshSearch', icon: 'layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-sm' lay-event='_delSearch'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-sm' lay-event='_addSearch'><i class='fa fa-plus'></i>添加查询字段</button><button type='button' class='layui-btn layui-btn-warm layui-btn-sm' lay-event='_editSearch'><i class='fa fa-pencil'></i>编辑</button><span class='layui-word-aux'><i class='fa fa-angle-double-left'></i>编辑排序</span></div>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { templet: '<span>2<span>', hide: true },
+                { field: "id", templet: "#id", hide: true },
+                { field: "OrderNo", title: "序号", width: 100, templet: "#OrderNo" },
+                { field: "IndexId", title: "字段", width: 200 },
+                { field: "Lable", title: "标签", width: 200 }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+
+                case "_addSearch":
+                    addIndexSearch();
+                    break;
+
+                case "_editSearch":
+                    editIndexSearch();
+                    break;
+
+                case "_delSearch":
+                    delIndexSearch();
+                    break;
+
+                case "_refreshSearch":
+                    refreshIndexSearch();
+                    break;
+
+            }
+        });
+
+        function addIndexSearch() {
+            if ($("#FromTbId").val() == '') {
+                layer.msg('请选择录入表');
+                return false;
+            }
+            exLayer.openMiddle("添加查询字段", "/SysStats/ReportBasic/AddReportIndexSearch?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val() + "&dbid=" + $("#DbID").val(), '500px', '350px', layui.device().mobile);
+        }
+
+        function editIndexSearch() {
+            var _gridList = foreachGridTable('2');
+            exUtils.ajax('/SysStats/ReportBasic/EditReportIndexSearch', 'post', { "gridlist": _gridList }, true).done(function (response) {
+                SearchTable.reload({
+                    url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val()
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function delIndexSearch() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableSearch');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelReportIndexSearch', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            SearchTable.reload({
+                                url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val()
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+
+        function refreshIndexSearch() {
+            SearchTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexSearchList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#FromTbId").val()
+            });
+        }
+
+        function foreachGridTable(flag) {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _flag = tdArr.eq(1).text();
+                var _id = tdArr.eq(2).find('input').val();
+                var _no = tdArr.eq(3).find('input').val();
+                if (_no != '' && _flag == flag) {
+                    var _row = {};
+                    _row.id = _id;
+                    _row.OrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+
+        function foreachGridTable2(flag) {
+            var _list = [];
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _flag = tdArr.eq(1).text();
+                var _id = tdArr.eq(2).find('input').val();
+                var _no = tdArr.eq(3).find('input').val();
+                var _width = tdArr.eq(7).find('input').val();
+                if (_no != '' && _flag == flag) {
+                    var _row = {};
+                    _row.id = _id;
+                    _row.OrderNo = _no;
+                    _row.ColWidth = _width;
+                    _list.push(_row);
+                }
+            }
+            return _list;
+        }
+
+    });
+</script>
+<script type='text/html' id='id'>
+    <input type="text" name="id" value="{{d.Id}}" class="layui-input">
+</script>
+<script type="text/html" id="OrderType">
+    {{#  if(d.OrderType == '2'){ }}
+       <span>倒序</span>
+     {{#  }else{ }}
+       <span>正序</span>
+     {{#  } }}
+</script>
+<script type="text/html" id="OrderNo">
+    <input type='text' name='OrderNo' value='{{d.OrderNo}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>
+<script type="text/html" id="ColWidth">
+    <input type='text' name='ColWidth' value='{{d.ColWidth}}' autocomplete='off' class='layui-input' maxlength='3' style='height:30px;' lay-verify='required|integer'>
+</script>

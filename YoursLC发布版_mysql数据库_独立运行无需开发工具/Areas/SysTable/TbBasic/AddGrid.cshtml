@@ -1,0 +1,322 @@
+﻿@using Think9.Models;
+@model Think9.Models.TbBasicEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiStepForm.cshtml";
+}
+
+<style>
+    /* 防止table的下拉列表被隐藏*/
+    .layui-table-cell {
+        overflow: visible;
+    }
+
+    .layui-table-box {
+        overflow: visible;
+    }
+
+    .layui-table-body {
+        overflow: visible;
+    }
+    /* 设置下拉框的高度与表格单元相同 */
+    td .layui-form-select {
+        margin-top: 5px;
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    .layui-table-view .layui-table th {
+        overflow: hidden;
+    }
+</style>
+<input style="display: none" name="id" id="id">
+<div class="layuimini-container layuimini-page-anim">
+    <div class="layuimini-main">
+        <div class="layui-fluid">
+            <div class="layui-card">
+                <div style="padding-top: 10px;">
+                    <div class="layui-carousel" id="stepForm" lay-filter="stepForm">
+                        <div carousel-item>
+                            <div>
+                                <form class="layui-form" style="padding-top: 10px;">
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required"> 选择主表</label>
+                                        <div class="layui-input-block">
+                                            <select id="ParentId" name="ParentId" lay-verify="required" lay-search=''>
+                                                <option value=""> ==请选择==</option>
+                                                @foreach (TbBasicEntity item in ((IEnumerable<TbBasicEntity>)ViewBag.TbList))
+                                                {
+                                                    <option value="@item.TbId">@item.TbName </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required">子表编码</label>
+                                        <div class="layui-input-block layui-col-space3">
+                                            <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+                                                <input type="text" name="TbId" id="TbId" placeholder="子表编码" autocomplete="off" class="layui-input" lay-verify="required|id">
+                                            </div>
+                                            <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                                                <select name="AutoType" id="AutoType" lay-filter="selectfilter">
+                                                    <option value=""> ⇓自动生成编码</option>
+                                                    <option value="英文"> 英文</option>
+                                                    <option value="全拼"> 全拼</option>
+                                                    <option value="首拼"> 首拼</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required">子表名称</label>
+                                        <div class="layui-input-block">
+                                            <input type="text" name="TbName" id="TbName" placeholder="子表名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <div class="layui-col-xs12 layui-col-sm6 layui-col-md6">
+                                            <label class="layui-form-label">添加模式</label>
+                                            <div class="layui-input-block">
+                                                <select name="InType" id="InType">
+                                                    <option value="1">可添加删除行(增加/删除按钮在右侧)</option>
+                                                    <option value="2">可添加删除行(增加/删除按钮在顶部)</option>
+                                                    <option value="0">不能添加删除行(无增加/删除按钮)需设置子表数据初始化</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+                                            <div class="layui-input-block">
+                                                <input type="hidden" name="isLeftNum" value="2">
+                                                <input type="checkbox" id="isLeftNum" name="isLeftNum" value="1" title="显示序号" lay-skin="primary">
+                                                <span style="position: absolute;bottom: 7px; margin-left: -10px;">
+                                                    <i class="layui-icon layui-icon-about" lay-tips="最左侧显示序号" data-offset="4"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label required"> 子表列数</label>
+                                        <div class="layui-input-block">
+                                            <select name="LineNumber" id="LineNumber" lay-filter="selectNumber" lay-search=''>
+                                                @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.selectNumber))
+                                                {
+                                                    <option value="@item.Value">@item.Text </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="layui-form-item">
+                                        <table class="layui-table" id="tableId" lay-filter="tableFilter"> </table>
+                                    </div>
+
+                                    <div class="layui-form-item">
+                                        <div class="layui-input-block">
+                                            <button type='button' class="layui-btn" lay-submit lay-filter="formStep">
+                                                &emsp;下一步&emsp;
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div>
+                                <div style="text-align: center;margin-top: 90px;">
+                                    <textarea placeholder="" value="" name="TBCreatDB" id="TBCreatDB" class="layui-textarea" readonly> </textarea>
+                                </div>
+                                <div style="text-align: center;margin-top: 50px;">
+                                    <button type="button" class="layui-btn" lay-submit lay-filter="formStep2">
+                                        创建数据表
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(["table", 'form', 'step', "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let step = layui.step;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let $ = layui.$;
+
+        form.verify({
+            id: function (value, item) {
+                if (!new RegExp("^[a-zA-Z]+[a-zA-Z0-9]+$").test(value)) {
+                    return '编码由英文字符和数字组成，并以字母开头，不得包含中文、空格及其他字符';
+                }
+            }
+        });
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysTable/TbBasic/GetGridNumber?iCount=" + $("#LineNumber").val(),
+            page: false,
+            cols: [[
+                { field: "IndexNo", title: "序号", width: 100 },
+                { field: "IndexName", title: "名称", templet: '#IndexName', width: 280 },
+                { field: "DataType", title: "数据类型", templet: '#DataType', width: 350 },
+                { field: "ColumnWith", title: "列宽", templet: '#ColumnWith', width: 80 }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        step.render({
+            elem: '#stepForm',
+            filter: 'stepForm',
+            width: '100%', //设置容器宽度
+            stepWidth: '750px',
+            height: '2200px',
+            stepItems: [{
+                title: '新建子表'
+            }, {
+                title: '创建数据表'
+            }]
+        });
+
+        //第1步
+        form.on('submit(formStep)', function (data) {
+            exLayer.confirm("您确定继续吗？", function () {
+                var _list = [];
+                foreachGridTable(_list);
+
+                exUtils.ajax("/SysTable/TbBasic/AddGridTable", "post", { "list": _list, entity: data.field }, true).done(function (response) {
+                    exLayer.greenTickMsg(response.message, function () {
+                        exUtils.ajax("/SysTable/TbBasic/GetCreatDBStr", "post", { tbid: $("#TbId").val() }, true).done(function (response) {
+                            $("#TBCreatDB").val(response.extra);
+                            step.next('#stepForm');
+                            $(window.parent.document).find('#btn_refresh').click();//刷新
+                            document.body.scrollTop = document.documentElement.scrollTop = 0;
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+                return false;
+            })
+        });
+
+        //生成数据表
+        form.on('submit(formStep2)', function (data) {
+            var sql = $("#TBCreatDB").val();
+            exUtils.ajax("/SysTable/TbBasic/CreatDB", "post", { sql: sql, tbid: $("#TbId").val() }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        $('.pre').click(function () {
+            step.pre('#stepForm');
+        });
+
+        $('.next').click(function () {
+            step.next('#stepForm');
+        });
+
+        //自动生成编码
+        form.on('select(selectfilter)', function (data) {
+            var name = $("#TbName").val().trim();
+            var type = data.value;
+            if (name == "") {
+                layer.msg("请输入名称");
+                return;
+            }
+
+            exUtils.ajax("/SysBasic/AutoCode/GetCode", "post", { name: name, type: type }, true).done(function (response) {
+                $("#TbId").val(response.extra);
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        })
+
+        //选择行数
+        form.on('select(selectNumber)', function (data) {
+            ThisTable.reload({
+                url: "/SysTable/TbBasic/GetGridNumber?iCount=" + $("#LineNumber").val()
+            });
+            return false;
+        })
+
+        function foreachGridTable(_list) {
+            var trList = $(".layui-table").find("tr");  //获取table下的所有tr
+            for (var i = 0; i < trList.length; i++) {  //遍历所有的tr
+                var tdArr = trList.eq(i).find("td"); //获取该tr下的所有td
+
+                var _no = tdArr.eq(0).text();
+                var _name = tdArr.eq(1).find('input').val();
+                var _type1 = tdArr.eq(2).find('select').val();
+                var _with = tdArr.eq(3).find('input').val();
+
+                if (_no != '') {
+                    var _row = {};
+                    _row.TbId = $("#TbId").val();
+                    _row.IndexNo = _no;
+                    _row.IndexName = _name;
+                    _row.ColumnWith = _with;
+                    _row.DataType = _type1;
+                    _row.IndexOrderNo = _no;
+                    _list.push(_row);
+                }
+            }
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    })
+</script>
+<!-- 行工具栏模板指标类型 -->
+<script type="text/html" id="DataType">
+    <div class="layui-form layui-input-inline" style="width:305px;">
+        <select name="DataType" lay-filter="DataType" data-value={{d.DataType}}  lay-search=''>
+            @foreach (IndexDtaeTypeEntity item in ((IEnumerable<IndexDtaeTypeEntity>)ViewBag.DtaeTypeList))
+            {
+                                        <option value="@item.TypeId">@item.TypeName </option>
+            }
+        </select>
+    </div>
+</script>
+<!-- 列宽 -->
+<script type='text/html' id='ColumnWith'>
+    <input type="text" name="ColumnWith" value="{{d.ColumnWith}}" class="layui-input" maxlength="4" style="height:32px;" verify="required|number">
+</script>
+<!-- 名称 -->
+<script type="text/html" id="IndexName">
+    <input type="text" name="IndexName" value="{{d.IndexName}}" class="layui-input" maxlength="25" style="height:32px;" lay-verify="required">
+</script>
+<script type="text/html" id="ControlType">
+    <div class="layui-input-inline" style="width:105px;">
+    </div>
+</script>

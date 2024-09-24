@@ -1,0 +1,261 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "select",
+                        "name": "inSupplierID",
+                        "label": "供应商ID",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "_default": "",
+                        "options": [
+                            {
+                                "title": "根据数据规范动态生成",
+                                "value": "1",
+                                "checked": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inJE",
+                        "label": "金额",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入金额",
+                        "_default": "＠randomint10000",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 7,
+                        "tag": "date",
+                        "name": "inDate",
+                        "label": "日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_3",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 8,
+                        "tag": "input",
+                        "name": "inSL",
+                        "label": "数量",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入数量",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 9,
+                        "tag": "select",
+                        "name": "inCategory",
+                        "label": "类别",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "_default": "",
+                        "options": [
+                            {
+                                "title": "根据数据规范动态生成",
+                                "value": "1",
+                                "checked": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 10,
+                        "tag": "input",
+                        "name": "inSpecificationAndModel",
+                        "label": "规格型号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入规格型号",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 3,
+        "tag": "grid",
+        "name": "grid_auto_6",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 11,
+                        "tag": "input",
+                        "name": "inUnitPrice",
+                        "label": "单价",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入单价",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 12,
+                        "tag": "select",
+                        "name": "inUnit",
+                        "label": "单位",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "_default": "",
+                        "options": [
+                            {
+                                "title": "根据数据规范动态生成",
+                                "value": "1",
+                                "checked": false
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 13,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 4,
+        "tag": "grid",
+        "name": "grid_auto_9",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 14,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 15,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": []
+            }
+        ]
+    }
+]

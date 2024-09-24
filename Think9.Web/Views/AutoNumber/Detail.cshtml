@@ -1,0 +1,77 @@
+﻿@*自动编号 查看详细页面 - 列表点击详细打开此页面*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:28:51 添加或编辑-此文件放置于Views/AutoNumber /中*@
+
+@{ ViewBag.Title = "Detail";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+
+<form class="layui-form" lay-filter="formUser">
+    <input style="display:none" id="_listid" value="@ViewBag.ListId">
+    <input style="display:none" id="_userid" value="@ViewBag.UserId">
+    <input style="display:none" id="_butAtt" value="@ViewBag.ButAtt">
+    <input style="display:none" id="_butPdf" value="@ViewBag.ButPdf">
+    <input style="display:none" id="_butDoc" value="@ViewBag.ButDoc">
+    <input style="display:none" id="_butExcel" value="@ViewBag.ButExcel">
+    <br/>
+    <span id="_show" style="text-align: center;"></span>
+    <div class="layui-form-item" style="text-align: center;">
+        <div class="layui-btn-group">
+            <a href="" target="_blank" id="html" class="layui-btn layui-btn-primary layui-btn-sm">打开网页</a>
+            <a href="" target="_blank" id="pdf" class="layui-btn layui-btn-primary layui-btn-sm">打开PDF</a>
+            <a href="" target="_blank" id="excel" class="layui-btn layui-btn-primary layui-btn-sm">导出Excel</a>
+            <a href="" target="_blank" id="doc" class="layui-btn layui-btn-primary layui-btn-sm">导出Doc</a>
+            <a href="" target="_blank" id="att" class="layui-btn layui-btn-primary layui-btn-sm">@ViewBag.ButAttTxt</a>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let $ = layui.$;
+
+        function setBut() {
+            $("#html").attr("href", "/_TB/GetDetail?listid=" + $('#_listid').val() + "&type=_html&fwid=bi_AutoNumber");
+
+            //附件按钮是否可见
+            if ($('#_butAtt').val() == 'y') {
+                $("#att").attr("href", "/Com/FileManage/AttList?listid=" + $('#_listid').val() + "&fwid=bi_AutoNumber" + "&userid=" + $('#_userid').val());
+            }
+            else {
+                $("#att").hide();
+            }
+            //PDF按钮是否可见
+            if ($('#_butPdf').val() == 'y') {
+                $("#pdf").attr("href", "/_TB/GetDetail?listid=" + $('#_listid').val() + "&type=pdf&fwid=bi_AutoNumber");
+            }
+            else {
+                $("#pdf").hide();
+            }
+            //Doc按钮是否可见
+            if ($('#_butDoc').val() == 'y') {
+                $("#doc").attr("href", "/_TB/GetDetail?listid=" + $('#_listid').val() + "&type=doc&fwid=bi_AutoNumber");
+            }
+            else {
+                $("#doc").hide();
+            }
+            //Excel按钮是否可见
+            if ($('#_butExcel').val() == 'y') {
+                $("#excel").attr("href", "/_TB/GetDetail?listid=" + $('#_listid').val() + "&type=excel&fwid=bi_AutoNumber");
+            }
+            else {
+                $("#excel").hide();
+            }
+
+            if ($('#_butExcel').val() != 'y' && $('#_butDoc').val() != 'y' && $('#_butPdf').val() != 'y' && $('#_butAtt').val() != 'y') {
+                $("#_show").css("display", "block");
+                $("#_show").text("可在录入表管理/页面按钮中设置按钮是否显示");
+            }
+            else {
+                $("#_show").css("display", "none");
+            }
+        }
+
+        $(document).ready(function () {
+            setBut();
+        });
+    });
+</script>

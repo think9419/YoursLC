@@ -1,0 +1,101 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="DbID" value="@ViewBag.dbId">
+<input style="display:none" id="ReportId" value="@ViewBag.rpId">
+<input style="display:none" id="colId" value="@ViewBag.colId">
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<table class="layui-table" id="tableColParm" lay-filter="tableFilter"> </table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ColTable = table.render({
+            elem: "#tableColParm",
+            url: "/SysStats/ReportBasic/GetReportIndexColParmList?rpId=" + $("#ReportId").val() + "&colId=" + $("#colId").val(),
+            page: false,
+            defaultToolbar: [{ title: '刷新', layEvent: '_refresh', icon: 'layui-icon-refresh' }],
+            toolbar: "<div class='layui-btn-container'><button type='button' class='layui-btn layui-btn-danger layui-btn-xs' lay-event='_del'><i class='fa fa-trash-o'></i>删除</button><button type='button' class='layui-btn layui-btn-normal layui-btn-xs' lay-event='_add'><i class='fa fa-plus'></i>新增</button>",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { field: "id", templet: "#id", hide: true },
+                { field: "ParmId", title: "参数", width: 200 },
+                { field: "ParmValue", title: "赋值", width: 200 },
+                { field: "Type", title: "方式", templet: "#Type", width: 100 }
+            ]],
+            done: function (res, curr, count) {
+
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "_add":
+                    add();
+                    break;
+                case "_del":
+                    del();
+                    break;
+                case "_refresh":
+                    refresh();
+                    break;
+            }
+        });
+
+        function add() {
+            exLayer.openMiddle("添加赋值参数", "/SysStats/ReportBasic/AddIndexColParm?rpId=" + $("#ReportId").val() + "&colId=" + $("#colId").val() + "&tbid=" + $("#tbid").val() + "&dbid=" + $("#DbID").val(), '500px', '350px', layui.device().mobile);
+        }
+
+        function del() {
+            var idsStr = '';
+            var checkStatus = table.checkStatus('tableColParm');
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    if (parseInt(checkStatus.data[i].Id) > 0) {
+                        idsStr += checkStatus.data[i].Id + ',';
+                    }
+                }
+                exLayer.confirm('确定要删除吗？', function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax('/SysStats/ReportBasic/BatchDelIndexColParm', 'post', { idsStr: idsStr }, true).done(function (response) {
+                            refresh();
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg('未选择有效数据');
+                return false;
+            }
+        }
+
+        function refresh() {
+            ColTable.reload({
+                url: "/SysStats/ReportBasic/GetReportIndexColParmList?rpId=" + $("#ReportId").val() + "&colId=" + $("#colId").val()
+            });
+        }
+
+    });
+</script>
+<script type="text/html" id="Type">
+    {{#  if(d.Type == '0'){ }}
+    当前行数据
+    {{#  }else{ }}
+    固定值
+    {{#  } }}
+</script>

@@ -1,0 +1,104 @@
+﻿@{
+    ViewBag.Title = "图片上传";
+    Layout = "~/Areas/Shared/_LayoutFile.cshtml";
+}
+
+<input style="display:none" id="_flag" value="ceeev1">
+<input style="display:none" id="pu_frm" value="@ViewBag.PuFrom">
+<input style="display:none" id="pu_tbid" value="@ViewBag.PuTbId">
+<input style="display:none" id="pu_indexid" value="@ViewBag.PuIndexId">
+<input style="display:none" id="pu_rowid" value="@ViewBag.PuId">
+<input style="display:none" id="pu_column" value="@ViewBag.PuV">
+<input style="display:none" id="pu_filename" value="@ViewBag.Pufname">
+<div class="layui-container">
+    <div class="layui-row">
+        <div class="layui-input-block" style="text-align: center;margin-top: 20px;margin-left:-15px;">
+            <button class="layui-btn" id="btn_Upload">
+                <i class="layui-icon layui-icon-upload"></i>上传图片
+            </button>
+            <button class="layui-btn" lay-submit lay-filter="btn_OK" id="btn_OK">确 定</button>
+        </div>
+    </div>
+    <div class="layui-row">
+        <div class="layui-input-block" style="text-align: center;margin-left:0;">
+            <div class="layui-upload-list">
+                <img id="F_Img" height="300" src='@ViewBag.src' />
+            </div>
+        </div>
+        <div class="layui-input-block" style="text-align: center;margin-left:0;">
+            <div class="layui-upload-list">
+                <a id="down" href="@ViewBag.src2" target='_blank'> <i class="fa fa-search-plus">查看原图</i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script type="text/javascript">
+        layui.use(['form', 'layer', 'upload'], function () {
+            let $ = layui.$;
+            let upload = layui.upload;
+            let layer = layui.layer;
+            let form = layui.form;
+
+            upload.render({
+                elem: '#btn_Upload',
+                field: 'file',
+                url: '@Url.Action("ImgUplaod")',
+                auto: true,
+                accept: 'images',//指定允许上传时校验的文件类型
+                acceptMime: 'image/*',//规定打开文件选择框时，筛选出的文件类型，值为用逗号隔开的 MIME 类型列表
+                exts: '@ViewBag.FileType',// 设置允许上传的格式
+                choose: function (obj) {
+
+                },
+                before: function () {  //文件提交上传前的回调
+                    this.data = {
+                        tbid: $('#pu_tbid').val(),
+                        oldName: $('#pu_filename').val()
+                    }
+                    layer.load(2);
+                },
+                done: function (res) {
+                    if (res.code == 0) {
+                        $("#F_Img").attr("src", res.src);
+                        $("#pu_filename").val(res.filename);
+
+                        getVal();
+                        layer.closeAll('loading');
+                    }
+                    else {
+                        layer.closeAll('loading');
+                        layer.alert(res.msg, {
+                            icon: 2
+                        });
+                    }
+                },
+                error: function () {
+                    layer.alert('上传失败', {
+                        icon: 2
+                    });
+                }
+            });
+
+            $('#btn_OK').on('click', function () {
+                getVal();
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+
+                return false;
+            });
+
+            function getVal() {
+                $(window.parent.document).find('#pu_value').val($('#pu_filename').val());
+                $(window.parent.document).find('#pu_tbid').val($('#pu_tbid').val());
+                $(window.parent.document).find('#pu_indexid').val($('#pu_indexid').val());
+                $(window.parent.document).find('#pu_rowid').val($('#pu_rowid').val());
+                $(window.parent.document).find('#pu_column').val($('#pu_column').val());
+
+                $(window.parent.document).find('#pu_value').click();
+            }
+
+        });
+    </script>
+}

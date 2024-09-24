@@ -1,0 +1,397 @@
+﻿@*字符过长2 列表页面*@
+@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:29:37 列表-此文件放置于Views/CharacterTooLong2 /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+<input style="display:none" id="_isDebug" value="debug">@*debug为调试；release为发布*@
+<input style="display:none" id="_fwid" value="bi_CharacterTooLong2">@*流程编码*@
+<input style="display:none" id="_searchTag" value="">@*查询字符与选项卡关联*@
+@*弹出选择时页面间传递数据--查询条件可能需要弹出选择页面*@
+<input style="display:none" id="pu_value">@*弹出选择时使用-选择的值*@
+<input style="display:none" id="pu_tbid">@*弹出选择时使用-表id*@
+<input style="display:none" id="pu_indexid">@*弹出选择时使用-指标编码*@
+<input style="display:none" id="pu_rowid">@*弹出选择时使用-子表弹出，对应tableid 哪一行*@
+<input style="display:none" id="pu_column">@*弹出选择时使用-子表弹出，第几列*@
+
+<fieldset class="table-fieldset" id="searchfield" style="display:none">
+    <legend style="color:darkgrey"><i class="fa fa-close" style="color: #FFAB00;font-size: 18px;" id="close_searchfield"></i>&nbsp;快速查询 -<span id="sp_searchmode"></span><span id="_anchor" lay-tips='锚定|隐藏'><i class='fa fa-anchor'></i></span></legend>
+    <div style="margin: 5px 5px 5px 5px">
+        <form class="layui-form layui-form-pane" action="" id="_formid">
+			<div class="layui-form layui-row layui-col-space10">
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<label class="layui-form-label">入库日期</label>
+					<div class="layui-input-inline">
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input name="inStorageDate" id="inStorageDate" autocomplete='off' class='layui-input'  onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd'})" style='font-size:12px'>
+						</div>
+						<div class="layui-input-inline" >-</div>
+						<div class="layui-input-inline" style="width: 72px; ">
+							<input name="inStorageDate_Exa" id="inStorageDate_Exa" autocomplete='off' class='layui-input'  onClick="WdatePicker({ el: this,dateFmt: 'yyyy-MM-dd'})" style='font-size:12px'>
+						</div>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<label class="layui-form-label">单位</label>
+					<div class="layui-input-block">
+						<select id="inUnit" name="inUnit" lay-search=''>
+							<option value="">==请选择==</option>
+								@foreach (valueTextEntity item in ((IEnumerable<valueTextEntity>)ViewBag.SelectList).Where(x => x.ClassID == "inUnit"))
+								{
+									 <option value="@item.Value">@item.Text</option>
+								}
+						</select>
+					</div>
+				</div>
+				<div class="layui-col-xs12 layui-col-sm3 layui-col-md3">
+					<button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search' lay-tips='查询'><i class='layui-icon layui-icon-search'></i></button> <button type='button' class='layui-btn layui-btn-primary' id='exportData' lay-submit lay-filter='exportData' lay-tips='查询并导出Excel'><i class='fa fa-file-excel-o'></i></button><button type='reset' class='layui-btn layui-btn-primary' lay-tips='清空'><i class='layui-icon layui-icon-refresh'></i></button>
+				</div>
+			 </div>
+        </form>
+    </div>
+</fieldset>
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script>
+    layui.config({
+        base: '/Self_JS/' /*自定义的js文件--wwwroot\Self_JS\CharacterTooLong2.js*/
+    });
+    layui.use(["table", "element", "form", "exLayer", "exUtils", "miniPage", "tableSelect", "CharacterTooLong2"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let miniPage = layui.miniPage;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+        let tableSelect = layui.tableSelect;
+        let myJS = layui.CharacterTooLong2;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+        form.render();//更新全部表单数据
+
+		element.on('tab(tabTag_Filter)', function (data) {
+		});
+
+        //渲染表格，url数据接口参数；cols设置显示字段...
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/_TB/GetPageList",
+            where: { fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val() },
+            limits: [10, 50, 100],
+            limit: 10,
+            method:"POST",
+            page: true,
+            defaultToolbar: layui.device().mobile ? [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }] : [{ title: '搜索', layEvent: 'searchShow', icon: 'layui-bg-blue layui-icon-search' }, { title: '显示所有数据', layEvent: 'refresh', icon: 'layui-bg-gray layui-icon-refresh' }, 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { type: "checkbox", fixed: 'left' },
+                { type: "numbers", title: "NO.", fixed: 'left' },
+                { title: "<i class='fa fa-unlock-alt'></i>", width: 45, templet: "#is_lock" },
+				{ title: "入库日期", width: 70 , sort: true , templet: '<span>{{showDate(d.inStorageDate)}}<span>'  },
+				{ field: "inUnit_Exa", title: "单位", width: 150, sort: true   },
+                
+                { title: "操作", width: 230, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operation_Tpl" }
+            ]],
+            done: function (res, curr, count) {
+                myJS.disableListBtn("@ViewBag.DisableBut");//控制列表上部按钮状态
+                if (count == -1) {
+                }
+            }
+        });
+
+         //查询 发布模式调用_TB/GetPageList，调试模式调用CharacterTooLong2/GetPageList
+        form.on("submit(search)", function (data) {
+            if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                $("#searchfield").hide();
+            }
+            ThisTable.reload({
+                where: {fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val(), model: data.field, json: JSON.stringify(data.field, null, 4)},
+                url: "/_TB/GetPageList",
+                page: { curr: 1 }
+            });
+            return false;
+        });
+        //导出 发布模式调用_TB/ExportData，调试模式调用CharacterTooLong2/ExportData
+        form.on("submit(exportData)", function (data) {
+            exUtils.ajax("/_TB/ExportData", "post", { json: JSON.stringify(data.field, null, 4), fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val() }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['250', '100px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        //toolbar监听事件(处理table顶部按钮)
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "add"://新增按钮事件
+                    add();
+                    break;
+                 case "importExcel"://数据导入按钮事件
+                    exLayer.open("数据导入", "/SysTable/ImportData/ImportDataFromExcel?tbid=tb_CharacterTooLong2", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    break;
+                case "searchShow"://查询按钮事件
+                    myJS.searchShow();
+                    break;
+                case "refresh"://刷新按钮事件-显示所有数据
+                    layer.msg('显示所有数据', { icon: 1, shade: this.shade, scrollbar: false, time: 2000, shadeClose: true });
+                    if ($("#_anchor").html().indexOf('fa fa-anchor') == -1) {
+                        $("#searchfield").hide();
+                    }
+                    //发布模式调用_TB/GetPageList，调试模式调用CharacterTooLong2/GetPageList
+                    ThisTable.reload({
+                        url: "/_TB/GetPageList?isAll=all",
+                        where: {fwid: $("#_fwid").val(), searchTag: $("#_searchTag").val()},
+                        page: { curr: 1 }
+                    });
+                    break;
+                case "mergeExport"://合并导出按钮事件
+                    mergeExport();
+                    break;
+                case "batchDel"://批量删除按钮事件
+                    batchDel();
+                    break;
+
+            }
+        });
+        //tool监听事件(处理table数据行按钮)
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detail"://列表行-查看详细按钮事件 select弹出选择页面，pdf打开pdf，html打开网页
+                    showDetailCom($('#_fwid').val(), data.ListId_Exa, 'select');//在global.js中定义
+                    break;
+                case "record"://列表行-查看记录按钮事件
+                    record(data.ListId);
+                    break;
+                case "edit"://列表行-编辑按钮事件
+                    edit(data.ListId);
+                    break;
+                case "prcslist"://列表行-流程记录查看按钮事件
+                    exLayer.open('记录查看', '/SysFlow/FlowRunList/RecordList?listid=' + data.ListId + "&fwid=" + $("#_fwid").val(), openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                    break;
+                case "del"://列表行-删除按钮事件
+                    del(data.ListId);
+                    break;
+
+
+            }
+        });
+
+        //新增数据 发布模式调用_TB/BeforeAdd，调试模式调用CharacterTooLong2/BeforeAdd
+        function add() {
+            exUtils.ajax("/_TB/BeforeAdd", "post", { type: 'add', listid: '0', fwid: $("#_fwid").val() }, true).done(function (response) {
+                exLayer.open("字符过长2 - 新增数据", "/_TB/Form?listid=" + response.extra + "&pid=" + response.extra2 + "&type=add" + "&fwid=" + $("#_fwid").val(), openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+        //编辑数据 发布模式调用_TB/BeforeEdit，调试模式调用CharacterTooLong2/BeforeEdit
+        function edit(id) {
+            exUtils.ajax("/_TB/BeforeEdit", "post", { type: 'edit', listid: id, fwid: $("#_fwid").val()}, true).done(function (response) {
+                exLayer.open("字符过长2 - 编辑数据", "/_TB/Form?listid=" + id + "&pid=" + response.extra2 + "&type=edit" + "&fwid=" + $("#_fwid").val(), openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+        //删除数据 发布模式调用_TB/Delete，调试模式调用CharacterTooLong2/Delete
+        function del(id) {
+            exLayer.confirm("确定要删除吗？", function () {
+                exUtils.ajax("/_TB/Delete", "get", { listid: id, fwid: $("#_fwid").val() }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    $(".layui-laypage-btn")[0].click();
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+        //记录查看
+        function record(id) {
+            exLayer.open('记录查看', '/SysFlow/FlowRunList/RecordList?listid=' + id + "&fwid=" + $("#_fwid").val(), openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        }
+        //批量删除数据 发布模式调用_TB/BatchDel，调试模式调用CharacterTooLong2/BatchDel
+        function batchDel() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ListId + ",";
+                }
+                exLayer.confirm("确定要删除吗？", function (index) {
+                    layer.close(index);
+                    if (idsStr) {
+                        exUtils.ajax("/_TB/BatchDel", "post", { idsStr: idsStr, fwid: $("#_fwid").val() }, true).done(function (response) {
+                            exUtils.tableSuccessMsg(response.message);
+                            $(".layui-laypage-btn")[0].click();
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                });
+            }
+            else {
+                layer.msg("未选择有效数据");
+            }
+        }
+       //合并导出pdf 发布模式调用_TB/MergeExport，调试模式调用CharacterTooLong2/MergeExport
+       function mergeExport() {
+            var idsStr = "";
+            var checkStatus = table.checkStatus("tableId");
+            var rows = checkStatus.data.length;
+            if (rows > 0) {
+                for (var i = 0; i < checkStatus.data.length; i++) {
+                    idsStr += checkStatus.data[i].ListId + ",";
+                }
+                if (idsStr) {
+                    exUtils.ajax("/_TB/MergeExport", "post", { idsStr: idsStr, fwid: $("#_fwid").val() }, true).done(function (response) {
+                        layer.open({
+                            title: response.message
+                            , type: 1
+                            , area: ['250', '100px']
+                            , content: response.extra
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+            }
+            else {
+                layer.msg("未选择有效数据");
+            }
+        }
+
+
+
+
+        //锚定|隐藏
+        $("#_anchor").click(function () {
+            if ($("#_anchor").html().indexOf('fa-angle-double-up') == -1) {
+                $("#_anchor").html("<i class='fa fa-angle-double-up' style='font-size: 18px;'></i>");
+            }
+            else {
+                $("#_anchor").html("<i class='fa fa-anchor'></i>");
+            }
+        });
+       //关闭搜索
+       $("#close_searchfield").click(function () {
+            $("#searchfield").attr("style", "display:none");
+        });
+        //弹出页面关闭后为控件赋值,子页面关闭时被调用
+        $("#pu_value").click(function () {
+            //弹出页面关闭时以下组件已被赋值
+        	var _tbid = $('#pu_tbid').val();//表id，主表为_main，子表纵列为_gridColumn
+			var _indexid = $('#pu_indexid').val();//指标编码，触发弹出选择的控件id
+			var _rowid = $('#pu_rowid').val();//子表数据主键
+			var _value = $('#pu_value').val();//弹出页面选择的值
+			var _column = $('#pu_column').val();//第几列--子表弹出时有用
+            //弹出页面关闭后，选择的Value为触发弹出页面的input赋值，wwwroot\Self_JS\CharacterTooLong2.js中定义
+            myJS.getValueFromPopUp(_tbid, _indexid, _rowid, _column, _value);
+        });
+        //图片预览|消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var tips = $(this).data("offset") || 4;
+            var remind = $(this).attr("lay-tips");
+            if (remind != '') {
+                var last4 = remind.substring(remind.length - 4).toLowerCase();
+				var last5 = remind.substring(remind.length - 5).toLowerCase();
+                if (last4 == '.jpg' || last4 == '.png' || last4 == '.gif' || last4 == '.bmp' || last5 == '.jpeg') {
+                    var src = '/UserImg/' + remind;
+                    var imgHtml = "<img src='" + src + "' style='width: 60px;height:60px'/>";
+                    layer.tips(imgHtml, this, {
+                        time: -1,
+                        tips: [tips, $(this).data("color") || '#ffffff'],
+                        area: ['auto', 'auto'],
+                    });
+                }
+                else {
+                    layer.tips(remind, this, {
+                        time: -1,
+                        tips: [tips, $(this).data("color") || '#88858e'],
+                        area: ['auto', 'auto'],
+                    });
+                }
+            }
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+       document.addEventListener('keyup', function (event) {
+            if (event.key === "Enter") {
+                event.preventDefault(); //阻止回车默认行为
+            }
+        });
+       $(document).ready(function () {
+            $("#sp_searchmode").text("@ViewBag.SearchMode");//查看编辑模式 可在录入表管理-权限管理中设置
+        });
+    });
+</script>
+<!--头部按钮工具栏模板，通过调用myJS.disableListBtn()控制按钮状态-->
+<script type="text/html" id="toolbarTpl">
+  <div class="layui-btn-container">
+	<button class="layui-btn layui-btn-danger layui-btn-sm" lay-event="batchDel" id="batchDel"><i class="fa fa-trash-o"></i>删除</button>
+	<button class="layui-btn layui-btn-normal layui-btn-sm" lay-event="mergeExport" id="mergeExport"><i class="fa fa-file-pdf-o"></i>导出</button>
+	<button class="layui-btn layui-btn-sm" lay-event="importExcel" id="importExcel"><i class="fa fa-file-excel-o"></i>导入</button>
+    <button type="button" class="layui-btn layui-btn-warm layui-btn-sm" lay-event="add" id="add"><i class="fa fa-plus"></i>新增</button>
+   </div>
+</script>
+<!-- 行工具栏模板(锁定) -->
+<script type='text/html' id='is_lock'>
+    {{#  if(d.isLock == '0'){ }}
+    <i class='fa fa-unlock'></i>
+    {{#  } }}
+    {{#  if(d.isLock == '1'){ }}
+    <i class='fa fa-lock'></i>
+    {{#  } }}
+    {{#  if(d.isLock == '9'){ }}
+    <i class='fa fa-unlock-alt'></i>
+    {{#  } }}
+</script>
+<!-- 行工具栏模板(流程步骤) -->
+<script type='text/html' id='prcslist'>
+    {{#  if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[listprcs]") > -1){ }}
+    <a class='layui-btn-primary layui-btn-sm' href='javascript:;' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  }else{ }}
+    {{#  if(d.runFlag == '1'){ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: #FE7300; border: 1px solid #fff;' href='javascript:;' lay-event='prcslist' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  }else{ }}
+    <a class='layui-btn-primary layui-btn-sm' style='color: blue; border: 1px solid #fff;' href='javascript:;' lay-event='prcslist' id='listprcs'>{{d.currentPrcsName}}</a>
+    {{#  } }}
+    {{#  } }}
+</script>
+<!-- 行工具栏模板(操作按钮)，DisableButStr禁用按钮字符，格式[btnid1][btnid2]，用于按钮权限控制，录入表管理/页面按钮可设置-->
+<script type="text/html" id="operation_Tpl">
+	{{#  if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[detail]") > -1){ }}
+	<a href='javascript:;' class="layui-btn layui-btn-disabled layui-btn-xs" id="detail">详细</a>
+	{{#  }else{ }}
+	<a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail" id="detail">详细</a>
+	{{#  } }}
+	
+	{{#  if(d.DisableButStr == 'all' || d.DisableButStr.indexOf("[record]") > -1){ }}
+	<a href='javascript:;' class="layui-btn layui-btn-disabled layui-btn-xs" id="record">记录</a>
+	{{#  }else{ }}
+	<a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="record" id="record">记录</a>
+	{{#  } }}
+    {{#  if(d.DisableButStr == 'all' ||  d.DisableButStr.indexOf("[edit]") > -1){ }}
+    <a href='javascript:;' class="layui-btn layui-btn-disabled layui-btn-xs" id="edit">编辑</a>
+    {{#  }else{ }}
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit" id="edit">编辑</a>
+    {{#  } }}
+
+    {{#  if(d.DisableButStr == 'all' ||  d.DisableButStr.indexOf("[del]") > -1){ }}
+    <a href='javascript:;' class="layui-btn layui-btn-disabled layui-btn-xs" id="del">删除</a>
+    {{#  }else{ }}
+    <a href='javascript:;' class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id="del">删除</a>
+    {{#  } }}
+</script>
+
+<!-- 图片显示 -->
+<script>
+    function PopUpImg(id) {
+        showImg(id);//在global.js中定义
+    }
+</script>

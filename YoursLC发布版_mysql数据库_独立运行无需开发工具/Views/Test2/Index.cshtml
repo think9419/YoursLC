@@ -1,0 +1,65 @@
+﻿@*Think9企业级开发工具 http://yourslc.top Create:admin 2024-09-24 13:35:17 此文件放置于Views/Test2 /中*@
+
+@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+@*统计表 - 测试2*@
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+    <input style="display:none" id="_rpId" value="rp_Test2">
+    <div class="layui-form-item">
+
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-md11" style="text-align: right;">
+            <div class="layui-input-block">
+                <input type="radio" name="type" value="html" title="显示网页" checked="">
+                <input type="radio" name="type" value="pdf" title="打开pdf">
+                <input type="radio" name="type" value="doc" title="导出Doc">
+                <input type="radio" name="type" value="excel" title="导出Excel">
+            </div>
+        </div>
+        <div class="layui-col-md1">
+            <button type='button' class='layui-btn layui-btn-primary' id='search' lay-submit lay-filter='search'><i class='layui-icon layui-icon-search'></i></button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["form", "exLayer", "layer", "exUtils", "miniPage"], function () {
+        let form = layui.form;
+        let miniPage = layui.miniPage;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+        form.render();
+
+        form.on("submit(search)", function (data) {
+            var url = jsonToUrlParam(data.field);
+            var _select = $("input[type='radio']:checked").val();
+            if (_select == 'doc' || _select == 'excel') {
+                exUtils.ajax("/_RP/GetReport?rpid=" + $("#_rpId").val() + "&" + url, "get", {}, true).done(function (response) {
+                    layer.open({
+                        title: response.message
+                        , type: 1
+                        , area: ['250', '100px']
+                        , content: response.extra
+                    });
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+            else {
+                exLayer.open("测试2", "/_RP/GetReport?rpid=" + $("#_rpId").val() + "&" + url, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+        });
+
+        //处理查询参数
+        function jsonToUrlParam(json) {
+            return Object.keys(json).map(key => key + '=' + json[key]).join('&');
+        }
+    });
+</script>

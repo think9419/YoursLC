@@ -1,0 +1,919 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display: none" name="AppId" id="AppId" value="@ViewBag.AppId">
+<input style="display:none" id="ParentId" value="">
+<input style="display:none" id="isAux" value="">
+<input style="display:none" id="flowType" value="">
+<input style="display:none" id="FlowId" value="">
+<blockquote class="layui-elem-quote  layui-text">
+    『自定义录入表』步骤 1：新建主表；2：为主表添加录入指标并设置指标属性及数据规范；3：创建数据表；4：为主表添加子表(可选)；5：设置自定义事件、数据读取、页面按钮等...；6：表单设计(可选，默认按照一行两列排列控件)；7：为录入表添加菜单；8：重新生成后查看运行效果；9：代码生成并调试测试(需启动调试模式)；10：测试并发布
+</blockquote>
+<span style="position: absolute;top: 20px; right: 20px;" id="blockquote_close">
+    <i class="fa fa-close" style="color: #FFAB00;"></i>
+</span>
+<div class="layui-form">
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <div class="layui-col-xs12 layui-col-sm8 layui-col-md8 layui-col-md-offset4" id="divTOP">
+                <div class="layui-btn-container">
+                    <button type="button" class="layui-btn layui-btn-normal" lay-event="sort" id="sort"><i class="fa fa-paste"></i>分类管理</button>
+                    <button type="button" class="layui-btn  layui-btn-normal" lay-event="add01" id="add01"><i class="fa fa-plus"></i>新建主表</button>
+                    <button type="button" class="layui-btn  layui-btn-normal" lay-event="add02" id="add02"><i class="fa fa-plus"></i>新建子表</button>
+                    <button type="button" class="layui-btn  layui-btn-normal" lay-event="add03" id="add03"><i class="fa fa-plus"></i>新建辅助表</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-col-xs12 layui-col-sm4 layui-col-md4" id="div_Tree">
+            <fieldset class="table-fieldset">
+                <legend style="color:darkgrey"><button type='button' class='layui-btn layui-btn-primary layui-btn-xs' id='btn_refresh' style="color:#FFAB00;" lay-submit lay-filter='search'><i class='fa fa-refresh'></i>刷新</button>  </legend>
+                <div id="tbTree" style="overflow: auto; height: 350px;"></div>
+            </fieldset>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm8 layui-col-md7" style="padding-left: 30px;">
+            <div id="divshow" style="margin: 5% auto; text-align: center; font-size: 18px; color: #c9e0f3;">选择录入表或点击新建按钮 <i class="fa fa-arrow-up"></i></div>
+            <div id="divInfo" style="display: none">
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:30px;">编码</label>
+                    <div class="layui-input-block" style="margin-left:60px;">
+                        <input type="text" name="TbId" id="TbId" class="layui-input" readonly="readonly">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width:30px;">名称</label>
+                    <div class="layui-input-block" style="margin-left:60px;">
+                        <input type="text" name="TbName" id="TbName" class="layui-input" readonly="readonly">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                        <label class="layui-form-label" style="width:30px;">创建</label>
+                        <div class="layui-input-block" style="margin-left:60px;">
+                            <input type="text" name="CreateTime" id="CreateTime" class="layui-input" readonly="readonly">
+                        </div>
+                    </div>
+                </div>
+                <fieldset class="layui-elem-field layui-field-title">
+                    <legend><button type='button' class='layui-btn layui-btn-xs  layui-btn-warm' lay-tips='刷新' id="btnRefresh"><i class='fa fa-refresh' lay-tips='刷新'></i></button></legend>
+                </fieldset>
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn11"> <span style="color: #337ab7; font-weight: 700"><i class="fa fa-edit"></i>1.基本属性</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn12"><span style="color: #337ab7; font-weight: 700"><span id="_indexCount"></span><i class="fa fa-bars"></i>2.录入指标<span id="indexCount"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn13"><span style="color: #337ab7; font-weight: 700"><span id="IsDataTableExists"></span><i class="fa fa-database"></i>3.数据表</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <a style="width: 140px; height:32px;" href="" target="_blank" id="btn14" class="layui-btn layui-btn-sm  layui-btn-primary"><span style="color: #337ab7; font-weight: 700"><span id="IsTbJson"></span><i class="fa fa-table"></i>4.表单设计</span></a>
+                    </div>
+                </div>
+                <hr class="layui-border-black">
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn21"><span style="color: #337ab7; font-weight: 700"><span id="IsModuleExists"></span><i class="fa fa-folder-open-o"></i>5.左侧菜单</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn22"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-user"></i>6.权限设置</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm   layui-btn-primary" id="btn71"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-pencil-square-o"></i>前端设置</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm   layui-btn-primary" id="btn24"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-paperclip"></i>公共附件设置</span></button>
+                    </div>
+                </div>
+                <hr class="layui-border-black">
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn62"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-pencil"></i>自定义事件<span id="EventCount"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn61"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-square-o"></i>按钮管理<span id="BtnCustomizeCount"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn32"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-check-square-o"></i>录入校验<span id="ValueCheckCount"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn39"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-eye-slash"></i>只读|保密字段<span id="HiddenIndexCount"></span></span></button>
+                    </div>
+                </div>
+                <hr class="layui-border-black">
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn_11"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-exchange"></i>数据读取<span id="TbRelationCount11"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn_31"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-reply"></i>数据回写<span id="TbRelationCount31"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn_21"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-list-alt"></i>子表数据初始化<span id="TbRelationCount21"></span></span></button>
+                    </div>
+                    <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn_42"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-file-text-o"></i>执行记录</span></button>
+                </div>
+                <hr class="layui-border-black">
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btnCheck"><span style="color: #337ab7; font-weight: 700"><span id="_Check"></span><i class="fa fa-warning"></i>检&nbsp;测</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn74"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-edit"></i>代码管理</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn72"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-code"></i>代码模板<span id="TbTempletCount"></span></span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm  layui-btn-primary" id="btn73"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-files-o"></i>代码备份<span id="TbTempDirectoryCount"></span></span></button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn99"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-code"></i>查看代码</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button type='button' style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn49"><span style="color: #337ab7; font-weight: 700"><span id="IsFileExists"></span><i class="fa fa-refresh"></i>重新生成<span id="CreateCount"></span></span></button>
+                    </div>
+
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn98"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-download"></i>生成代码并下载</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn92"><span style="color: #337ab7; font-weight: 700"><i class="layui-icon layui-icon-upload"></i>模式切换</span></button>
+                    </div>
+                </div>
+                <hr class="layui-border-black">
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn58"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-wrench"></i>流程步骤</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn412"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-folder-open-o"></i>数据导出</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm layui-btn-primary" id="btn41"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-file-excel-o"></i>数据导入</span></button>
+                    </div>
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btn42"><span style="color: #337ab7; font-weight: 700"><i class="fa fa-file-text-o"></i>操作记录</span></button>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-col-xs6 layui-col-sm3 layui-col-md3">
+                        <button style="width: 140px; height:32px;" class="layui-btn layui-btn-sm  layui-btn-danger" id="btn43"><i class="fa fa-trash-o"></i>删除录入表</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['tree', 'layer', 'util', 'exLayer', 'exUtils', 'miniPage'], function () {
+        let tree = layui.tree;
+        let layer = layui.layer;
+        let util = layui.util;
+        let index = 100;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let miniPage = layui.miniPage;
+
+        let $ = layui.$;
+        var openWH = miniPage.getOpenWidthHeight();
+
+        $("#blockquote_close").click(function () {
+            $(".layui-elem-quote").attr("style", "display:none");
+            $("#blockquote_close").attr("style", "display:none");
+        });
+
+        tree.render({
+            elem: '#tbTree',
+            data: eval('(' + getData() + ')'),
+            id: 'treeTb',
+            click: function (obj) {
+                var nodes = document.getElementsByClassName("layui-tree-txt");
+                for (var i = 0; i < nodes.length; i++) {
+                    if (nodes[i].innerHTML === obj.data.title && obj.data.id != '') {
+                        nodes[i].style.fontWeight = "bold";
+                        nodes[i].style.color = "#FE7300";
+                    } else {
+                        nodes[i].style.fontWeight = "normal";
+                        nodes[i].style.color = "#a29c9c";
+                    }
+                }
+
+                getTbInfo(obj.data.id);
+            },
+            showCheckbox: false,  //是否显示复选框
+            accordion: 0,  //是否开启手风琴模式
+            onlyIconControl: true, //是否仅允许节点左侧图标控制展开收缩
+            isJump: 0,  //点击文案跳转地址
+            edit: false  //操作节点图标
+        });
+
+        //刷新
+        $("#btn_refresh").click(function () {
+            tree.reload('treeTb', { data: eval('(' + getData() + ')') });
+            $("#TbId").val("");
+            $("#TbName").val("");
+            $("#divInfo").hide();
+            $("#divshow").show();
+            return false;
+        });
+
+        //刷新
+        $("#btnRefresh").click(function () {
+            getTbInfo($("#TbId").val());
+        });
+
+        //新增主表
+        $("#add01").click(function () {
+            exLayer.open("新建主表", "/SysTable/TbBasic/AddMain", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //前端自定义
+        $("#btn71").click(function () {
+            layer.msg('建设中...');
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 前端自定义", "/SysTable/TbBasic/TbUtility?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //代码模板
+        $("#btn72").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 代码模板", "/SysBasic/TempletCode/List?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //代码管理
+        $("#btn74").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 代码管理", "/SysBasic/TempletCode/TbCodeList?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //代码备份
+        $("#btn73").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 代码备份", "/SysBasic/TempletCode/TempDirectory?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //左侧菜单
+        $("#btn21").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            if ($("#ParentId").val() == "") {
+                exLayer.openMiddle("录入表菜单", "/SysTable/TbBasic/OpenModule?tbid=" + $("#TbId").val() + "&name=" + $("#TbName").val(), '500px', '500px', layui.device().mobile);
+            }
+            else {
+                layer.msg("请选择主表");
+                return false;
+            }
+        });
+
+        //新增子表
+        $("#add02").click(function () {
+            exLayer.open("新建子表", "/SysTable/TbBasic/AddGrid", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //新增辅助表
+        $("#add03").click(function () {
+            exLayer.confirm("辅助表生成的数据表只包含添加的录入指标字段，不能为辅助表生成代码，不能为辅助表添加子表，可通过『数据导入』为辅助表导入数据，可写入数据（如通过其他录入表自定义事件或数据回写），数据规范（如单列选择多列选择）可从辅助表读取数据，可基于辅助表自定义统计表...<br>确定要继续吗？", function () {
+                exLayer.open("新建辅助表", "/SysTable/TbBasic/AddAux", openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            })
+        });
+
+        //分类管理
+        $("#sort").click(function () {
+            exLayer.openMiddle("录入表分类", "/SysBasic/Sort/List?classid=CAT_table", '500px', '380px', layui.device().mobile);
+        });
+
+        //基本属性
+        $("#btn11").click(function () {
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                if ($("#isAux").val() == '1') {
+                    exLayer.open($("#TbName").val(), "/SysTable/TbBasic/EditAux?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                }
+                else {
+                    exLayer.open($("#TbName").val(), "/SysTable/TbBasic/EditMain?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                }
+            }
+            else {
+                exLayer.open($("#TbName").val(), "/SysTable/TbBasic/EditGrid?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+        });
+
+        //录入指标
+        $("#btn12").click(function () {
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 录入指标管理", "/SysTable/TbSetUp/TbIndexList?tbid=" + tbid + "&isMobile=" + layui.device().mobile, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                exLayer.open($("#TbName").val() + " - 录入指标管理", "/SysTable/TbSetUp/ColumnList?tbid=" + tbid + "&isMobile=" + layui.device().mobile, '100%', '100%', '0px', '0px', null, null);
+            }
+        });
+
+        //数据表
+        $("#btn13").click(function () {
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 数据表管理", "/SysTable/TbSetUp/DBTable?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //权限设置
+        $("#btn22").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 权限设置管理", "/SysTable/TbBasic/TbLimits?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //附件设置
+        $("#btn24").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 公共附件设置", "/SysTable/TbBasic/TbAtt?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //页面按钮
+        $("#btn61").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 按钮管理", "/SysTable/TbBasic/TbBut?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //事件扩展
+        $("#btn62").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 事件扩展设置", "/SysTable/TbEvent/List?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //按钮管理
+        $("#btn63").click(function () {
+            var tbid = $("#TbId").val();
+        });
+
+        //保密字段
+        $("#btn39").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            var tbid = $("#TbId").val();
+            var flowType = $("#flowType").val();
+            if ($("#ParentId").val() == "") {
+                if (flowType == '1') {
+                    layer.msg("固定流程通过流程步骤确定保密字段");
+                }
+                else {
+                    exLayer.open($("#TbName").val() + " - 只读|保密字段", "/SysTable/TbBasic/TbHiddenIndex?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                }
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //录入校验
+        $("#btn32").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 录入校验管理", "/SysTable/TbValueCheck/List?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //数据读取
+        $("#btn_11").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            exLayer.open($("#TbName").val() + " - 数据读取", "/SysTable/TbRelation/ListRead?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //数据回写
+        $("#btn_31").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            exLayer.open($("#TbName").val() + " - 数据回写", "/SysTable/TbRelation/ListWrite?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //子表数据初始化
+        $("#btn_21").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                layer.msg("请选择子表");
+            }
+            else {
+                exLayer.open($("#TbName").val() + " - 数据读写管理", "/SysTable/TbRelation/ListGridData?tbid=" + $("#TbId").val(), '100%', '100%', '0px', '0px', null, null);
+            }
+        });
+
+        //记录
+        $("#btn_42").click(function () {
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 执行记录", "/SysTable/TableList/RecordList?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //记录
+        $("#btn42").click(function () {
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 操作记录", "/SysTable/TbBasic/RecordList?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+        });
+
+        //代码查看
+        $("#btn99").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 代码查看", "/SysTable/TbCodeBuild/LookCode?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //流程步骤
+        $("#btn58").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            var flowId = $("#FlowId").val();
+            var flowType = $("#flowType").val();
+
+            if ($("#ParentId").val() == "") {
+                if (flowType == '1') {
+                    exLayer.open($("#TbName").val() + "-流程步骤", "/SysFlow/FlowPrcs/List?id=" + flowId + "&tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+                }
+                else {
+                    layer.msg("基础信息表及自由流程无需设置流程步骤");
+                }
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //数据交互
+        $("#btn50").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            exLayer.open($("#TbName").val() + " - 代码查看", "/SysTable/TableList/TbDCI?tbid=" + tbid, '100%', '100%', '0px', '0px', null, null);
+        });
+
+        //检测
+        $("#btnCheck").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open($("#TbName").val() + " - 检测", "/SysTable/TableList/Warn?idsStr=" + tbid + "&from=code", '100%', '100%', '0px', '0px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //重新生成
+        $("#btn49").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                //个人用户
+                if ($("#AppId").val().indexOf('B1') > -1) {
+                    exUtils.ajax("/SysTable/TbCodeBuild/GetMsg", "post", { idsStr: tbid }, true).done(function (response) {
+                        layer.confirm(response.message, {
+                            btn: ['继续', '取消']
+                        }, function () {
+                            Release(tbid);
+                        }, function () {
+                            layer.msg('操作已取消');
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                }
+                else {
+                    Release(tbid);
+                }
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //生成并下载
+        $("#btn98").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            else {
+                var tbid = $("#TbId").val();
+                if ($("#ParentId").val() == "") {
+                    //个人用户
+                    if ($("#AppId").val().indexOf('B1') > -1) {
+                        exUtils.ajax("/SysTable/TbCodeBuild/GetMsg", "post", { idsStr: tbid }, true).done(function (response) {
+                            layer.confirm(response.message, {
+                                btn: ['继续', '取消']
+                            }, function () {
+                                DownloadCode(tbid);
+                            }, function () {
+                                layer.msg('操作已取消');
+                            });
+                        }).fail(function (error) {
+                            console.log(error);
+                        });
+                    }
+                    else {
+                        DownloadCode(tbid);
+                    }
+                }
+                else {
+                    layer.msg("请选择主表");
+                }
+            }
+        });
+
+        //彻底删除
+        $("#btn43").click(function () {
+            exLayer.confirm("<span style='color: red;' >将删除录入表,如果该录入表是主表将删除该主表包含的子表，录入表数据及为该录入表所做的配置信息将被完全删除，并且不可恢复，确定删除吗？</span>", function () {
+                var tbid = $("#TbId").val();
+                exUtils.ajax("/SysTable/TbBasic/DeletTbAll", "post", { tbid: $("#TbId").val() }, true).done(function (data) {
+                    tree.reload('treeTb', { data: eval('(' + getData() + ')') });
+                    $("#TbId").val("");
+                    $("#flowType").val("");
+                    $("#FlowId").val("");
+                    $("#TbName").val("");
+                    $("#ParentId").val("");
+                    $("#divInfo").hide();
+                    $("#divshow").show();
+                    exUtils.tableSuccessMsg('删除成功！');
+                }).fail(function (error) {
+                    console.log(error);
+                });
+                return false;
+            })
+        });
+
+        //数据导入
+        $("#btn41").click(function () {
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                exLayer.open("数据导入", "/SysTable/ImportData/ImportDataFromExcel?tbid=" + tbid, openWH[0] + 'px', openWH[1] + 'px', openWH[2] + 'px', openWH[3] + 'px', null, null);
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        //数据导出
+        $("#btn412").click(function () {
+            var tbid = $("#TbId").val();
+            exUtils.ajax("/SysTable/ExportData/ExportData", "get", { tbid: tbid }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['250', '100px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        });
+
+        //模式切换
+        $("#btn92").click(function () {
+            if ($("#isAux").val() == "1") {
+                layer.msg("辅助表无需设置");
+                return false;
+            }
+            var tbid = $("#TbId").val();
+            if ($("#ParentId").val() == "") {
+                var modelType;
+                $.ajax({
+                    url: "/SysTable/TbBasic/GetModelType",
+                    type: "get",
+                    data: { tbId: tbid },
+                    dataType: "json",
+                    async: false,
+                    success: function (result) {
+                        modelType = result;
+                    }
+                });
+
+                if (modelType == "0") {
+                    layer.msg("未建立菜单或者链接路径录入错误");
+                    return false;
+                }
+
+                //模式？0不确定1发布模式2调试模式
+                if (modelType == "1") {
+                    layer.confirm("当前为『发布模式』，设置修改后『重新生成』将按照最新设置运行程序<br>启用『调试模式』，系统将自动修改录入表链接路径，自动将前端文件（后缀为cshtml）中的『/_TB/』修改为『/类名/』。<br>启用『调试模式』后需将下载的代码文件中后缀为.cs文件放在AppCreatCode文件夹中，刷新菜单，地址显示为『.../去除tb_前缀的录入表编码』，将按照『调试模式』运行，启用『调试模式』可使用代码调式功能", {
+                        title: ['模式切换'],
+                        btn: ['启动调试模式', '取消'],
+                        yes: function () {
+                            exUtils.ajax("/SysTable/TbSetUp/ChangeModel", "post", { idsStr: tbid, isRelease: '' }, true).done(function (response) {
+                                layer.closeAll();
+                            }).fail(function (error) {
+                                console.log(error);
+                            });
+                        }
+                    });
+                    return false;
+                }
+
+                if (modelType == "2") {
+                    layer.confirm("当前为『调式模式』<br>启动『发布模式』，系统将自动修改链接路径；自动将前端文件（后缀为cshtml）中的『/类名/』修改为『/_TB/』<br>菜单地址显示为『.../_TB?tbid=表编码』，将按照『发布模式』运行", {
+                        title: ['模式切换'],
+                        btn: ['启动发布模式', '取消'],
+                        yes: function () {
+                            exUtils.ajax("/SysTable/TbSetUp/ChangeModel", "post", { idsStr: tbid, isRelease: 'release' }, true).done(function (response) {
+                                layer.closeAll();
+                            }).fail(function (error) {
+                                console.log(error);
+                            });
+                        }
+                    });
+                    return false;
+                }
+            }
+            else {
+                layer.msg("请选择主表");
+            }
+        });
+
+        function DownloadCode(tbid) {
+            exUtils.ajax("/SysTable/TbCodeBuild/DownloadCode", "post", { idsStr: tbid }, true).done(function (response) {
+                layer.open({
+                    title: response.message
+                    , type: 1
+                    , area: ['400', '180px']
+                    , content: response.extra
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+        };
+
+        function Release(tbid) {
+            layer.confirm("『重新生成』将启动『发布模式』，确定要继续吗？<br/>『重新生成』将会自动更新替换Views文件夹中cshtml文件及wwwroot/Reports、wwwroot/Self_JS文件夹中的rdlc和js文件，如有必要请手动|设置自动备份以上文件（备份通过录入表管理/代码管理操作）<br/>由于动态更新了js文件，生成后可能不跳转到自动检测页面，点击『检测』按钮可完成检测功能。（关闭vs热重载可避免生成后不跳转到自动检测页面）<br/>备注：生成后再运行时需考虑清理浏览器缓存(尤其当有子表时)", {
+                title: ['重新生成'],
+                btn: ['生成', '取消'],
+                yes: function () {
+                    var isTemp = "n";
+                    if ($('#isTemp').is(':checked')) {
+                        isTemp = "y";
+                    }
+                    exUtils.ajax("/SysTable/TbRelease/SingleRelease", "post", { idsStr: tbid }, true).done(function (response) {
+                        exLayer.greenTickMsg(response.message, function () {
+                            exLayer.open("生成成功！检测出可能存在的问题", "/SysTable/TableList/Warn?idsStr=" + tbid, '100%', '100%', '0px', '0px', null, null);
+                        });
+                    }).fail(function (error) {
+                        console.log(error);
+                    });
+                },
+                btn2: function () {
+
+                }
+            });
+        };
+
+        function getData() {
+            var data;
+            $.ajax({
+                url: "/SysTable/TableList/GetTableTree",
+                type: "post",
+                async: false,
+                success: function (result) {
+                    data = result.extra;
+                }
+            });
+            return data;
+        };
+
+        function getTbInfo(tbid) {
+            if (tbid != "") {
+                $("#CreateTime").val("");
+                $("#TbId").val("");
+                $("#TbName").val("");
+                $("#divInfo").hide();
+                $("#divshow").hide();
+
+                $("#divInfo").show();
+                exUtils.ajax("/SysTable/TbBasic/GetModel", "post", { tbid: tbid }, true).done(function (data) {
+                    var obj = JSON.parse(data.extra);
+
+                    $("#CreateTime").val(obj.createUser + ' ' + obj.createTime);
+
+                    $("#CreateCount").html(obj.CreateCount);
+
+                    $("#indexCount").html(obj.indexCount);
+                    $("#TbRelationCount").html(obj.TbRelationCount);
+                    $("#TbRelationCount11").html(obj.TbRelationCount11);
+                    $("#TbRelationCount21").html(obj.TbRelationCount21);
+                    $("#TbRelationCount31").html(obj.TbRelationCount31);
+                    $("#ValueCheckCount").html(obj.ValueCheckCount);
+                    $("#HiddenIndexCount").html(obj.HiddenIndexCount);
+                    $("#EventCount").html(obj.EventCount);
+                    $("#ButCount").html(obj.ButCount);
+
+                    $("#TbTempletCount").html(obj.TempletCount);
+                    $("#TbTempDirectoryCount").html(obj.TempDirectoryCount);
+
+                    $("#BtnCustomizeCount").html(obj.BtnCustomizeCount);
+
+                    $("#_Check").html('');
+
+                    $("#IsDataTableExists").html('');
+                    if (obj.IsDataTableExists == '{N}') {
+                        $("#IsDataTableExists").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        if (obj.isAux == '2' && obj.ParentId == '') {
+                            $("#_Check").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        }
+                    }
+
+                    $("#IsModuleExists").html('');
+                    if (obj.IsModuleExists == '{N}' && obj.isAux == '2' && obj.ParentId == '') {
+                        $("#IsModuleExists").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        $("#_Check").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                    }
+
+                    $("#_indexCount").html('');
+                    if (obj.indexCount == '(0)') {
+                        $("#_indexCount").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        if (obj.isAux == '2' && obj.ParentId == '') {
+                            $("#_Check").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        }
+                    }
+
+                    $("#IsFileExists").html('');
+                    if (obj.IsFileExists == 'N' && obj.isAux == '2' && obj.ParentId == '') {
+                        $("#IsFileExists").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                        $("#_Check").html("<span style='color: red;'><i class='fa fa-exclamation'></i></span>&nbsp;");
+                    }
+
+                    $("#IsTbJson").html('');
+                    if (obj.IsTbJson == 'N' && obj.isAux == '2' && obj.ParentId == '') {
+                        $("#IsTbJson").html("<span style='color: red;'><i class='fa fa-question'></i></span>&nbsp;");
+                    }
+
+                    $("#TbId").val(obj.TbId);
+                    $("#ParentId").val(obj.ParentId);
+                    $("#isAux").val(obj.isAux);
+                    $("#flowType").val(obj.flowType);
+                    $("#FlowId").val(obj.FlowId);
+                    if (obj.ParentId != '') {
+                        $("#TbName").val(obj.TbName + "{子表}");
+
+                        if (!layui.device().mobile) {
+                            $("#btn14").attr("href", "/SysTable/TbSetUp/TbJson?tbid=" + obj.ParentId + "&isAux=2");
+                        }
+                    }
+                    else {
+                        if (!layui.device().mobile) {
+                            $("#btn14").attr("href", "/SysTable/TbSetUp/TbJson?tbid=" + obj.TbId + "&isAux=" + obj.isAux);
+                        }
+
+                        if (obj.isAux == '1') {
+                            $("#TbName").val(obj.TbName + "{辅助表}");
+                        }
+                        else {
+                            if (obj.isInfo == '1') {
+                                $("#TbName").val(obj.TbName + "{主表 基础信息表}");
+                            }
+                            else {
+                                if (obj.flowType == '1') {
+                                    $("#TbName").val(obj.TbName + "{主表 固定流程}");
+                                }
+                                else {
+                                    $("#TbName").val(obj.TbName + "{主表 自由流程}");
+                                }
+                            }
+                        }
+                    }
+
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            }
+        };
+
+        $(document).ready(function () {
+            if (layui.device().mobile) {
+                $("#divTOP").attr("class", "layui-col-xs12");
+                $("#div_Tree").attr("style", "position: relative;top: -20px;");
+                $("#tbTree").height(200);
+
+                $(".layui-col-xs6").attr("style", "padding-top: 10px;");
+
+                $("#sort").attr("style", "display:none");
+
+                var display = $('#divInfo').css('display');
+                if (display == 'none') {
+
+                }
+                else {
+                    $("#divInfo").attr("style", "padding-top: 0px;");
+                }
+
+                $("#add01").html('<i class="fa fa-plus"></i>主表');
+                $("#add02").html('<i class="fa fa-plus"></i>子表');
+                $("#add03").html('<i class="fa fa-plus"></i>辅助表');
+            }
+            else {
+                $("#div_Tree").attr("style", "position: relative;top: -60px;");
+                $("#tbTree").height(openWH[1] - 20);
+                $(".layui-border-black").attr("style", "display:none");
+            }
+        });
+    });
+</script>

@@ -1,0 +1,84 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = @ViewBag.tbid + "统计表检测";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<form class="layui-form">
+    <input style="display: none" name="tbid" id="tbid" value="@ViewBag.tbid">
+    <input style="display: none" name="from" id="from" value="@ViewBag.from">
+    <!--数据表格-->
+    <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+</form>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/Report/GetWarnList?idsStr=" + $("#tbid").val() + "&from=" + $("#from").val(),
+            page: false,
+            method: "post",
+            defaultToolbar: [{ title: '刷新', layEvent: 'refresh', icon: 'layui-icon-refresh' }, 'exports', 'filter'],
+            toolbar: "#toolbarTpl",
+            cols: [[
+                { field: "level", title: "类别", width: 80, sort: true },
+                { field: "tbid", title: "统计表编码", width: 120, sort: true },
+                { field: "indexid", title: "指标编码", width: 120, sort: true },
+                { field: "postion", title: "行列", width: 150, sort: true },
+                { field: "Content", title: "备注", sort: true, templet: "#Content" },
+                { field: "Detial", title: "详细", width: 60, align: "center" }
+            ]],
+            text: {
+                none: '无记录'
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+                case "refresh":
+                    ThisTable.reload({
+                        url: "/SysStats/Report/GetWarnList?idsStr=" + $("#tbid").val() + "&from=" + $("#from").val(),
+                        page: { curr: 1 }
+                    });
+                    break;
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "detial":
+                    getDetial(data.Detial);
+                    break;
+
+            }
+        });
+
+        function getDetial(id) {
+            exLayer.open('详细', '/SysStats/Report/WarnDetails?tbid=' + id, '100%', '100%', '0px', '0px', null, null);
+        }
+    })
+</script>
+<script type='text/html' id='Content'>
+    {{#  if(d.level == 'err'){ }}
+    <span style="color: #FE7300;">{{d.Content}}</span>
+    {{#  }else{ }}
+    {{d.Content}}
+    {{#  } }}
+</script>
+<script type='text/html' id='Detial'>
+    {{#  if(d.Detial != '' && d.Detial != null){ }}
+    <a href='javascript:;' class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detial" id="detial"><i class="fa fa-code"></i></a>
+    {{#  }else{ }}
+    {{#  } }}
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operation_Tpl">
+</script>

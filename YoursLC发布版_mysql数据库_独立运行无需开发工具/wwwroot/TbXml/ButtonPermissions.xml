@@ -1,0 +1,13 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="审核" horAlignment="None" verAlignment="None" Selectable="True">审核</lab>
+			<drop x="130" y="30" width="280" height="30"  txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inAuditing" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">inAuditing</drop>
+			<lab x="420" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="省" horAlignment="None" verAlignment="None" Selectable="True">省</lab>
+			<drop x="540" y="30" width="280" height="30"  txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inProvince" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">inProvince</drop>
+			<lab x="10" y="75" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="小数04" horAlignment="None" verAlignment="None" Selectable="True">小数04</lab>
+			 <textField x="130" y="75" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inXS04" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inXS04</textField>
+		</staticContent>
+	</content>
+</daReport>

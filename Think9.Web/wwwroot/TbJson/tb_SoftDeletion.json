@@ -1,0 +1,39 @@
+﻿[
+    {
+        "index": 0,
+        "tag": "note",
+        "name": "note_0",
+        "textarea": "录入表基本属性勾选软删除，将不删除数据，只将state字段修改为-1",
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "input",
+        "name": "inCoding",
+        "label": "编码",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入编码",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 2,
+        "tag": "input",
+        "name": "inName",
+        "label": "名称",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入名称",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    }
+]

@@ -1,0 +1,133 @@
+﻿[
+    {
+        "index": 3,
+        "tag": "note",
+        "name": "note_3",
+        "textarea": "一般录入表分为自由流程表和固定流程表，固定流程指流程步骤预先设定。每一个流程步骤都设置对控件的编辑权限",
+        "width": 100
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_1",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 5,
+                        "tag": "date",
+                        "name": "inDate",
+                        "label": "日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 3,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 4,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "不可编辑",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 1,
+        "tag": "note",
+        "name": "note_1",
+        "textarea": "可写子表",
+        "width": 100
+    },
+    {
+        "index": 0,
+        "tag": "gridtable",
+        "name": "tb_Subtable01",
+        "label": "子表",
+        "labelwidth": 110,
+        "labelhide": true,
+        "width": 100
+    },
+    {
+        "index": 1,
+        "tag": "note",
+        "name": "note_1t",
+        "textarea": "不可写子表",
+        "width": 100
+    },
+    {
+        "index": 4,
+        "tag": "gridtable",
+        "name": "tb_Subtable02",
+        "label": "子表",
+        "labelwidth": 110,
+        "labelhide": true,
+        "width": 100
+    }
+]

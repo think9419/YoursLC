@@ -1,0 +1,12 @@
+﻿<daReport papersize="XSmaller" layout="Portrait">
+	<margins left="5" top="5" right="5" bottom="5" />
+	<content>
+		<staticContent>
+			<lab x="10" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="编号" horAlignment="None" verAlignment="None" Selectable="True">编号</lab>
+			 <textField x="130" y="30" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inNumber" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inNumber</textField>
+			<lab x="420" y="30" width="115" height="30" txthorAlignment="Right" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" labtext="上报日期" horAlignment="None" verAlignment="None" Selectable="True">上报日期</lab>
+			 <textField x="540" y="30" width="280" height="30" txthorAlignment="Left" txtverAlignment="Middle" fontFamily="微软雅黑 Light" fontSize="10" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="0" borderColor="Control" field="inReportDate" parameter="" horAlignment="None" verAlignment="None" Selectable="True">inReportDate</textField>
+			<table2 x="10" y="75" width="960" height="150" txthorAlignment="Left" txtverAlignment="Top" fontFamily="微软雅黑 Light" fontSize="9" fontStyle="Regular" foreGroundColor="Black" backGroundColor="White" borderWidth="1" borderColor="Control" field="tb_B2WriteBackSubTable" parameter="" DisplayFormt="" horAlignment="None" verAlignment="None" Selectable="True">tb_B2WriteBackSubTable</table2>
+		</staticContent>
+	</content>
+</daReport>

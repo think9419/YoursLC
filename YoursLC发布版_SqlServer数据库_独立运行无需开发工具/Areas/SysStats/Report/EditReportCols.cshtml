@@ -1,0 +1,165 @@
+﻿@using Think9.Models;
+@{ ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml"; }
+
+<input style="display: none" id="rpId" value="@ViewBag.rpId">
+<input style="display: none" id="frm" value="@ViewBag.frm">
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/Report/GetColsList?rpId=" + $("#rpId").val(),
+            method: "post",
+            page: false,
+            cols: [[
+                { field: "ColNum", title: "序号", align: "center" },
+                { title: "操作", width: 360, align: "center", fixed: layui.device().mobile ? null : 'right', templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("toolbar(tableFilter)", function (obj) {
+            switch (obj.event) {
+
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "addFront":
+                    addFront(data.ColNum);
+                    break;
+                case "addBehind":
+                    addBehind(data.ColNum);
+                    break;
+                case "del":
+                    del(data.ColNum);
+                    break;
+            }
+        });
+
+        function addBehind(num) {
+            exUtils.ajax("/SysStats/Report/InsertReportColsBehind", "post", { rpId: $("#rpId").val(), num: num }, true).done(function (response) {
+
+                exUtils.tableSuccessMsg(response.message);
+                if ($("#frm").val() == 'list') {
+                    $(window.parent.document).find("#colsNum").val(response.extra);
+                    var lists = response.list;
+                    if (lists != null) {
+                        for (var item in lists) {
+                            var _value = lists[item].ControlValue;
+                            var _id = lists[item].ControlID;
+                            /*$("#" + _id).val(_value);*/
+                            $(window.parent.document).find("#" + _id).val(_value);
+                            /*  alert(_id + " " + _value);*/
+                        }
+                    }
+
+                    parent.layui.table.reload('tableId', { url: "/SysStats/ReportRows/GetList?rpId=" + $(window.parent.document).find("#rpId").val() });
+                }
+
+                if ($("#frm").val() == 'edit') {
+                    parent.layui.table.reload('tableId', { url: "/SysStats/Report/GetReportColList?rpId=" + $(window.parent.document).find("#ReportId").val() });
+                }
+
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function addFront(num) {
+            exUtils.ajax("/SysStats/Report/InsertReportColsFront", "post", { rpId: $("#rpId").val(), num: num }, true).done(function (response) {
+
+                exUtils.tableSuccessMsg(response.message);
+                if ($("#frm").val() == 'list') {
+                    $(window.parent.document).find("#colsNum").val(response.extra);
+                    var lists = response.list;
+                    if (lists != null) {
+                        for (var item in lists) {
+                            var _value = lists[item].ControlValue;
+                            var _id = lists[item].ControlID;
+                            /*$("#" + _id).val(_value);*/
+                            $(window.parent.document).find("#" + _id).val(_value);
+                            /*  alert(_id + " " + _value);*/
+                        }
+                    }
+
+                    parent.layui.table.reload('tableId', { url: "/SysStats/ReportRows/GetList?rpId=" + $(window.parent.document).find("#rpId").val() });
+                }
+
+                if ($("#frm").val() == 'edit') {
+                    parent.layui.table.reload('tableId', { url: "/SysStats/Report/GetReportColList?rpId=" + $(window.parent.document).find("#ReportId").val() });
+                }
+
+                parent.layer.close(parent.layer.getFrameIndex(window.name));
+            }).fail(function (error) {
+                console.log(error);
+            });
+        }
+
+        function del(num) {
+            exLayer.confirm("确定要移除列吗？", function () {
+                exUtils.ajax("/SysStats/Report/DelReportCols", "post", { rpId: $("#rpId").val(), num: num }, true).done(function (response) {
+                    exUtils.tableSuccessMsg(response.message);
+                    if ($("#frm").val() == 'list') {
+                        $(window.parent.document).find("#colsNum").val(response.extra);
+                        var lists = response.list;
+                        if (lists != null) {
+                            for (var item in lists) {
+                                var _value = lists[item].ControlValue;
+                                var _id = lists[item].ControlID;
+                                $(window.parent.document).find("#" + _id).val(_value);
+                            }
+                        }
+
+                        parent.layui.table.reload('tableId', { url: "/SysStats/ReportRows/GetList?rpId=" + $(window.parent.document).find("#rpId").val() });
+                    }
+
+                    if ($("#frm").val() == 'edit') {
+                        parent.layui.table.reload('tableId', { url: "/SysStats/Report/GetReportColList?rpId=" + $(window.parent.document).find("#ReportId").val() });
+                    }
+
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                }).fail(function (error) {
+                    console.log(error);
+                });
+            })
+        }
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="addFront">列{{d.ColNum}}前插入</a>
+    <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="addBehind">列{{d.ColNum}}后插入</a>
+    <a href="javascript:;" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" lay-tips='删除列{{d.ColNum}}'>移除列{{d.ColNum}}</a>
+</script>

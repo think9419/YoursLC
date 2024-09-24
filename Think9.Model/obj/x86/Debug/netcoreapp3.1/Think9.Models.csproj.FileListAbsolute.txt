@@ -1,0 +1,13 @@
+D:\AAA_Yourslc\Think9.Model\bin\x86\Debug\netcoreapp3.1\Think9.Models.deps.json
+D:\AAA_Yourslc\Think9.Model\bin\x86\Debug\netcoreapp3.1\Think9.Models.dll
+D:\AAA_Yourslc\Think9.Model\bin\x86\Debug\netcoreapp3.1\Think9.Models.pdb
+D:\AAA_Yourslc\Think9.Model\bin\x86\Debug\netcoreapp3.1\Think9.Dapper.dll
+D:\AAA_Yourslc\Think9.Model\bin\x86\Debug\netcoreapp3.1\Think9.Dapper.pdb
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.csproj.AssemblyReference.cache
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.GeneratedMSBuildEditorConfig.editorconfig
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.AssemblyInfoInputs.cache
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.AssemblyInfo.cs
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.csproj.CoreCompileInputs.cache
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.csproj.CopyComplete
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.dll
+D:\AAA_Yourslc\Think9.Model\obj\x86\Debug\netcoreapp3.1\Think9.Models.pdb

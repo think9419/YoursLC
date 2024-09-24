@@ -1,0 +1,169 @@
+﻿@using Think9.Models;
+@model Think9.Models.RuleTreeEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form">
+    <div class="layui-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label required">名 称</label>
+            <div class="layui-input-block">
+                <input type="text" name="Name" placeholder="必填 请输入名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength='50'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">取值数据表</label>
+            <div class="layui-input-block">
+                <select id="TbId" name="TbId" lay-filter="selectfilter" lay-verify="required" lay-search=''>
+                    <option value="">==需首先选择 -  从数据字典取值、已定义的录入表(主表)或已创建的视图取值==</option>
+                    <optgroup label="从数据字典取值">
+                        @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("#dict#")))
+                        {
+
+                            <option value="@item.Value">数据字典{@item.Text}</option>
+                        }
+                    </optgroup>
+                    <optgroup label="从已定义的录入表(主表)取值 未创建数据表的录入表不能取值">
+                        @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.SelectSourceList).FindAll(x => x.ClassID.Equals("#table#")))
+                        {
+
+                            <option value="@item.Value">@item.Text</option>
+                        }
+                    </optgroup>
+                </select>
+                <tip>
+                    <span style="color: #FE7300;">
+                        需首先选择
+                    </span>
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">Value字段</label>
+            <div class="layui-input-block">
+                <select id="ValueFiled" name="ValueFiled" lay-verify="required">
+                    <option value="">==请选择 需先选择取值数据表==</option>
+                </select>
+                <tip>
+                    作为下拉框、单选按钮等组件的value值，根据Value字段前缀按层次显示数据，如3个选项Value分别为 A，A01， A011，将显示为╋选项1，---├『选项2』，------├『选项3』
+                </tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">Text字段</label>
+            <div class="layui-input-block">
+                <select id="TxtFiled" name="TxtFiled" lay-verify="required">
+                    <option value="">==请选择 需先选择取值数据表==</option>
+                </select>
+                <tip>作为下拉框、单选按钮等组件的Text值</tip>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-row">
+                <div class="layui-col-md10">
+                    <label class="layui-form-label required">排序字段</label>
+                    <div class="layui-input-block">
+                        <select id="OrderFiled" name="OrderFiled" lay-verify="required">
+                            <option value="">==请选择 需先选择取值数据表==</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-col-md2" align="left">
+                    <div class="layui-input-block">
+                        <input type="hidden" name="OrderType" value="1">
+                        <input type="checkbox" id="OrderType" name="OrderType" value="2" title="倒序">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="padding-top:10px;">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add">新建树形选择</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "layer"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let tableSelect = layui.tableSelect;
+        let layer = layui.layer;
+
+        let $ = layui.$;
+
+        form.render(); //
+
+        form.verify({
+            name: function (value, item) {
+                if (!new RegExp("^[\u4e00-\u9fa5_a-zA-Z0-9]+$").test(value)) {
+                    return '名称由汉字、数字、字母、下划线组成，不得包含其他字符';
+                }
+            }
+        });
+
+        //监听的元素有select(选中) ，checkbox（勾选）,swich(开关),radio(选择),submit(提交)
+        form.on('select(selectfilter)', function (data) {
+            var loading = layer.load('Loading...', {
+                shade: [0.1, '#fff']
+            });
+
+            setTimeout(function () {
+                GetSelectValueFieldByTb(data.value);
+                GetSelectTxtFieldByTb(data.value);
+                GetSelectOrderFieldByTb(data.value);
+
+                layer.close(loading);
+            }, 2000);
+        })
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysTable/RuleTree/Add", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    $(window.parent.document).find('#search').click();
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        function GetSelectValueFieldByTb(id) {
+            var controlid = "#ValueFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/RuleTree/GetSelectValueFieldByTb", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        function GetSelectTxtFieldByTb(id) {
+            var controlid = "#TxtFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/RuleTree/GetSelectTxtFieldByTb", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+
+        function GetSelectOrderFieldByTb(id) {
+            var controlid = "#OrderFiled";
+            $("" + controlid + "").empty(); //清空控件
+            $.getJSON("/SysTable/RuleTree/GetSelectOrderFieldByTb", { id: id }, function (data) {
+                $.each(data, function (i, item) {
+                    $("" + controlid + "").append(new Option(item.Text, item.Value));
+                });
+                form.render();//不加下拉框可能不正确显示
+            });
+        }
+    });
+</script>

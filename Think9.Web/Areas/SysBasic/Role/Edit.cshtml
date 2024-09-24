@@ -1,0 +1,61 @@
+﻿@model Think9.Models.RoleEntity
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form" lay-filter="formUser">
+    @*一些不需要更新的隐藏字段*@
+    @Html.HiddenFor(x => x.Id)
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="EnCode" placeholder="角色编码" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">角色名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="FullName" placeholder="角色名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="30">
+        </div>
+    </div>
+    <div class="layui-form-item">
+
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="2">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn" lay-submit lay-filter="add">编辑角色</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        //赋值
+        form.val("formUser", {
+            "EnCode": "@Model.EnCode",
+            "FullName": "@Model.FullName",
+            "OrderNo": "@Model.OrderNo"
+        });
+
+        form.on("submit(add)", function (data) {
+            exUtils.ajax("/SysBasic/Role/Edit", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/Role/List" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

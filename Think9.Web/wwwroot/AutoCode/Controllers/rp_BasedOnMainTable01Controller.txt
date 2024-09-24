@@ -1,0 +1,110 @@
+﻿/*******************************************************************************
+ * Creator:admin 2024-09-24 13:35:17
+ * Description: Think9企业级开发工具 http://yourslc.top Service类
+*********************************************************************************/
+
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Think9.Models;
+using Think9.Services.Base;
+using Think9.Services.Basic;
+using Think9.Services.Com;
+using Think9.Services.CodeBuild;
+
+namespace Think9.Controllers.CodeBuild
+{
+    /// <summary>
+    /// Controller
+    /// </summary>
+    public partial class BasedOnMainTable01Controller : BaseController
+    {
+        private ComService comService = new ComService();
+        private BasedOnMainTable01Service rpBasedOnMainTable01 = new BasedOnMainTable01Service();
+        private readonly string _rpid = "rp_BasedOnMainTable01";//统计表编码
+        private readonly string _rpname = "基于主表";//统计表名称
+        //当前用户 可统一修改
+        private CurrentUserEntity GetUser()
+        {
+            return GetCurrentUser();
+        }
+
+        /// <summary>
+        /// 调试模式下点击左侧菜单触发，菜单链接路径为去除rp_前缀的统计表编码
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override ActionResult Index(int? id)
+        {
+            object param = BasicHelp.GetParamObject(GetUser());//系统参数可作为数据规范的条件参数
+            ViewBag.SelectList = rpBasedOnMainTable01.GetSelectList("list", param);//查询条件有下拉框时为下拉选项赋值
+            return base.Index(id);
+        }
+
+        /// <summary>
+        /// 显示数据,从其他页面打开
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public ActionResult Show()
+        {
+            object param = BasicHelp.GetParamObject(GetUser());//系统参数可作为数据规范的条件参数
+            ViewBag.SelectList = rpBasedOnMainTable01.GetSelectList("list", param);//查询条件有下拉框时为下拉选项赋值
+            return View(rpBasedOnMainTable01.GetModel(HttpContext.Request));
+        }
+
+        /// <summary>
+        /// 数据查询，列表页面点击查询按钮触发
+        /// </summary>
+        /// <param name="controlList">查询条件</param>
+        /// <param name="pageInfo">页面信息，包括行数、排序等</param>
+        /// <returns></returns>
+        [HttpPost]
+        public JsonResult GetPageList(IEnumerable<ControlEntity> controlList, PageInfoEntity pageInfo)
+        {
+            long total = 0;
+            try
+            {
+                List<dynamic> list = rpBasedOnMainTable01.GetListForPage(ref total, controlList, pageInfo, GetUser());
+                if (list == null)
+                {
+                    return Json(new { msg = "<span>数据列表为空，可能存在错误</span>", count = -1 });
+                }
+                else
+                {
+                    var result = new { code = 0, msg = "", count = total, data = list };
+                    return Json(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                Record.AddErr("", _rpid, "BasedOnMainTable01Controller:GetPageList", ex);
+                return Json(new { msg = ex.Message, count = -1 });
+            }
+        }
+
+        /// <summary>
+        /// 导出EXCEL,点击导出按钮触发
+        /// </summary>
+        /// <param name="controlList">查询条件</param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult ExportData(IEnumerable<ControlEntity> controlList)
+        {
+            string err = "";
+            string newFileName = System.Guid.NewGuid().ToString("N") + ".xlsx";
+            string sourcePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\TempFile\\" + newFileName);
+
+            RdlcDeviceEntity device = rpBasedOnMainTable01.GetRdlcDevice(_rpid, _rpname, controlList);
+            byte[] _byte = RDLCReport.ExportExcelList(ref err, device);
+            if (!string.IsNullOrEmpty(err))
+            {
+                return Json(ErrorTip(err));
+            }
+            Think9.Util.Helper.FileHelper.CreateFile(sourcePath, _byte);
+            string url = "<br><br><div class=\"layui-form-item\" style=\"text-align: center;width: 200px;\"><a href='../TempFile/" + newFileName + "' target ='_blank' class='layui-btn'>点击下载</a></div>";
+            return Json(SuccessTip("", url));
+        }
+    }
+}

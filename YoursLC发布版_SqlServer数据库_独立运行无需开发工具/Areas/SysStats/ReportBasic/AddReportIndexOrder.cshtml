@@ -1,0 +1,95 @@
+﻿@using Think9.Models;
+@model Think9.Models.ReportIndexOrderEntity
+@{
+    ViewBag.Title = "Add";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<form class="layui-form layui-form-pane" lay-filter="formUser">
+    <input style="display:none" id="ReportId" value="@ViewBag.rpId">
+    <input style="display:none" id="_tbid" value="@ViewBag.tbid">
+    <div class="layui-form">
+        <div class="layui-form-item" id="divIndexId">
+            <label class="layui-form-label required">选择</label>
+            <div class="layui-input-block">
+                <select name='IndexId' id="IndexId" lay-filter='IndexList'>
+                    <option value="">== 请选择 ==</option>
+                    @foreach (valueTextEntity item in ((List<valueTextEntity>)ViewBag.FieldList).FindAll(x => x.ClassID.Equals("valuetext")))
+                    {
+
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">方式</label>
+            <div class="layui-input-block">
+                <select name="OrderType" id="OrderType">
+                    <option value="1">正序</option>
+                    <option value="2">倒序</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label required">序号</label>
+            <div class="layui-input-block">
+                <input type='text' name='OrderNo' id='OrderNo' autocomplete='off' class='layui-input' maxlength='3' lay-verify='required|integer' placeholder='请输入序号'>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit lay-filter="add" id="add">添加</button>&nbsp;
+                <input type="checkbox" id="continue" title="连续添加">
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "exLayer", "exUtils", "table"], function () {
+        let form = layui.form;
+        let layer = layui.layer;
+        let table = layui.table;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render();
+
+        //点击保存按钮
+        form.on("submit(add)", function (data) {
+            var _sort = $('input:radio[name="IndexType"]:checked').val();
+            var _index = $("#IndexId").val();
+            var _tbid = $("#_tbid").val();
+            exUtils.ajax("/SysStats/ReportBasic/AddReportIndexOrder", "post", { model: data.field, rpId: $("#ReportId").val(), tbid: _tbid, index: _index }, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableOrder', { url: "/SysStats/ReportBasic/GetReportIndexOrderList?rpId=" + $("#ReportId").val() + "&tbid=" + $("#_tbid").val() });
+                    if ($("#continue").is(':checked')) {
+                        var _OrderNo = Number($("#OrderNo").val()) + 1;
+                        $("#OrderNo").val(_OrderNo);
+                    }
+                    else {
+                        parent.layer.close(parent.layer.getFrameIndex(window.name));
+                    }
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+
+        //消息提示
+        $(document).on("mouseenter", "*[lay-tips]", function () {
+            var remind = $(this).attr("lay-tips");
+            var tips = $(this).data("offset") || 4;
+            var color = $(this).data("color") || '#88858e';
+            layer.tips(remind, this, {
+                time: -1,
+                tips: [tips, color],
+                area: ['auto', 'auto'],
+            });
+        }).on("mouseleave", "*[lay-tips]", function () {
+            layer.closeAll("tips");
+        });
+    });
+</script>

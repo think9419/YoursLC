@@ -1,0 +1,122 @@
+﻿@using Think9.Models;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiList.cshtml";
+}
+
+<input style="display:none" id="tbid" value="@ViewBag.tbid">
+<input style="display:none" id="formid" value="@ViewBag.formid">
+<div class="layui-collapse" lay-filter="test" lay-accordion>
+    <div class="layui-colla-item">
+        <h2 class="layui-colla-title"><span style='color: #FE7300;'><i class="fa fa-question"></i></span></h2>
+        <div class="layui-colla-content">
+            <p>校验式由指标值、SQL函数、四则运算符(加减乘除及括号)、数字组成</p>
+            <p>1.校验式左右需最终转化为数字，即校验式不能进行字符或者日期比较</p>
+            <p>2.日期比较可使用 左侧：DATEDIFF('表编码.指标编码1.Value', '表编码.指标编码2.Value')；右侧：数字如1</p>
+            <p>3.主表编码.指标编码.Length-表示指标字符长度，主表编码.指标编码.Value-表示指标数值</p>
+            <p>4.子表编码.指标编码.Length-表示当前行指标字符长度，子表编码.指标编码.Value-表示当前行指标数值</p>
+            <p>5.子表编码.指标编码[行号].Length-表示该行(行号)指标字符长度，子表编码.指标编码[行号].Value-表示该行(行号)指标数值，如tb_tb001.v2[3].Value表示第二列(v2)第3行([3])指标数值，备注：如果子表采用增加/删除按钮在右侧，增加行行号为0</p>
+        </div>
+    </div>
+</div>
+<br />
+
+<form class="layui-form" action="" id="_formid">
+    <div class="layui-form-item">
+        <div class="layui-block">
+            <textarea class='layui-textarea' id='formula' name='formula'>@ViewBag.some</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn01">加+</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn02">减-</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn03">乘*</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn04">除/</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn05">括号(</a>
+            <a href="javascript:;" class="layui-btn layui-btn-normal layui-btn-xs" id="btn06">括号)</a>
+        </div>
+        <div class="layui-inline">
+            <button type="button" class="layui-btn" lay-submit lay-filter="OK">确 定</button>
+        </div>
+    </div>
+</form>
+
+<table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+<script src="~/lib/layui/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(["table", "form", "exLayer", "exUtils", "element"], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        form.render();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            height: 215, //容器高度
+            url: "/SysTable/TbValueCheck/GetSelectIndexList?tbid=" + $("#tbid").val(),
+            method: "GET",
+            cols: [[
+                , { field: "Value", title: "", hide: true }
+                , { field: "Text", title: "点击选择", templet: "#operationTpl" }
+            ]],
+            done: function (res, curr, count) {
+                //console.log(res, curr, count);
+            }
+        });
+
+        table.on("tool(tableFilter)", function (obj) {
+            let data = obj.data;
+            switch (obj.event) {
+                case "select":
+                    addSelect(data.Value);
+                    break;
+            }
+        });
+
+        $('#btn01').on('click', function () {
+            addSelect(' 加 ');
+        });
+        $('#btn02').on('click', function () {
+            addSelect(' 减 ');
+        });
+        $('#btn03').on('click', function () {
+            addSelect(' 乘 ');
+        });
+        $('#btn04').on('click', function () {
+            addSelect(' 除 ');
+        });
+        $('#btn05').on('click', function () {
+            addSelect('(');
+        });
+        $('#btn06').on('click', function () {
+            addSelect(')');
+        });
+
+        form.on("submit(OK)", function (data) {
+
+            var some = $("#formula").val();
+            if ($("#formid").val() == 'left') {
+                $(window.parent.document).find("#LeftValue").val(some);
+            }
+            else {
+                $(window.parent.document).find("#RightValue").val(some);
+            }
+            parent.layer.close(parent.layer.getFrameIndex(window.name));
+        });
+
+        function addSelect(selectid) {
+            var some = $("#formula").val() + selectid;
+            $("#formula").val(some);
+        }
+    });
+</script>
+<!-- 行工具栏模板 -->
+<script type="text/html" id="operationTpl">
+    <span> <a lay-event="select" id="select"> <span>{{d.Text}}</span></a></span>
+</script>

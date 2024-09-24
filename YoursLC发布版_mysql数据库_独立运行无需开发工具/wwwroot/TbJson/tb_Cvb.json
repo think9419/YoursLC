@@ -1,0 +1,1155 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_a878e9c9f11343d0967fc725f69c2594",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 21,
+                        "tag": "date",
+                        "name": "inRQ01",
+                        "label": "日期01",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 22,
+                        "tag": "input",
+                        "name": "inZF09",
+                        "label": "字符09",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符09",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_ad10bda801e149f49208d61fb22de965",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 23,
+                        "tag": "input",
+                        "name": "inZF08",
+                        "label": "字符08",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符08",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 26,
+                        "tag": "input",
+                        "name": "inZF05",
+                        "label": "字符05",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符05",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 3,
+        "tag": "grid",
+        "name": "grid_ed307768138c4c66af93e444b0493736",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 24,
+                        "tag": "input",
+                        "name": "inZF07",
+                        "label": "字符07",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符07",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 25,
+                        "tag": "input",
+                        "name": "inZF06",
+                        "label": "字符06",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符06",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 4,
+        "tag": "grid",
+        "name": "grid_94d21ca0847e4f24bb72938f8eadde76",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 19,
+                        "tag": "file",
+                        "name": "inAttachment",
+                        "label": "附件",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 20,
+                        "tag": "date",
+                        "name": "inRQ02",
+                        "label": "日期02",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 27,
+                        "tag": "input",
+                        "name": "inZF04",
+                        "label": "字符04",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符04",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 5,
+        "tag": "input",
+        "name": "inZF03",
+        "label": "字符03",
+        "labelwidth": "110",
+        "msg": "",
+        "labelhide": false,
+        "placeholder": "请输入字符03",
+        "_default": "",
+        "width": 100,
+        "required": false,
+        "disabled": false,
+        "verify": ""
+    },
+    {
+        "index": 6,
+        "tag": "grid",
+        "name": "grid_90952c703b8945a6bd605c71e4599b2c",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 29,
+                        "tag": "input",
+                        "name": "inZF02",
+                        "label": "字符02",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符02",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 31,
+                        "tag": "input",
+                        "name": "inHideAndAssignValues",
+                        "label": "隐藏并赋值",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入隐藏并赋值",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 7,
+        "tag": "grid",
+        "name": "grid_c91c1399ddcf497ead82605eab9a4ae8",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 30,
+                        "tag": "input",
+                        "name": "inZF01",
+                        "label": "字符01",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入字符01",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 32,
+                        "tag": "date",
+                        "name": "inStorageDate",
+                        "label": "入库日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 37,
+                        "tag": "input",
+                        "name": "inOperator",
+                        "label": "经办人",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入经办人",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 8,
+        "tag": "grid",
+        "name": "grid_1e36ab03307a4ad89725dd4564e07213",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 33,
+                        "tag": "input",
+                        "name": "inWarehouse",
+                        "label": "仓库",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入仓库",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 35,
+                        "tag": "date",
+                        "name": "inPurchaseDate",
+                        "label": "采购日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 36,
+                        "tag": "input",
+                        "name": "inTotalAmount",
+                        "label": "金额合计",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入金额合计",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 9,
+        "tag": "grid",
+        "name": "grid_75f47c7393494a489f4495358c199048",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 34,
+                        "tag": "input",
+                        "name": "inWarehouseEntryNumber",
+                        "label": "入库单号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入入库单号",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 54,
+                        "tag": "input",
+                        "name": "inXS01",
+                        "label": "小数01",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数01",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 55,
+                        "tag": "input",
+                        "name": "inLockDuringEditing",
+                        "label": "编辑时锁定",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编辑时锁定",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 56,
+                        "tag": "input",
+                        "name": "inLocking",
+                        "label": "锁定",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入锁定",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 10,
+        "tag": "grid",
+        "name": "grid_8c4cd93d8ec441e2bb6b3f008e99080c",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 57,
+                        "tag": "input",
+                        "name": "inNotLocked",
+                        "label": "不锁定",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入不锁定",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 58,
+                        "tag": "img",
+                        "name": "inPicture",
+                        "label": "图片",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 59,
+                        "tag": "date",
+                        "name": "inDate",
+                        "label": "日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 11,
+        "tag": "grid",
+        "name": "grid_c9a2552695ab4501a14464c399a51574",
+        "column": "3",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 46,
+                        "tag": "input",
+                        "name": "inSuperiorCode",
+                        "label": "上级编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入上级编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 60,
+                        "tag": "input",
+                        "name": "inDropdownTree",
+                        "label": "下拉树",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入下拉树",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 61,
+                        "tag": "input",
+                        "name": "inPopUpSelection",
+                        "label": "弹出选择",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入弹出选择",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 12,
+        "tag": "grid",
+        "name": "grid_0943d3feb4fa4df3838490fe39b2556a",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 62,
+                        "tag": "input",
+                        "name": "inMultipleChoice",
+                        "label": "多选",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入多选",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 63,
+                        "tag": "input",
+                        "name": "inSingleChoice",
+                        "label": "单选",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入单选",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 13,
+        "tag": "grid",
+        "name": "grid_e5c02ff68ec849e3925814d51dbf72b0",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 38,
+                        "tag": "input",
+                        "name": "inSupplier",
+                        "label": "供应商",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入供应商",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 39,
+                        "tag": "input",
+                        "name": "inProcurementNumber",
+                        "label": "采购编号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入采购编号",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 40,
+                        "tag": "input",
+                        "name": "inListID",
+                        "label": "ListID",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入ListID",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 41,
+                        "tag": "input",
+                        "name": "inID",
+                        "label": "ID",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入ID",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 14,
+        "tag": "grid",
+        "name": "grid_f9e7404e3d564ed7a6d841ebf933524f",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 42,
+                        "tag": "input",
+                        "name": "inAuditing",
+                        "label": "审核",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入审核",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 43,
+                        "tag": "input",
+                        "name": "inProvince",
+                        "label": "省",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入省",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 44,
+                        "tag": "input",
+                        "name": "inCityAndCounty",
+                        "label": "市县",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入市县",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 45,
+                        "tag": "input",
+                        "name": "inTownship",
+                        "label": "乡镇",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入乡镇",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 15,
+        "tag": "grid",
+        "name": "grid_0941c9372a864116a9aebcc73f6a16b9",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 47,
+                        "tag": "input",
+                        "name": "inXS08",
+                        "label": "小数08",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数08",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 48,
+                        "tag": "input",
+                        "name": "inXS07",
+                        "label": "小数07",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数07",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 49,
+                        "tag": "input",
+                        "name": "inXS06",
+                        "label": "小数06",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数06",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 50,
+                        "tag": "input",
+                        "name": "inXS05",
+                        "label": "小数05",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数05",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 16,
+        "tag": "grid",
+        "name": "grid_d0550b02dd9741689d570ca38dd18158",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 51,
+                        "tag": "input",
+                        "name": "inXS04",
+                        "label": "小数04",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数04",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 52,
+                        "tag": "input",
+                        "name": "inXS03",
+                        "label": "小数03",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数03",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 53,
+                        "tag": "input",
+                        "name": "inXS02",
+                        "label": "小数02",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入小数02",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 64,
+                        "tag": "input",
+                        "name": "inDropdownSelection",
+                        "label": "下拉选择",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入下拉选择",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 17,
+        "tag": "grid",
+        "name": "grid_0ea9975ad7134f5d94d1aba50224d8b5",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 65,
+                        "tag": "input",
+                        "name": "inTextBox",
+                        "label": "文本框",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入文本框",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 66,
+                        "tag": "input",
+                        "name": "inCategory",
+                        "label": "类别",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入类别",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 67,
+                        "tag": "input",
+                        "name": "inSpecificationAndModel",
+                        "label": "规格型号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入规格型号",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 68,
+                        "tag": "input",
+                        "name": "inUnitPrice",
+                        "label": "单价",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入单价",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 18,
+        "tag": "grid",
+        "name": "grid_92e2af8a463c465f94f805142e26ca6f",
+        "column": "4",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 69,
+                        "tag": "input",
+                        "name": "inUnit",
+                        "label": "单位",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入单位",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 70,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 71,
+                        "tag": "input",
+                        "name": "inName",
+                        "label": "名称",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入名称",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 72,
+                        "tag": "input",
+                        "name": "inCoding",
+                        "label": "编码",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入编码",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    }
+]

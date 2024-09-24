@@ -1,0 +1,180 @@
+﻿@using Think9.Models;
+@model Think9.Models.CodeBuildEntity
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml";
+}
+
+<style>
+    .pre {
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
+</style>
+<form class="layui-form">
+    <input style="display:none" id="currentID" value="0">
+    <div class="layui-tab layui-tab-brief" lay-filter="tabTag_Filter">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="1">Controllers</li>
+            <li lay-id="2">Services</li>
+            <li lay-id="3">Models</li>
+            <li lay-id="4">Views_Index</li>
+            <li lay-id="5">Reports_Rdlc</li>
+            <li lay-id="6"><span style="color: #FE7300;">Warn</span></li>
+        </ul><br />
+        <span style="text-align: right; display: block; "> <button type="button" class="layui-btn layui-btn-xs" id="copy"><i class="fa fa-code"></i>复制</button></span>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show" id="Controllers">
+<pre class="layui-code" lay-title="Controller类" lay-height="" lay-skin="" lay-encode="">
+                    @Model.Controllers
+</pre>
+            </div>
+            <div class="layui-tab-item" id="Services">
+<pre class="layui-code" lay-title="Service类" lay-height="" lay-skin="" lay-encode="true">
+                    @Model.Services
+</pre>
+            </div>
+            <div class="layui-tab-item" id="Models">
+                <pre class="layui-code" lay-title="Model类" lay-height="" lay-skin="" lay-encode="">
+                    @Model.Models
+</pre>
+            </div>
+            <div class="layui-tab-item" id="Views_Index">
+<pre class="layui-code" lay-title="Index.cshtml文件" lay-height="" lay-skin="" lay-encode="">
+                    @Model.Views_Index
+</pre>
+            </div>
+            <div class="layui-tab-item" id="Reports_Rdlc">
+<pre class="layui-code" lay-title="样式模板-查看时使用，可直接导出pdf、word，下载安装MicrosoftRDLC报表设计器可编辑设计其样式 放置于wwwroot/Reports文件夹中" lay-height="" lay-skin="" lay-encode="">
+                    @Model.Reports_Rdlc
+</pre>
+            </div>
+            <div class="layui-tab-item" id="Warn">
+                <!--数据表格-->
+                <table class="layui-hide" id="tableId" lay-filter="tableFilter"></table>
+            </div>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "element", "exLayer", "exUtils", "table", "code"], function () {
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let table = layui.table;
+        let element = layui.element;
+
+        let $ = layui.$;
+
+        layui.code({
+            /*            skin: 'notepad',//如果要默认风格，不用设定该key。*/
+            about: false,
+            encode: true
+        });
+
+        form.render();
+
+        formValExa();
+
+        let ThisTable = table.render({
+            elem: "#tableId",
+            url: "/SysStats/Report/GetWarnList?idsStr=" + '@Model.TbId',
+            page: false,
+            method: "post",
+            cols: [[
+                { field: "level", title: "类别", width: 80, sort: true },
+                { field: "tbid", title: "录入表编码", width: 120, sort: true },
+                { field: "indexid", title: "指标编码", width: 120, sort: true },
+                { field: "Content", title: "备注", sort: true, templet: "#Content" }
+            ]]
+        });
+
+        element.on('tab(tabTag_Filter)', function (data) {
+            var currentID = data.index;
+            $("#currentID").val(currentID);
+        });
+
+        function formValExa() {
+
+        }
+
+        $("#copy").click(function () {
+            var controlID = "Controllers";
+            var _ID = $("#currentID").val();
+            switch (_ID) {
+                case "0":
+                    controlID = "Controllers";
+                    break;
+                case "1":
+                    controlID = "Services";
+                    break;
+                case "2":
+                    controlID = "Models";
+                    break;
+                case "3":
+                    controlID = "Views_Index";
+                    break;
+                case "4":
+                    controlID = "Reports_Rdlc";
+                    break;
+                case "5":
+                    controlID = "Warn";
+                    break;
+                default:
+                    controlID = "Controllers";
+            }
+
+            var div = document.getElementById(controlID);
+            if (document.body.createTextRange) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(div);
+                range.select();
+            } else if (window.getSelection) {
+                var selection = window.getSelection();
+                var range = document.createRange();
+                range.selectNodeContents(div);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                /*if(selection.setBaseAndExtent){
+                    selection.setBaseAndExtent(text, 0, text, 1);
+                }*/
+            } else {
+                console.warn("none");
+            }
+            document.execCommand("Copy"); // 执行浏览器复制命令
+        });
+
+        function getCopy(divID) {
+            layer.msg("请选择主表");
+            var div = document.getElementById(divID);
+            if (document.body.createTextRange) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(div);
+                range.select();
+            } else if (window.getSelection) {
+                var selection = window.getSelection();
+                var range = document.createRange();
+                range.selectNodeContents(div);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                /*if(selection.setBaseAndExtent){
+                    selection.setBaseAndExtent(text, 0, text, 1);
+                }*/
+            } else {
+                console.warn("none");
+            }
+            document.execCommand("Copy"); // 执行浏览器复制命令
+        }
+
+    });
+</script>
+<script type='text/html' id='Content'>
+    {{#  if(d.level == 'err'){ }}
+    <span style="color: #FE7300;">{{d.Content}}</span>
+    {{#  }else{ }}
+    {{d.Content}}
+    {{#  } }}
+</script>

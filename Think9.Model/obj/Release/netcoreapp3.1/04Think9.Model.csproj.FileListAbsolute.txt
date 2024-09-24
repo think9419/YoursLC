@@ -1,0 +1,15 @@
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\04Think9.Model.deps.json
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\04Think9.Model.dll
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\04Think9.Model.pdb
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\03Think9.Common.dll
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\Think9.Dapper.dll
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\Think9.Dapper.pdb
+D:\A_Think9_NetCore_Y2021\Think9.Model\bin\Release\netcoreapp3.1\03Think9.Common.pdb
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.csproj.AssemblyReference.cache
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.GeneratedMSBuildEditorConfig.editorconfig
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.AssemblyInfoInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.AssemblyInfo.cs
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.csproj.CoreCompileInputs.cache
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.csproj.CopyComplete
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.dll
+D:\A_Think9_NetCore_Y2021\Think9.Model\obj\Release\netcoreapp3.1\04Think9.Model.pdb

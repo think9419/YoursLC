@@ -1,0 +1,85 @@
+﻿@model Think9.Models.OrganizeEntity
+@{ ViewBag.Title = "Edit";
+    Layout = "~/Areas/Shared/_LayuiForm.cshtml"; }
+
+<form class="layui-form" lay-filter="formUser">
+    <div class="layui-form-item" id="divParent">
+        <label class="layui-form-label required">上级机构</label>
+        <div class="layui-input-block">
+            <input type="text" id="ParentId" lay-filter="tree" name="ParentId" placeholder="上级机构" autocomplete="off" class="layui-input" readonly="readonly" verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">机构编码</label>
+        <div class="layui-input-block">
+            <input type="text" name="EnCode" id="EnCode" placeholder="机构编码" autocomplete="off" class="layui-input" readonly="readonly">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">机构名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="FullName" placeholder="机构名称" autocomplete="off" class="layui-input" lay-verify="required" maxlength="50">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label required">序 号</label>
+        <div class="layui-input-block">
+            <input type="text" name="OrderNo" placeholder="排序" autocomplete="off" class="layui-input" lay-verify="required|number" maxlength="3">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type ="button" class="layui-btn" lay-submit lay-filter="edit">编 辑</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["form", "treeSelect", "exLayer", "exUtils"], function () {
+        let treeSelect = layui.treeSelect;
+        let form = layui.form;
+        let exLayer = layui.exLayer;
+        let exUtils = layui.exUtils;
+        let $ = layui.$;
+
+        form.render(); //
+
+        treeSelect.render({
+            elem: "#ParentId",
+            data: "/SysBasic/Organize/GetOrganizeTreeSelect",
+            type: "GET"
+            @if (Model.EnCode == "top")
+            {
+            }
+             else
+            {
+                <text>,success: function (d) {
+                treeSelect.checkNode('tree', "@Model.ParentId");
+                treeSelect.refresh('tree');
+                }</text>
+            }
+        });
+
+        //赋值
+        form.val("formUser", {
+            "EnCode": "@Model.EnCode",
+            "FullName": "@Model.FullName",
+            "OrderNo": "@Model.OrderNo"
+        });
+
+        if ($("#EnCode").val() == "top") {
+            $("#divParent").hide();
+        }
+
+        form.on("submit(edit)", function (data) {
+            exUtils.ajax("/SysBasic/Organize/Edit", "post", data.field, true).done(function (response) {
+                exLayer.greenTickMsg(response.message, function () {
+                    parent.layui.table.reload('tableId', { url: "/SysBasic/Organize/GetList" });
+                    parent.layer.close(parent.layer.getFrameIndex(window.name));
+                });
+            }).fail(function (error) {
+                console.log(error);
+            });
+            return false;
+        });
+    });
+</script>

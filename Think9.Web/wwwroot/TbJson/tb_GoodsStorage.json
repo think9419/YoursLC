@@ -1,0 +1,184 @@
+﻿[
+    {
+        "index": 1,
+        "tag": "grid",
+        "name": "grid_auto_0",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 6,
+                        "tag": "input",
+                        "name": "inWarehouseEntryNumber",
+                        "label": "入库单号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入入库单号",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 7,
+                        "tag": "select",
+                        "name": "inWarehouse",
+                        "label": "仓库",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "width": 100,
+                        "required": true,
+                        "disabled": false,
+                        "_default": "",
+                        "options": [
+                            {
+                                "title": "根据数据规范动态生成",
+                                "value": "1",
+                                "checked": false
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 2,
+        "tag": "grid",
+        "name": "grid_auto_1",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 8,
+                        "tag": "input",
+                        "name": "inTotalAmount",
+                        "label": "金额合计",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "自动计算",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 9,
+                        "tag": "input",
+                        "name": "inOperator",
+                        "label": "经办人",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入经办人",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 3,
+        "tag": "grid",
+        "name": "grid_auto_2",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 10,
+                        "tag": "date",
+                        "name": "inStorageDate",
+                        "label": "入库日期",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "data_dateformat": "yyyy-MM-dd",
+                        "placeholder": "yyyy-MM-dd",
+                        "_default": "",
+                        "width": 100,
+                        "required": true,
+                        "disabled": false
+                    }
+                ]
+            },
+            {
+                "children": [
+                    {
+                        "index": 11,
+                        "tag": "input",
+                        "name": "inProcurementNumber",
+                        "label": "采购编号",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "选择后将采购明细读取到入库明细中",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "index": 4,
+        "tag": "grid",
+        "name": "grid_auto_3",
+        "column": "2",
+        "children": [
+            {
+                "children": [
+                    {
+                        "index": 12,
+                        "tag": "input",
+                        "name": "inRemarks",
+                        "label": "备注",
+                        "labelwidth": "110",
+                        "msg": "",
+                        "labelhide": false,
+                        "placeholder": "请输入备注",
+                        "_default": "",
+                        "width": 100,
+                        "required": false,
+                        "disabled": false,
+                        "verify": ""
+                    }
+                ]
+            },
+            {
+                "children": []
+            }
+        ]
+    },
+    {
+        "index": 5,
+        "tag": "gridtable",
+        "name": "tb_InventoryDetails",
+        "label": "入库明细",
+        "labelwidth": "110",
+        "labelhide": true,
+        "width": "100"
+    }
+]
